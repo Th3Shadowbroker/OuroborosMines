@@ -14,8 +14,4 @@ jobs:
       with:
         java-version: 1.8
     - name: Build with Gradle
-      run: |
-        ./gradlew compileJava
-        ./gradlew processResources
-        ./gradlew classes
-        ./gradlew jar
+      run: ./gradlew build
