@@ -1,0 +1,51 @@
+# @plugin_name@v@plugin_version@ by @plugin_author@
+
+# When true all regions will be handled as OM-zone.
+# Not recommended for big-servers as the replacement-tasks require a lot of scheduling.
+default: false
+
+# Defines the plugins chat-options
+# prefix - The plugins prefix in chat-messages.
+chat:
+  prefix: '&9[OM]'
+
+# This key defines all materials that can be mined.
+# In error-logs these materials are known as mining- or mine-materials.
+#
+# Here is an example for a custom material:
+#
+# stone: <-- The key represents the mined material.
+#   replacements: <-- The replacements-list contains every material that will could replace the mined material.
+#     -cobblestone_block <-- In this case stone can be replaced with cobblestone-blocks.
+#   cooldown: 10 <-- The cooldown (in seconds) defines the time for the mined block to respawn.
+#
+materials:
+  stone:
+    replacements:
+      - cobblestone
+    cooldown: 10
+
+  coal_ore:
+    replacements:
+      - stone
+    cooldown: 20
+
+  gold_ore:
+    replacements:
+      - stone
+    cooldown: 30
+
+  iron_ore:
+    replacements:
+      - stone
+    cooldown:  40
+
+  emerald_ore:
+    replacements:
+      - stone
+    cooldown: 50
+
+  diamond_ore:
+    replacements:
+      - stone
+    cooldown: 120

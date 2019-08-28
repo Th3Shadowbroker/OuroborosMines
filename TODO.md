@@ -1,0 +1,2 @@
+- [ ] Block-Replacements are created even when a block is already queued for replacement. This should not happen!
+- [ ] It should be possible to enable random respawning for blocks within certain regions marked by a specific flag (ouroboros-mines-random?)
