@@ -19,40 +19,27 @@
 
 package dev.th3shadowbroker.ouroboros.mines.util;
 
-import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
-public class TaskManager {
+public class WorldUtils {
 
-    private final List<ReplacementTask> tasks = new ArrayList<>();
-
-    private final OuroborosMines plugin = OuroborosMines.INSTANCE;
-
-
-    public void register(ReplacementTask task) {
-        tasks.add(task);
+    public static Optional<ApplicableRegionSet> getBlockRegions(Block block) {
+        Optional<RegionManager> regionManager = Optional.ofNullable( WorldGuard.getInstance().getPlatform().getRegionContainer().get( BukkitAdapter.adapt(block.getWorld()) ) );
+        return regionManager.map(manager -> manager.getApplicableRegions(BukkitAdapter.asBlockVector(block.getLocation())));
     }
 
-    public void unregister(ReplacementTask task) {
-        tasks.remove(task);
-    }
-
-    public boolean hasPendingReplacementTask(Block block) {
-        return tasks.stream().anyMatch(replacementTask -> WorldUtils.compareLocations(replacementTask.getBlock().getLocation(), block.getLocation()));
-    }
-
-    public void flush() {
-        plugin.getLogger().info(String.format("Executing %s pending tasks...", tasks.size()));
-
-        for (int i = 0; i < tasks.size(); i++) {
-            ReplacementTask replacementTask = tasks.get(i);
-            replacementTask.getTask().cancel();
-            plugin.getLogger().info(String.format("Executing task (Id: %s) [%s/%s]", replacementTask.getTask().getTaskId(),i + 1, tasks.size()));
-            replacementTask.run();
-        }
+    public static boolean compareLocations(Location a, Location b) {
+        return a.getBlockX() == b.getBlockX() &&
+               a.getBlockY() == b.getBlockY() &&
+               a.getBlockZ() == b.getBlockZ() &&
+               a.getWorld()  == b.getWorld();
     }
 
 }

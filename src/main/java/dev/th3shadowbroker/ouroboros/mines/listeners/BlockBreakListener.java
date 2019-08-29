@@ -19,14 +19,11 @@
 
 package dev.th3shadowbroker.ouroboros.mines.listeners;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.util.MineableMaterial;
 import dev.th3shadowbroker.ouroboros.mines.util.ReplacementTask;
-import org.bukkit.block.Block;
+import dev.th3shadowbroker.ouroboros.mines.util.WorldUtils;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -41,24 +38,21 @@ public class BlockBreakListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockBreak(BlockBreakEvent event) {
         Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType());
-        Optional<ApplicableRegionSet> blockRegions = getBlockRegions(event.getBlock());
+        Optional<ApplicableRegionSet> blockRegions = WorldUtils.getBlockRegions(event.getBlock());
 
-        if ( minedMaterial.isPresent() && blockRegions.isPresent() && blockRegions.get().testState(null, OuroborosMines.FLAG)) {
+        if ( blockRegions.isPresent() && blockRegions.get().testState(null, OuroborosMines.FLAG)) {
 
-            if (!plugin.getTaskManager().hasPendingReplacementTask(event.getBlock())) {
-                new ReplacementTask(event.getBlock().getLocation(), event.getBlock().getType(), minedMaterial.get().getCooldown());
+            if (minedMaterial.isPresent()) {
+                if (!plugin.getTaskManager().hasPendingReplacementTask(event.getBlock())) {
+                    new ReplacementTask(event.getBlock().getLocation(), event.getBlock().getType(), minedMaterial.get().getCooldown());
+                }
+
+                event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+                event.getBlock().setType(minedMaterial.get().getReplacement());
             }
-
-            event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
-            event.getBlock().setType(minedMaterial.get().getReplacement());
 
             event.setCancelled(true);
         }
-    }
-
-    private Optional<ApplicableRegionSet> getBlockRegions(Block block) {
-        Optional<RegionManager> regionManager = Optional.ofNullable( WorldGuard.getInstance().getPlatform().getRegionContainer().get( BukkitAdapter.adapt(block.getWorld()) ) );
-        return regionManager.map(manager -> manager.getApplicableRegions(BukkitAdapter.asBlockVector(block.getLocation())));
     }
 
 }
