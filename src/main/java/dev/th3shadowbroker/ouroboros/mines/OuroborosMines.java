@@ -52,25 +52,23 @@ public class OuroborosMines extends JavaPlugin {
     public void onLoad() {
         //Check for world-guard and disable if not installed
         worldGuardFound = worldGuardIsInstalled();
+        if (!worldGuardFound) { return; }
 
-        if (worldGuardFound) {
+        //Static stuff
+        INSTANCE = this;
+        FLAG = new StateFlag("ouroboros-mine", false);
 
-            //Static stuff
-            INSTANCE = this;
-            FLAG = new StateFlag("ouroboros-mine", false);
+        //Internal stuff
+        materialManager = new MaterialManager();
+        taskManager = new TaskManager();
 
-            //Internal stuff
-            materialManager = new MaterialManager();
-            taskManager = new TaskManager();
+        //Config
+        getLogger().info("Loading configuration...");
+        saveDefaultConfig();
+        PREFIX = ChatColor.translateAlternateColorCodes('&', getConfig().getString("chat.prefix", "&9[OM]") + "&r ");
 
-            //Config
-            getLogger().info("Loading configuration...");
-            saveDefaultConfig();
-            PREFIX = ChatColor.translateAlternateColorCodes('&', getConfig().getString("chat.prefix", "&9[OM]") + "&r ");
-
-            //Register flag
-            WorldGuard.getInstance().getFlagRegistry().register(FLAG);
-        }
+        //Register flag
+        WorldGuard.getInstance().getFlagRegistry().register(FLAG);
     }
 
     @Override
@@ -86,9 +84,8 @@ public class OuroborosMines extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (worldGuardFound) {
-            getTaskManager().flush();
-        }
+        if (!worldGuardFound) { return; }
+        getTaskManager().flush();
     }
 
     private boolean worldGuardIsInstalled() {
