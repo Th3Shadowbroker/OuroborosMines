@@ -26,6 +26,7 @@ import dev.th3shadowbroker.ouroboros.mines.listeners.BlockBreakListener;
 import dev.th3shadowbroker.ouroboros.mines.util.MaterialManager;
 import dev.th3shadowbroker.ouroboros.mines.util.MineableMaterial;
 import dev.th3shadowbroker.ouroboros.mines.util.TaskManager;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -80,6 +81,8 @@ public class OuroborosMines extends JavaPlugin {
 
         loadMineMaterials();
         getServer().getPluginManager().registerEvents( new BlockBreakListener(), this );
+
+        new Metrics(this);
     }
 
     @Override

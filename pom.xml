@@ -17,6 +17,7 @@
   </properties>
 
   <repositories>
+    <!--Spigot-->
     <repository>
       <id>spigot-repo</id>
       <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
@@ -27,9 +28,16 @@
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </repository>
 
+    <!--WorldGuard-->
     <repository>
       <id>sk89q-repo</id>
       <url>https://maven.enginehub.org/repo/</url>
+    </repository>
+
+    <!--bStats-->
+    <repository>
+      <id>CodeMC</id>
+      <url>https://repo.codemc.org/repository/maven-public</url>
     </repository>
   </repositories>
 
@@ -46,6 +54,13 @@
       <artifactId>worldguard-bukkit</artifactId>
       <version>7.0.0</version>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.bstats</groupId>
+      <artifactId>bstats-bukkit-lite</artifactId>
+      <version>1.5</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 
@@ -80,6 +95,33 @@
         <configuration>
           <encoding>UTF-8</encoding>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <includes>
+                  <include>org.bstats:bstats-bukkit-lite**</include>
+                </includes>
+              </artifactSet>
+              <relocations>
+                <relocation>
+                  <pattern>org.bstats</pattern>
+                  <shadedPattern>dev.th3shadowbroker.ouroboros.mines.metrics</shadedPattern>
+                </relocation>
+              </relocations>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
 
