@@ -1,4 +1,4 @@
-# @plugin_name@v@plugin_version@ by @plugin_author@
+# ${plugin.name} v${plugin.version} by ${plugin.author}
 
 # When true all regions will be handled as OM-zone.
 # Not recommended for big-servers as the replacement-tasks require a lot of scheduling.
