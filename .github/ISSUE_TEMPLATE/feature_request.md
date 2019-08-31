@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea for OuroborosMines
+about: Suggest an idea for OuroborosMines.
 title: ''
 labels: ''
 assignees: ''
