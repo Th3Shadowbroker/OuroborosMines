@@ -1,0 +1,17 @@
+<settings>
+    <pluginGroups>
+        <pluginGroup>org.sonarsource.scanner.maven</pluginGroup>
+    </pluginGroups>
+    <profiles>
+        <profile>
+            <id>sonar</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <sonar.host.url>${{ secrets.SONAR_SERVER_URL }}</sonar.host.url>
+                <sonar.login>${{ secrets.SONAR_AUTH_TOKEN }}</sonar.login>
+            </properties>
+        </profile>
+    </profiles>
+</settings>
