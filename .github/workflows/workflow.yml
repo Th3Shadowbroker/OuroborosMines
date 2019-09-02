@@ -14,4 +14,12 @@ jobs:
       with:
         java-version: 1.8
     - name: Build with Maven
-      run: mvn package --file pom.xml
+      run: |
+        wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.0.0.1744-linux.zip
+        unzip sonar-scanner-cli-4.0.0.1744-linux.zip
+        ./sonar-scanner-4.0.0.1744-linux/bin/sonar-scanner \
+        -Dsonar.projectKey=ouroboros-mines \
+        -Dsonar.sources=. \
+        -Dsonar.host.url=SONAR_SERVER_URL \
+        -Dsonar.login=SONAR_AUTH_TOKEN
+        mvn package --file pom.xml
