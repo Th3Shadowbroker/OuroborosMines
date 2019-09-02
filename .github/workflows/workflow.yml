@@ -18,6 +18,7 @@ jobs:
         SONAR_SERVER_URL: ${{ secrets.SONAR_SERVER_URL}}
         SONAR_AUTH_TOKEN: ${{ secrets.SONAR_AUTH_TOKEN }}
       run: |
+        mvn package --file pom.xml
         wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.0.0.1744-linux.zip
         unzip sonar-scanner-cli-4.0.0.1744-linux.zip
         ./sonar-scanner-4.0.0.1744-linux/bin/sonar-scanner \
@@ -25,4 +26,3 @@ jobs:
         -Dsonar.sources=. \
         -Dsonar.host.url=${SONAR_SERVER_URL} \
         -Dsonar.login=${SONAR_AUTH_TOKEN}
-        mvn package --file pom.xml
