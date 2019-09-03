@@ -35,6 +35,8 @@ public class MineableMaterial {
 
     private final Material[] replacements;
 
+    private final Random replRandom = new Random();
+
     private final long cooldown;
 
     public MineableMaterial(Material material, Material[] replacements, long cooldown) {
@@ -57,9 +59,7 @@ public class MineableMaterial {
 
     public Material getReplacement() {
         if (replacements.length == 1) return replacements[0];
-
-        Random rnd = new Random();
-        return replacements[rnd.nextInt(replacements.length)];
+        return replacements[replRandom.nextInt(replacements.length)];
     }
 
     public static MineableMaterial fromSection(ConfigurationSection section) throws InvalidMineMaterialException {
