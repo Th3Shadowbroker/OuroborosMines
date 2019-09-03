@@ -16,4 +16,4 @@ jobs:
     - name: Build with Maven
       run: |
         mvn package --file pom.xml
-        mvn sonar:sonar
+        mvn sonar:sonar --settings settings.xml
