@@ -9,8 +9,8 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <sonar.host.url>${{ secrets.SONAR_SERVER_URL }}</sonar.host.url>
-                <sonar.login>${{ secrets.SONAR_AUTH_TOKEN }}</sonar.login>
+                <sonar.host.url>${SONAR_SERVER_URL}</sonar.host.url>
+                <sonar.login>${SONAR_AUTH_TOKEN}</sonar.login>
             </properties>
         </profile>
     </profiles>
