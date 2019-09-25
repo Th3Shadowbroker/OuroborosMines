@@ -40,13 +40,13 @@ public class ReplacementTask implements Runnable {
         minedMaterial = material;
         task = plugin.getServer().getScheduler().runTaskLater(plugin, this, cooldownSeconds);
         plugin.getTaskManager().register(this);
-        plugin.getLogger().info(String.format("Scheduled restoration of %s %s %s in %s as %s", location.getX(), location.getY(), location.getZ(), cooldownSeconds, minedMaterial.name()));
+        //plugin.getLogger().info(String.format("Scheduled restoration of %s %s %s in %s as %s", location.getX(), location.getY(), location.getZ(), cooldownSeconds, minedMaterial.name()));
     }
 
     @Override
     public void run() {
         location.getBlock().setType(minedMaterial);
-        plugin.getTaskManager().unregister(this);
+        if (!getTask().isCancelled()) plugin.getTaskManager().unregister(this);
     }
 
     public BukkitTask getTask() {
