@@ -5,3 +5,4 @@ description: ${plugin.description}
 website: ${plugin.website}
 main: ${plugin.main}
 softdepend: [WorldGuard]
+api-version: 1.13
