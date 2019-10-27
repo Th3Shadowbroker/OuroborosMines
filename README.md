@@ -1,5 +1,5 @@
 # OuroborosMines
-OuroborosMines allows you make mines you created yourself mineable for players without destroying anything. The plugin is highly customizable and you can define your own mining materials with ease. Please have a look at the wiki for more information.
+OuroborosMines allows you to make mines you created yourself mineable for players without destroying anything. The plugin is highly customizable and you can define your own mining materials with ease. Please have a look at the wiki for more information.
 
 [![Quality Gate Status](https://sonar.th3shadowbroker.dev/api/project_badges/measure?project=dev.th3shadowbroker.spigot%3AOuroborosMines&metric=alert_status)](https://sonar.th3shadowbroker.dev/dashboard?id=dev.th3shadowbroker.spigot%3AOuroborosMines)
 [![Maintainability Rating](https://sonar.th3shadowbroker.dev/api/project_badges/measure?project=dev.th3shadowbroker.spigot%3AOuroborosMines&metric=sqale_rating)](https://sonar.th3shadowbroker.dev/dashboard?id=dev.th3shadowbroker.spigot%3AOuroborosMines)
