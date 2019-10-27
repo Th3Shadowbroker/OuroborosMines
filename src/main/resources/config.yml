@@ -45,6 +45,11 @@ materials:
       - stone
     cooldown: 50
 
+  redstone_ore:
+    replacements:
+      - stone
+    cooldown: 55
+
   diamond_ore:
     replacements:
       - stone
