@@ -9,7 +9,7 @@ default: false
 chat:
   prefix: '&9[OM]'
 
-# This key defines all materials that can be mined.
+# This keys define all materials that can be mined.
 # In error-logs these materials are known as mining- or mine-materials.
 #
 # Here is an example for a custom material:
