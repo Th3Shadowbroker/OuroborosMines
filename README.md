@@ -12,7 +12,8 @@ OuroborosMines is licensed under the conditions of the MIT-License. Contribution
 Issue-reporting and feature-requests are an essential part of the plugins development. However, issues and requests that do not follow the issue templates might be rejected.
 
 ### Donations
-Donations are always welcome and help me to keep my servers up and running.
+Donations are always welcome and help me to keep my servers up and running or finance my development software.
+[Sponsor me on GitHub](https://github.com/sponsors/Th3Shadowbroker)
 
 [![](https://c5.patreon.com/external/logo/become_a_patron_button.png)](https://patreon.com/m4taiori)
 
