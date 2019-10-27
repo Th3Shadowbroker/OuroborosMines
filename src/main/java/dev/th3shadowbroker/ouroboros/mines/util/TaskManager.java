@@ -23,13 +23,11 @@ import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import org.bukkit.block.Block;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 public class TaskManager {
 
-    private final List<ReplacementTask> tasks = Collections.synchronizedList(new ArrayList<>());
+    private final List<ReplacementTask> tasks = new ArrayList<>();
 
     private final OuroborosMines plugin = OuroborosMines.INSTANCE;
 
@@ -47,8 +45,6 @@ public class TaskManager {
     }
 
     public void flush() {
-        List<ReplacementTask> tasks = new ArrayList<>(this.tasks);
-
         plugin.getLogger().info(String.format("Executing %s pending tasks...", tasks.size()));
         for (int i = 0; i < tasks.size(); i++) {
             ReplacementTask replacementTask = tasks.get(i);
