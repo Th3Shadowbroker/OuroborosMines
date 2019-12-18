@@ -23,6 +23,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -36,6 +37,10 @@ public class WorldUtils {
     public static Optional<ApplicableRegionSet> getBlockRegions(Block block) {
         Optional<RegionManager> regionManager = Optional.ofNullable( WorldGuard.getInstance().getPlatform().getRegionContainer().get( BukkitAdapter.adapt(block.getWorld()) ) );
         return regionManager.map(manager -> manager.getApplicableRegions(BukkitAdapter.asBlockVector(block.getLocation())));
+    }
+
+    public static Optional<ProtectedRegion> getTopRegion(ApplicableRegionSet regionSet) {
+        return regionSet.getRegions().stream().findFirst();
     }
 
     public static Optional<ApplicableRegionSet> getPlayerRegions(Player player) {
