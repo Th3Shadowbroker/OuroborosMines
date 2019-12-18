@@ -19,6 +19,8 @@
 
 package dev.th3shadowbroker.ouroboros.mines.util;
 
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
@@ -29,12 +31,27 @@ public class MaterialManager {
 
     private final List<MineableMaterial> minableMaterials = new ArrayList<>();
 
+    private final List<RegionConfiguration> mineableMaterialOverrides = new ArrayList<>();
+
+    public void loadRegionConfigurations() {
+        mineableMaterialOverrides.addAll(RegionConfiguration.getConfigurationsInDirectory(RegionConfiguration.REGION_CONFIG_DIR));
+        OuroborosMines.INSTANCE.getLogger().info("Loaded " + mineableMaterialOverrides.size() + " region-specific configurations");
+    }
+
     public void register(MineableMaterial mineableMaterial) {
         minableMaterials.add(mineableMaterial);
     }
 
-    public Optional<MineableMaterial> getMaterialProperties(Material material) {
-        return minableMaterials.stream().filter(mineableMaterial -> mineableMaterial.getMaterial() == material).findFirst();
+    public Optional<MineableMaterial> getMaterialProperties(Material material, ProtectedRegion region) {
+         Optional<RegionConfiguration> regionConfiguration = mineableMaterialOverrides.stream().filter(rc -> rc.getRegionId().equals(region.getId())).findFirst();
+
+         //Check for region specific settings
+         if (regionConfiguration.isPresent()) {
+             Optional<MineableMaterial> regionMineableMaterial = regionConfiguration.get().getMaterialList().stream().filter(mineableMaterial -> mineableMaterial.getMaterial() == material).findFirst();
+             if (regionMineableMaterial.isPresent()) return regionMineableMaterial;
+         }
+
+         return minableMaterials.stream().filter(mineableMaterial -> mineableMaterial.getMaterial() == material).findFirst();
     }
 
 }
