@@ -27,6 +27,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 
 import java.util.Optional;
 
@@ -35,6 +36,11 @@ public class WorldUtils {
     public static Optional<ApplicableRegionSet> getBlockRegions(Block block) {
         Optional<RegionManager> regionManager = Optional.ofNullable( WorldGuard.getInstance().getPlatform().getRegionContainer().get( BukkitAdapter.adapt(block.getWorld()) ) );
         return regionManager.map(manager -> manager.getApplicableRegions(BukkitAdapter.asBlockVector(block.getLocation())));
+    }
+
+    public static Optional<ApplicableRegionSet> getPlayerRegions(Player player) {
+        Optional<RegionManager> regionManager = Optional.ofNullable( WorldGuard.getInstance().getPlatform().getRegionContainer().get( BukkitAdapter.adapt(player.getWorld()) ) );
+        return regionManager.map(manager -> manager.getApplicableRegions(BukkitAdapter.adapt(player.getLocation()).toVector().toBlockPoint()));
     }
 
     public static boolean isAccessible(Block block) {
