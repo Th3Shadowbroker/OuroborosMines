@@ -10,7 +10,7 @@ api-version: 1.13
 commands:
   om:
     description: General command for ${plugin.name}
-    usage: /om [customize]
+    usage: /om [customize:reload]
     permission-message: §cYou're not allowed to do this!
 
 permissions:
@@ -29,13 +29,10 @@ permissions:
       ouroboros.mines.command.reload: true
 
   ouroboros.mines.command.info:
-    description: Shows basic information about this plugin.
     default: true
 
   ouroboros.mines.command.customize:
-    description: Generates a region specific configuration file for the region the player is standing in.
     default: op
 
   ouroboros.mines.command.reload:
-    description: Reloads the plugins configuration, as well as all region-configurations.
     default: op
