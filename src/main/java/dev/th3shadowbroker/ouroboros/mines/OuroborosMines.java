@@ -21,10 +21,12 @@ package dev.th3shadowbroker.ouroboros.mines;
 
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.StateFlag;
+import dev.th3shadowbroker.ouroboros.mines.commands.OmCommand;
 import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialException;
 import dev.th3shadowbroker.ouroboros.mines.listeners.BlockBreakListener;
 import dev.th3shadowbroker.ouroboros.mines.util.MaterialManager;
 import dev.th3shadowbroker.ouroboros.mines.util.MineableMaterial;
+import dev.th3shadowbroker.ouroboros.mines.util.RegionConfiguration;
 import dev.th3shadowbroker.ouroboros.mines.util.TaskManager;
 import org.bstats.bukkit.MetricsLite;
 import org.bukkit.Bukkit;
@@ -82,6 +84,8 @@ public class OuroborosMines extends JavaPlugin {
         loadMineMaterials();
         getServer().getPluginManager().registerEvents( new BlockBreakListener(), this );
 
+        getCommand("om").setExecutor(new OmCommand());
+
         new MetricsLite(this);
     }
 
@@ -113,6 +117,10 @@ public class OuroborosMines extends JavaPlugin {
                 e.printStackTrace();
             }
         }
+
+        //Load region specific rules
+        if (!RegionConfiguration.REGION_CONFIG_DIR.exists()) RegionConfiguration.REGION_CONFIG_DIR.mkdirs();
+        materialManager.loadRegionConfigurations();
     }
 
     public MaterialManager getMaterialManager() {

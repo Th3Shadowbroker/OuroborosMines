@@ -6,3 +6,33 @@ website: ${plugin.website}
 main: ${plugin.main}
 softdepend: [WorldGuard]
 api-version: 1.13
+
+commands:
+  om:
+    description: General command for ${plugin.name}
+    usage: /om [customize:reload]
+    permission-message: §cYou're not allowed to do this!
+
+permissions:
+  ouroboros.mines.*:
+    description: This permission grants full access to all of the plugins functions.
+    default: false
+    children:
+      ouroboros.mines.command.*: true
+
+  ouroboros.mines.command.*:
+    description: Grants permission to al of the plugins commands.
+    default: false
+    children:
+      ouroboros.mines.command.info: true
+      ouroboros.mines.command.customize: true
+      ouroboros.mines.command.reload: true
+
+  ouroboros.mines.command.info:
+    default: true
+
+  ouroboros.mines.command.customize:
+    default: op
+
+  ouroboros.mines.command.reload:
+    default: op

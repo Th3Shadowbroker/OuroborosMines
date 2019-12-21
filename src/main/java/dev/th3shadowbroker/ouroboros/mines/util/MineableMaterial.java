@@ -88,4 +88,5 @@ public class MineableMaterial {
 
         return new MineableMaterial(material.get(), replacementMaterials.toArray( new Material[replacementMaterials.size()] ), section.getInt("cooldown"));
     }
+
 }

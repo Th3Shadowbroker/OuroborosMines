@@ -19,6 +19,7 @@
 
 package dev.th3shadowbroker.ouroboros.mines.listeners;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.util.MineableMaterial;
@@ -37,11 +38,10 @@ public class BlockBreakListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockBreak(BlockBreakEvent event) {
-        Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType());
         Optional<ApplicableRegionSet> blockRegions = WorldUtils.getBlockRegions(event.getBlock());
 
         if ( blockRegions.isPresent() && blockRegions.get().testState(null, OuroborosMines.FLAG)) {
-
+            Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType(), WorldUtils.getTopRegion(blockRegions.get()).get(), BukkitAdapter.adapt(event.getBlock().getWorld()));
             if (minedMaterial.isPresent()) {
                 if (!plugin.getTaskManager().hasPendingReplacementTask(event.getBlock())) {
                     new ReplacementTask(event.getBlock().getLocation(), event.getBlock().getType(), minedMaterial.get().getCooldown());
