@@ -6,3 +6,36 @@ website: ${plugin.website}
 main: ${plugin.main}
 softdepend: [WorldGuard]
 api-version: 1.13
+
+commands:
+  om:
+    description: General command for ${plugin.name}
+    usage: /om [customize]
+    permission-message: §cYou're not allowed to do this!
+
+permissions:
+  ouroboros.mines.*:
+    description: This permission grants full access to all of the plugins functions.
+    default: false
+    children:
+      ouroboros.mines.command.*: true
+
+  ouroboros.mines.command.*:
+    description: Grants permission to al of the plugins commands.
+    default: false
+    children:
+      ouroboros.mines.command.info: true
+      ouroboros.mines.command.customize: true
+      ouroboros.mines.command.reload: true
+
+  ouroboros.mines.command.info:
+    description: Shows basic information about this plugin.
+    default: true
+
+  ouroboros.mines.command.customize:
+    description: Generates a region specific configuration file for the region the player is standing in.
+    default: op
+
+  ouroboros.mines.command.reload:
+    description: Reloads the plugins configuration, as well as all region-configurations.
+    default: op

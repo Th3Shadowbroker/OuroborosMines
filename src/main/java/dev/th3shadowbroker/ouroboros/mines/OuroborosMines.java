@@ -21,6 +21,7 @@ package dev.th3shadowbroker.ouroboros.mines;
 
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.StateFlag;
+import dev.th3shadowbroker.ouroboros.mines.commands.OmCommand;
 import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialException;
 import dev.th3shadowbroker.ouroboros.mines.listeners.BlockBreakListener;
 import dev.th3shadowbroker.ouroboros.mines.util.MaterialManager;
@@ -82,6 +83,8 @@ public class OuroborosMines extends JavaPlugin {
 
         loadMineMaterials();
         getServer().getPluginManager().registerEvents( new BlockBreakListener(), this );
+
+        getCommand("om").setExecutor(new OmCommand());
 
         new MetricsLite(this);
     }
