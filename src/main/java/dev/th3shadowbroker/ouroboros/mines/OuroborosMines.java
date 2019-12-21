@@ -114,6 +114,7 @@ public class OuroborosMines extends JavaPlugin {
             {
                 materialManager.register(MineableMaterial.fromSection(parentSection.getConfigurationSection(childSectionKey)));
             } catch (InvalidMineMaterialException e) {
+                getLogger().severe(e.getMessage());
                 e.printStackTrace();
             }
         }

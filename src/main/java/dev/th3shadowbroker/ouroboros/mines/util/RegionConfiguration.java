@@ -72,6 +72,7 @@ public class RegionConfiguration {
                                 try {
                                     materialList.add(MineableMaterial.fromSection(materialDefinitionSection));
                                 } catch (InvalidMineMaterialException e) {
+                                    plugin.getLogger().severe(e.getMessage());
                                     e.printStackTrace();
                                 }
                             });
