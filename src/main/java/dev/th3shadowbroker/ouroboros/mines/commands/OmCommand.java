@@ -75,7 +75,7 @@ public class OmCommand implements CommandExecutor {
                     if (sender.hasPermission(Permissions.COMMAND_RELOAD.permission)) {
                         sender.sendMessage(OuroborosMines.PREFIX + "§2Reloading configuration...");
                         plugin.reloadConfig();
-                        sender.sendMessage(OuroborosMines.PREFIX + "§eReloading region-configurations...");
+                        sender.sendMessage(OuroborosMines.PREFIX + "§2Reloading region-configurations...");
                         plugin.getMaterialManager().reloadRegionConfigurations();
                         sender.sendMessage(OuroborosMines.PREFIX + "§2Loaded " + plugin.getMaterialManager().getMineableMaterialOverrides().size() + " region-specific configurations");
                     } else {
