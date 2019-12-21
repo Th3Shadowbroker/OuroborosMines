@@ -19,6 +19,7 @@
 
 package dev.th3shadowbroker.ouroboros.mines.commands;
 
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.util.Permissions;
@@ -52,7 +53,8 @@ public class OmCommand implements CommandExecutor {
                     if (sender.hasPermission(Permissions.COMMAND_CUSTOMIZE.permission)) {
                         if (sender instanceof Player) {
                             Player player = (Player) sender;
-                            Optional<ProtectedRegion> region = WorldUtils.getTopRegion(WorldUtils.getPlayerRegions(player).get());
+                            Optional<ApplicableRegionSet> regionSet = WorldUtils.getPlayerRegions(player);
+                            Optional<ProtectedRegion> region = regionSet.flatMap(WorldUtils::getTopRegion);
                             if (region.isPresent()) {
                                 if (!RegionConfiguration.configExists(region.get().getId(), player.getWorld().getName())) {
                                     new RegionConfiguration(region.get().getId(), player.getWorld().getName());
