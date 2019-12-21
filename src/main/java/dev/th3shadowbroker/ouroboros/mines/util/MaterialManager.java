@@ -19,6 +19,7 @@
 
 package dev.th3shadowbroker.ouroboros.mines.util;
 
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import org.bukkit.Material;
@@ -38,20 +39,35 @@ public class MaterialManager {
         OuroborosMines.INSTANCE.getLogger().info("Loaded " + mineableMaterialOverrides.size() + " region-specific configurations");
     }
 
+    public void reloadRegionConfigurations() {
+        mineableMaterialOverrides.clear();
+        loadRegionConfigurations();
+    }
+
     public void register(MineableMaterial mineableMaterial) {
         minableMaterials.add(mineableMaterial);
     }
 
-    public Optional<MineableMaterial> getMaterialProperties(Material material, ProtectedRegion region) {
-         Optional<RegionConfiguration> regionConfiguration = mineableMaterialOverrides.stream().filter(rc -> rc.getRegionId().equals(region.getId())).findFirst();
+    public Optional<MineableMaterial> getMaterialProperties(Material material, ProtectedRegion region, World regionWorld) {
+         Optional<RegionConfiguration> regionConfiguration = mineableMaterialOverrides.stream()
+                                                             .filter(rc -> rc.getRegionId().equals(region.getId()))
+                                                             .filter(rc -> rc.getWorld().getName().equals(regionWorld.getName())).findFirst();
 
          //Check for region specific settings
          if (regionConfiguration.isPresent()) {
              Optional<MineableMaterial> regionMineableMaterial = regionConfiguration.get().getMaterialList().stream().filter(mineableMaterial -> mineableMaterial.getMaterial() == material).findFirst();
              if (regionMineableMaterial.isPresent()) return regionMineableMaterial;
+             if (!regionConfiguration.get().isInheritingDefaults()) return Optional.empty();
          }
 
          return minableMaterials.stream().filter(mineableMaterial -> mineableMaterial.getMaterial() == material).findFirst();
     }
 
+    public List<MineableMaterial> getMinableMaterials() {
+        return minableMaterials;
+    }
+
+    public List<RegionConfiguration> getMineableMaterialOverrides() {
+        return mineableMaterialOverrides;
+    }
 }

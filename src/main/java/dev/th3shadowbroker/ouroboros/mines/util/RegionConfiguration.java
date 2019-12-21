@@ -21,7 +21,9 @@ package dev.th3shadowbroker.ouroboros.mines.util;
 
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialException;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -35,21 +37,27 @@ public class RegionConfiguration {
 
     private final String regionId;
 
+    private final World world;
+
     private final File configurationFile;
 
     private final FileConfiguration configuration;
 
     private final List<MineableMaterial> materialList;
 
+    private final boolean inheritDefaults;
+
     private static final OuroborosMines plugin = OuroborosMines.INSTANCE;
 
     public static final File REGION_CONFIG_DIR = new File(plugin.getDataFolder() + "/regions");
 
-    public RegionConfiguration(String regionId) {
+    public RegionConfiguration(String regionId, String worldName) {
         this.regionId = regionId;
-        this.configurationFile = new File(REGION_CONFIG_DIR, String.format("%s.yml", regionId));
+        this.world = Bukkit.getWorld(worldName);
+        this.configurationFile = new File(REGION_CONFIG_DIR, String.format("%s/%s.yml", worldName, regionId));
         this.configuration = YamlConfiguration.loadConfiguration(configurationFile);
         this.materialList = new ArrayList<>();
+        this.inheritDefaults = configuration.getBoolean("inherit", false);
         this.loadMaterialOverrides();
     }
 
@@ -70,11 +78,10 @@ public class RegionConfiguration {
                 });
             });
         } else {
+            configuration.set("inherit", false);
             Optional<ConfigurationSection> materialSection = Optional.ofNullable(plugin.getConfig().getConfigurationSection("materials"));
-            materialSection.ifPresent(configurationSection -> {
-                configuration.createSection(configurationSection.getName(), configurationSection.getValues(true));
-                save();
-            });
+            materialSection.ifPresent(configurationSection -> configuration.createSection(configurationSection.getName(), configurationSection.getValues(true)));
+            save();
         }
     }
 
@@ -94,8 +101,16 @@ public class RegionConfiguration {
         return materialList;
     }
 
+    public World getWorld() {
+        return world;
+    }
+
     public Optional<MineableMaterial> getMaterialProperties(Material material) {
         return materialList.stream().filter(mineableMaterial -> mineableMaterial.getMaterial() == material).findFirst();
+    }
+
+    public boolean isInheritingDefaults() {
+        return inheritDefaults;
     }
 
     private void save() {
@@ -107,18 +122,41 @@ public class RegionConfiguration {
         }
     }
 
+    public static boolean configExists(String regionId, String worldName) {
+        return new File(REGION_CONFIG_DIR, String.format("%s/%s.yml", worldName, regionId)).exists();
+    }
+
     public static List<RegionConfiguration> getConfigurationsInDirectory(File directory) {
         List<RegionConfiguration> regionConfigurations = new ArrayList<>();
+        //Ensure requirements are given
         if (directory.exists() && directory.isDirectory()) {
-            FilenameFilter filter = new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.endsWith(".yml");
+
+            //Check files
+            for (File worldDirectory : directory.listFiles()) {
+
+                //World directory is a directory
+                if (worldDirectory.isDirectory()) {
+
+                    //Try to resolve the world
+                    Optional<World> world = Optional.ofNullable(Bukkit.getWorld(worldDirectory.getName()));
+                    if (world.isPresent()) {
+                        FilenameFilter filter = new FilenameFilter() {
+                            @Override
+                            public boolean accept(File dir, String name) {
+                                return name.endsWith(".yml");
+                            }
+                        };
+
+                        for (File file : worldDirectory.listFiles(filter)) {
+                            String regionId = file.getName().replace(".yml","");
+                            regionConfigurations.add(new RegionConfiguration(regionId, world.get().getName()));
+                        }
+                    } else {
+                        plugin.getLogger().info("The world " + worldDirectory.getName() + " is unknown. You may remove it's directory from the regions directory of OM.");
+                    }
+
                 }
-            };
-            for (File file : directory.listFiles(filter)) {
-                String regionId = file.getName().replace(".yml","");
-                regionConfigurations.add(new RegionConfiguration(regionId));
+
             }
         }
         return regionConfigurations;

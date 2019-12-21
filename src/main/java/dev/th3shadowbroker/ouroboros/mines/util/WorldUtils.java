@@ -22,8 +22,10 @@ package dev.th3shadowbroker.ouroboros.mines.util;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -40,7 +42,7 @@ public class WorldUtils {
     }
 
     public static Optional<ProtectedRegion> getTopRegion(ApplicableRegionSet regionSet) {
-        return regionSet.getRegions().stream().findFirst();
+        return regionSet.getRegions().stream().filter(region -> region.getFlags().containsKey(OuroborosMines.FLAG) && region.getFlags().get(OuroborosMines.FLAG) == StateFlag.State.ALLOW).findFirst();
     }
 
     public static Optional<ApplicableRegionSet> getPlayerRegions(Player player) {
