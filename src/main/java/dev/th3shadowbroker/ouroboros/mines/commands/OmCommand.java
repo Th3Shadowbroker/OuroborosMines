@@ -21,6 +21,7 @@ package dev.th3shadowbroker.ouroboros.mines.commands;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
+import dev.th3shadowbroker.ouroboros.mines.util.Permissions;
 import dev.th3shadowbroker.ouroboros.mines.util.RegionConfiguration;
 import dev.th3shadowbroker.ouroboros.mines.util.WorldUtils;
 import org.bukkit.command.Command;
@@ -39,7 +40,7 @@ public class OmCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String cmdLabel, String[] args) {
         if (args.length == 0) {
-            if (sender.hasPermission("ouroboros.mines.command.info")) {
+            if (sender.hasPermission(Permissions.COMMAND_INFO.permission)) {
                 sender.sendMessage(OuroborosMines.PREFIX + plugin.getName() + " v" + plugin.getDescription().getVersion());
             } else {
                 sender.sendMessage(cmd.getPermissionMessage());
@@ -48,14 +49,14 @@ public class OmCommand implements CommandExecutor {
             switch (args[0].toLowerCase())
             {
                 case "customize":
-                    if (sender instanceof Player) {
-                        Player player = (Player) sender;
-                        if (sender.hasPermission("ouroboros.mines.command.customize")) {
+                    if (sender.hasPermission(Permissions.COMMAND_CUSTOMIZE.permission)) {
+                        if (sender instanceof Player) {
+                            Player player = (Player) sender;
                             Optional<ProtectedRegion> region = WorldUtils.getTopRegion(WorldUtils.getPlayerRegions(player).get());
                             if (region.isPresent()) {
                                 if (!RegionConfiguration.configExists(region.get().getId(), player.getWorld().getName())) {
                                     new RegionConfiguration(region.get().getId(), player.getWorld().getName());
-                                    sender.sendMessage(OuroborosMines.PREFIX + "§2A new configuration file for the region §b" + region.get().getId() + " §2has been created!");
+                                    sender.sendMessage(OuroborosMines.PREFIX + "§2A new configuration file for §b" + region.get().getId() + " §2has been created!");
                                 } else {
                                     sender.sendMessage(OuroborosMines.PREFIX + "§cThere's already a configuration file for this region!");
                                 }
@@ -63,15 +64,13 @@ public class OmCommand implements CommandExecutor {
                                 sender.sendMessage(OuroborosMines.PREFIX + "§cNo region found at your position!");
                             }
                         } else {
-                            sender.sendMessage(cmd.getPermissionMessage());
+                            sender.sendMessage(consoleNotAllowed);
                         }
-                    } else {
-                        sender.sendMessage(consoleNotAllowed);
                     }
                     break;
 
                 case "reload":
-                    if (sender.hasPermission("ouroboros.mines.command.reload")) {
+                    if (sender.hasPermission(Permissions.COMMAND_RELOAD.permission)) {
                         sender.sendMessage(OuroborosMines.PREFIX + "§2Reloading configuration...");
                         plugin.reloadConfig();
                         sender.sendMessage(OuroborosMines.PREFIX + "§eReloading region-configurations...");
