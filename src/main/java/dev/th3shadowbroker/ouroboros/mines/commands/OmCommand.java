@@ -66,6 +66,8 @@ public class OmCommand implements CommandExecutor {
                         } else {
                             sender.sendMessage(consoleNotAllowed);
                         }
+                    } else {
+                        sender.sendMessage(cmd.getPermissionMessage());
                     }
                     break;
 
