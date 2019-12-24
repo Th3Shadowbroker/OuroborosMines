@@ -39,10 +39,13 @@ public class MineableMaterial {
 
     private final long cooldown;
 
-    public MineableMaterial(Material material, Material[] replacements, long cooldown) {
+    private final long cooldownMax;
+
+    public MineableMaterial(Material material, Material[] replacements, long cooldown, long cooldownMax) {
         this.material = material;
         this.replacements = replacements;
         this.cooldown = cooldown;
+        this.cooldownMax = cooldownMax;
     }
 
     public Material getMaterial() {
@@ -54,7 +57,8 @@ public class MineableMaterial {
     }
 
     public long getCooldown() {
-        return cooldown * 20;
+        //     Cooldowns equal         Regular cooldown  Generate a random cooldown in range of the given values
+        return cooldown == cooldownMax ? cooldown * 20 : (cooldown + replRandom.nextInt((int) cooldownMax + 1)) * 20;
     }
 
     public Material getReplacement() {
@@ -86,7 +90,22 @@ public class MineableMaterial {
         //Fail when replacements materials failed to parse
         if (replacementMaterials.isEmpty()) { throw new InvalidMineMaterialException( String.format("All materials of the mine-material %s failed to parse.", section.getName()) ); }
 
-        return new MineableMaterial(material.get(), replacementMaterials.toArray( new Material[replacementMaterials.size()] ), section.getInt("cooldown"));
+        //Parse cooldown to allow random cooldowns in given range
+        String[] cooldownStr;
+        int cooldown;
+        int cooldownMax;
+
+        try {
+            cooldownStr = section.getString("cooldown").split("-");
+            cooldown = Integer.parseInt(cooldownStr[0]);
+            cooldownMax = cooldownStr.length > 1 ? Integer.parseInt(cooldownStr[1]) : cooldown;
+        } catch (NumberFormatException ex) {
+            throw new InvalidMineMaterialException( String.format("Unable to parse the cooldown of %s from string \"%s\"", material.get().name(), section.getString("cooldown")) );
+        } catch (Exception ex) {
+            throw new InvalidMineMaterialException( ex.getMessage() );
+        }
+
+        return new MineableMaterial(material.get(), replacementMaterials.toArray( new Material[replacementMaterials.size()] ), cooldown, cooldownMax);
     }
 
 }
