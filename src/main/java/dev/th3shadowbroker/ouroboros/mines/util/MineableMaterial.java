@@ -41,11 +41,14 @@ public class MineableMaterial {
 
     private final long cooldownMax;
 
-    public MineableMaterial(Material material, Material[] replacements, long cooldown, long cooldownMax) {
+    private final double richChance;
+
+    public MineableMaterial(Material material, Material[] replacements, long cooldown, long cooldownMax, double richChance) {
         this.material = material;
         this.replacements = replacements;
         this.cooldown = cooldown;
         this.cooldownMax = cooldownMax;
+        this.richChance = richChance;
     }
 
     public Material getMaterial() {
@@ -62,6 +65,11 @@ public class MineableMaterial {
     }
 
     public Material getReplacement() {
+        if (richChance > 0) {
+            double rndNumber = 1 + replRandom.nextDouble() * 100;
+            if (rndNumber <= richChance) return material;
+        }
+
         if (replacements.length == 1) return replacements[0];
         return replacements[replRandom.nextInt(replacements.length)];
     }
@@ -105,7 +113,7 @@ public class MineableMaterial {
             throw new InvalidMineMaterialException( ex.getMessage() );
         }
 
-        return new MineableMaterial(material.get(), replacementMaterials.toArray( new Material[replacementMaterials.size()] ), cooldown, cooldownMax);
+        return new MineableMaterial(material.get(), replacementMaterials.toArray( new Material[replacementMaterials.size()] ), cooldown, cooldownMax, section.getDouble("rich-chance", 0) );
     }
 
 }
