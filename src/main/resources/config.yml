@@ -19,6 +19,14 @@ chat:
 #     -cobblestone_block <-- In this case stone can be replaced with cobblestone-blocks.
 #   cooldown: 10 <-- The cooldown (in seconds) defines the time for the mined block to respawn.
 #
+# Additional customizations:
+#   Randomizing cooldowns:
+#     Cooldowns can be randomized. Just use a range as cooldown. A cooldown with the value of "10-60" will generate
+#     a random cooldown between ten and 60 seconds.
+#   Rich deposits:
+#     To make mining even more interesting it is possible to give regular ores a small chance to replace themselves with
+#     their own material. You can do so by adding the rich-chance property to a material defined in the configuration.
+#     This property accepts doubles as type, which means you're allowed to use frictional digits.
 materials:
   stone:
     replacements:
