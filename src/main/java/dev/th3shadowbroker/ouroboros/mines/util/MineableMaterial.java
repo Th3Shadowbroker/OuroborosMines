@@ -43,12 +43,18 @@ public class MineableMaterial {
 
     private final double richChance;
 
-    public MineableMaterial(Material material, Material[] replacements, long cooldown, long cooldownMax, double richChance) {
+    private final int richAmountMin;
+
+    private final int richAmountMax;
+
+    public MineableMaterial(Material material, Material[] replacements, long cooldown, long cooldownMax, double richChance, int richAmountMin, int richAmountMax) {
         this.material = material;
         this.replacements = replacements;
         this.cooldown = cooldown;
         this.cooldownMax = cooldownMax;
         this.richChance = richChance;
+        this.richAmountMin = richAmountMin;
+        this.richAmountMax = richAmountMax;
     }
 
     public Material getMaterial() {
@@ -59,17 +65,26 @@ public class MineableMaterial {
         return replacements;
     }
 
+    public boolean canBeRich() {
+        return richChance > 0 && richAmountMin > 0 && richAmountMax > 0;
+    }
+
     public long getCooldown() {
         //     Cooldowns equal         Regular cooldown  Generate a random cooldown in range of the given values
         return cooldown == cooldownMax ? cooldown * 20 : (cooldown + replRandom.nextInt((int) cooldownMax + 1)) * 20;
     }
 
-    public Material getReplacement() {
-        if (richChance > 0) {
+    public int getDrawnRichness() {
+        if (richChance > 0 && richAmountMin > 0) {
             double rndNumber = 1 + replRandom.nextDouble() * 100;
-            if (rndNumber <= richChance) return material;
+            if (rndNumber <= richChance) {
+                return richAmountMin == richAmountMax ? richAmountMin : richAmountMin + replRandom.nextInt(richAmountMax + 1);
+            }
         }
+        return 0;
+    }
 
+    public Material getReplacement() {
         if (replacements.length == 1) return replacements[0];
         return replacements[replRandom.nextInt(replacements.length)];
     }
@@ -113,7 +128,21 @@ public class MineableMaterial {
             throw new InvalidMineMaterialException( ex.getMessage() );
         }
 
-        return new MineableMaterial(material.get(), replacementMaterials.toArray( new Material[replacementMaterials.size()] ), cooldown, cooldownMax, section.getDouble("rich-chance", 0) );
+        //Parse richness amount
+        String[] richnessAmountStr;
+        int richnessAmountMin = 0;
+        int richnessAmountMax = 0;
+        if (section.isSet("rich-amount")) {
+            try {
+                richnessAmountStr = section.getString("rich-amount").split("-");
+                richnessAmountMin = Integer.parseInt(richnessAmountStr[0]);
+                richnessAmountMax = richnessAmountStr.length > 1 ? Integer.parseInt(richnessAmountStr[1]) : richnessAmountMin;
+            } catch (NumberFormatException ex) {
+                throw new InvalidMineMaterialException(String.format("Unable to parse the rich-amount %s from %s", material.get().name(), section.getString("rich-amount")));
+            }
+        }
+
+        return new MineableMaterial(material.get(), replacementMaterials.toArray( new Material[replacementMaterials.size()] ), cooldown, cooldownMax, section.getDouble("rich-chance", 0), richnessAmountMin, richnessAmountMax);
     }
 
 }
