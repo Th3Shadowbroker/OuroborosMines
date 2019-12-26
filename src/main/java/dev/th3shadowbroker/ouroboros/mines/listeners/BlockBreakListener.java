@@ -22,6 +22,7 @@ package dev.th3shadowbroker.ouroboros.mines.listeners;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
+import dev.th3shadowbroker.ouroboros.mines.util.MetaUtils;
 import dev.th3shadowbroker.ouroboros.mines.util.MineableMaterial;
 import dev.th3shadowbroker.ouroboros.mines.util.ReplacementTask;
 import dev.th3shadowbroker.ouroboros.mines.util.WorldUtils;
@@ -43,6 +44,27 @@ public class BlockBreakListener implements Listener {
         if ( blockRegions.isPresent() && blockRegions.get().testState(null, OuroborosMines.FLAG)) {
             Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType(), WorldUtils.getTopRegion(blockRegions.get()).get(), BukkitAdapter.adapt(event.getBlock().getWorld()));
             if (minedMaterial.isPresent()) {
+
+                if (minedMaterial.get().canBeRich()) {
+                    //Draw for richness
+                    if (!MetaUtils.isRich(event.getBlock())) {
+                        int drawnRichness = minedMaterial.get().getDrawnRichness();
+                        if (drawnRichness > 0) {
+                            MetaUtils.setRichness(event.getBlock(), drawnRichness);
+                        }
+                    }
+
+                    //If rich
+                    if (MetaUtils.isRich(event.getBlock())) {
+                        event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+                        event.getBlock().setType(minedMaterial.get().getMaterial());
+                        MetaUtils.decreaseRichness(event.getBlock());
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+
+                //If richness was never set or hit 0
                 if (!plugin.getTaskManager().hasPendingReplacementTask(event.getBlock())) {
                     new ReplacementTask(event.getBlock().getLocation(), event.getBlock().getType(), minedMaterial.get().getCooldown());
                 }
