@@ -24,6 +24,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import dev.th3shadowbroker.ouroboros.mines.commands.OmCommand;
 import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialException;
 import dev.th3shadowbroker.ouroboros.mines.listeners.BlockBreakListener;
+import dev.th3shadowbroker.ouroboros.mines.update.OMUpdateCallback;
 import dev.th3shadowbroker.ouroboros.mines.util.MaterialManager;
 import dev.th3shadowbroker.ouroboros.mines.util.MineableMaterial;
 import dev.th3shadowbroker.ouroboros.mines.util.RegionConfiguration;
@@ -34,6 +35,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.inventivetalent.update.spiget.SpigetUpdate;
+import org.inventivetalent.update.spiget.comparator.VersionComparator;
 
 import java.util.Optional;
 
@@ -87,6 +90,7 @@ public class OuroborosMines extends JavaPlugin {
         getCommand("om").setExecutor(new OmCommand());
 
         new MetricsLite(this);
+        checkForUpdate();
     }
 
     @Override
@@ -122,6 +126,17 @@ public class OuroborosMines extends JavaPlugin {
         //Load region specific rules
         if (!RegionConfiguration.REGION_CONFIG_DIR.exists()) RegionConfiguration.REGION_CONFIG_DIR.mkdirs();
         materialManager.loadRegionConfigurations();
+    }
+
+    private void checkForUpdate() {
+        try {
+            SpigetUpdate spigetUpdate = new SpigetUpdate(this, 72325);
+            spigetUpdate.setVersionComparator(VersionComparator.SEM_VER_SNAPSHOT);
+            spigetUpdate.setUserAgent("ouroboros-mines/" + getDescription().getVersion());
+            spigetUpdate.checkForUpdate(new OMUpdateCallback());
+        } catch (Exception ex) {
+            getLogger().severe("Unable to check for updates. Your version of " + getName() + " might be outdated!");
+        }
     }
 
     public MaterialManager getMaterialManager() {

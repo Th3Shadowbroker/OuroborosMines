@@ -5,7 +5,7 @@
 
   <groupId>dev.th3shadowbroker.spigot</groupId>
   <artifactId>OuroborosMines</artifactId>
-  <version>1.2.0-SNAPSHOT</version>
+  <version>1.2.1-SNAPSHOT</version>
 
   <properties>
     <plugin.name>${project.artifactId}</plugin.name>
@@ -39,6 +39,12 @@
       <id>CodeMC</id>
       <url>https://repo.codemc.org/repository/maven-public</url>
     </repository>
+
+    <!--inventivetalent-->
+    <repository>
+      <id>inventive-repo</id>
+      <url>https://repo.inventivetalent.org/content/groups/public/</url>
+    </repository>
   </repositories>
 
   <dependencies>
@@ -61,6 +67,12 @@
       <artifactId>bstats-bukkit-lite</artifactId>
       <version>1.5</version>
       <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.inventivetalent.spiget-update</groupId>
+      <artifactId>bukkit</artifactId>
+      <version>1.4.2-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
@@ -111,12 +123,17 @@
               <artifactSet>
                 <includes>
                   <include>org.bstats:bstats-bukkit-lite**</include>
+                  <include>org.inventivetalent.spiget-update:bukkit**</include>
                 </includes>
               </artifactSet>
               <relocations>
                 <relocation>
                   <pattern>org.bstats</pattern>
                   <shadedPattern>dev.th3shadowbroker.ouroboros.mines.metrics</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.inventivetalent.update.spiget</pattern>
+                  <shadedPattern>dev.th3shadowbroker.ouroboros.mines.update</shadedPattern>
                 </relocation>
               </relocations>
             </configuration>
