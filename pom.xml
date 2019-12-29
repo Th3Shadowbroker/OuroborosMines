@@ -17,6 +17,12 @@
   </properties>
 
   <repositories>
+    <!--Th3Shadowbroker-->
+    <repository>
+      <id>th3shadowbroker-snapshots</id>
+      <url>https://nexus.m4taiori.io/repository/public/</url>
+    </repository>
+
     <!--Spigot-->
     <repository>
       <id>spigot-repo</id>
@@ -38,12 +44,6 @@
     <repository>
       <id>CodeMC</id>
       <url>https://repo.codemc.org/repository/maven-public</url>
-    </repository>
-
-    <!--inventivetalent-->
-    <repository>
-      <id>inventive-repo</id>
-      <url>https://repo.inventivetalent.org/content/groups/public/</url>
     </repository>
   </repositories>
 
@@ -70,9 +70,15 @@
     </dependency>
 
     <dependency>
-      <groupId>org.inventivetalent.spiget-update</groupId>
-      <artifactId>bukkit</artifactId>
-      <version>1.4.2-SNAPSHOT</version>
+      <groupId>org.th3shadowbroker.ouroboros.update</groupId>
+      <artifactId>core</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.th3shadowbroker.ouroboros.update</groupId>
+      <artifactId>spiget</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
@@ -124,16 +130,13 @@
                 <includes>
                   <include>org.bstats:bstats-bukkit-lite**</include>
                   <include>org.inventivetalent.spiget-update:bukkit**</include>
+                  <include>org.th3shadowbroker.ouroboros.update:*:**</include>
                 </includes>
               </artifactSet>
               <relocations>
                 <relocation>
                   <pattern>org.bstats</pattern>
                   <shadedPattern>dev.th3shadowbroker.ouroboros.mines.metrics</shadedPattern>
-                </relocation>
-                <relocation>
-                  <pattern>org.inventivetalent.update.spiget</pattern>
-                  <shadedPattern>dev.th3shadowbroker.ouroboros.mines.update</shadedPattern>
                 </relocation>
               </relocations>
             </configuration>
