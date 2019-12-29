@@ -71,12 +71,6 @@
 
     <dependency>
       <groupId>org.th3shadowbroker.ouroboros.update</groupId>
-      <artifactId>core</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.th3shadowbroker.ouroboros.update</groupId>
       <artifactId>spiget</artifactId>
       <version>1.0.0-SNAPSHOT</version>
     </dependency>
