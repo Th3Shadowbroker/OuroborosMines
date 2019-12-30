@@ -78,7 +78,7 @@ public class MineableMaterial {
         if (richChance > 0 && richAmountMin > 0) {
             double rndNumber = 1 + replRandom.nextDouble() * 100;
             if (rndNumber <= richChance) {
-                return richAmountMin == richAmountMax ? richAmountMin : richAmountMin + replRandom.nextInt(richAmountMax + 1);
+                return richAmountMin == richAmountMax ? richAmountMin : richAmountMin + replRandom.nextInt(richAmountMax);
             }
         }
         return 0;
