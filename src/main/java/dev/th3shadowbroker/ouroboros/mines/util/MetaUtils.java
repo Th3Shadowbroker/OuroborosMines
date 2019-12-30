@@ -27,7 +27,13 @@ public class MetaUtils {
 
     private static final String META_NAME = "OM_RICHNESS";
 
+    private static final String META_NAME_LOCK = "OM_RICHNESS_LOCK";
+
     public static boolean isRich(Block block) {
+        if (isLocked(block)) {
+            unlock(block);
+            return true;
+        }
         return block.hasMetadata(META_NAME);
     }
 
@@ -43,6 +49,18 @@ public class MetaUtils {
         block.setMetadata(META_NAME, new FixedMetadataValue(OuroborosMines.INSTANCE, value));
     }
 
+    public static void lock(Block block) {
+        block.setMetadata(META_NAME_LOCK, new FixedMetadataValue(OuroborosMines.INSTANCE, true));
+    }
+
+    public static void unlock(Block block) {
+        block.removeMetadata(META_NAME_LOCK, OuroborosMines.INSTANCE);
+    }
+
+    public static boolean isLocked(Block block) {
+        return block.hasMetadata(META_NAME_LOCK);
+    }
+
     public static void decreaseRichness(Block block) {
         int current = getRichness(block);
         int next = current - 1;
@@ -51,6 +69,7 @@ public class MetaUtils {
             setRichness(block, next);
         } else {
             clear(block);
+            lock(block);
         }
     }
 
