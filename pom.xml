@@ -72,7 +72,7 @@
     <dependency>
       <groupId>org.th3shadowbroker.ouroboros.update</groupId>
       <artifactId>spiget</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>1.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
