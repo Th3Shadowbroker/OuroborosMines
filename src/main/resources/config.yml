@@ -8,6 +8,16 @@ default: false
 # prefix - The plugins prefix in chat-messages.
 chat:
   prefix: '&9[OM]'
+  messages:
+    consoleOnly: "&cThis command can not be executed from console!"
+    unrecognizedArgument: "&cUnrecognized argument"
+    regionCustomize: "&2A new configuration file for &b%region%&2 has been created!"
+    regionAlreadyCustomized: "&cThere's already a configuration file for this region!"
+    regionNotFound: "&cNo region found at your position!"
+    reloadingConfig: "&2Reloading configuration..."
+    reloadingRegionConfigurations: "&2Reloading region-configurations..."
+    reloadedRegionConfigurations: "&2Loaded %count% region-specific configurations"
+    depositDiscovered: "&2You've discovered an &e%material%&2 deposit!"
 
 # This keys define all materials that can be mined.
 # In error-logs these materials are known as mining- or mine-materials.
