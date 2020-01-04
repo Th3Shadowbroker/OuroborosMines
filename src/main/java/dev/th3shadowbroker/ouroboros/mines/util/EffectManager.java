@@ -17,23 +17,22 @@
  * SOFTWARE.
  */
 
-package dev.th3shadowbroker.ouroboros.mines.listeners;
+package dev.th3shadowbroker.ouroboros.mines.util;
 
-import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
-import dev.th3shadowbroker.ouroboros.mines.events.DepositDiscoveredEvent;
-import dev.th3shadowbroker.ouroboros.mines.util.TemplateMessage;
-import dev.th3shadowbroker.ouroboros.mines.util.TriggeredEffect;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public class DepositDiscoveryListener implements Listener {
+public class EffectManager {
 
-    private final OuroborosMines plugin = OuroborosMines.INSTANCE;
+    private final List<TriggeredEffect> effects = new ArrayList<>();
 
-    @EventHandler
-    public void onDepositDiscovered(DepositDiscoveredEvent event) {
-        event.getPlayer().sendMessage(TemplateMessage.from("chat.messages.depositDiscovered").insert("material", event.getMineableMaterial().getMaterial().name().toLowerCase().replace("_"," ")).colorize().toString());
-        plugin.getEffectManager().getAllTriggeredBy(TriggeredEffect.Trigger.DEPOSIT_DISCOVERED).forEach(effect -> effect.playAt(event.getBlock().getLocation()));
+    public void register(TriggeredEffect effect) {
+        effects.add(effect);
+    }
+
+    public List<TriggeredEffect> getAllTriggeredBy(TriggeredEffect.Trigger trigger) {
+        return effects.stream().filter(effect -> effect.getTrigger() == trigger).collect(Collectors.toList());
     }
 
 }

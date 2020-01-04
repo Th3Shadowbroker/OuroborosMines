@@ -25,10 +25,7 @@ import dev.th3shadowbroker.ouroboros.mines.commands.OmCommand;
 import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialException;
 import dev.th3shadowbroker.ouroboros.mines.listeners.BlockBreakListener;
 import dev.th3shadowbroker.ouroboros.mines.listeners.DepositDiscoveryListener;
-import dev.th3shadowbroker.ouroboros.mines.util.MaterialManager;
-import dev.th3shadowbroker.ouroboros.mines.util.MineableMaterial;
-import dev.th3shadowbroker.ouroboros.mines.util.RegionConfiguration;
-import dev.th3shadowbroker.ouroboros.mines.util.TaskManager;
+import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bstats.bukkit.MetricsLite;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -54,6 +51,8 @@ public class OuroborosMines extends JavaPlugin {
 
     private MaterialManager materialManager;
 
+    private EffectManager effectManager;
+
     private TaskManager taskManager;
 
     private boolean worldGuardFound = false;
@@ -70,6 +69,7 @@ public class OuroborosMines extends JavaPlugin {
 
         //Internal stuff
         materialManager = new MaterialManager();
+        effectManager = new EffectManager();
         taskManager = new TaskManager();
 
         //Config
@@ -90,6 +90,7 @@ public class OuroborosMines extends JavaPlugin {
         }
 
         loadMineMaterials();
+        loadEffects();
         getServer().getPluginManager().registerEvents( new BlockBreakListener(), this );
         getServer().getPluginManager().registerEvents( new DepositDiscoveryListener(), this );
 
@@ -134,6 +135,28 @@ public class OuroborosMines extends JavaPlugin {
         materialManager.loadRegionConfigurations();
     }
 
+    private void loadEffects() {
+        Optional<ConfigurationSection> parentSection = Optional.ofNullable(getConfig().getConfigurationSection("effects"));
+        if (parentSection.isPresent()) {
+            for (String childSectionKey : parentSection.get().getKeys(false))
+            {
+                Optional<ConfigurationSection> childSection = Optional.ofNullable(parentSection.get().getConfigurationSection(childSectionKey));
+                if (childSection.isPresent()) {
+                    try
+                    {
+                        effectManager.register(TriggeredEffect.fromSection(childSection.get()));
+                    } catch (Exception e) {
+                        getLogger().severe("Unable to parse effect of type " + childSectionKey + "!");
+                    }
+                } else {
+                    getLogger().severe("Expected " + childSectionKey + " to be a section!");
+                }
+            }
+        } else {
+            getLogger().info("No effects defined");
+        }
+    }
+
     private void updateConfig() {
          Optional<InputStream> defaultConfigInput = Optional.ofNullable(getResource("config.yml"));
          if (defaultConfigInput.isPresent()) {
@@ -158,6 +181,10 @@ public class OuroborosMines extends JavaPlugin {
 
     public MaterialManager getMaterialManager() {
         return materialManager;
+    }
+
+    public EffectManager getEffectManager() {
+        return effectManager;
     }
 
     public TaskManager getTaskManager() {
