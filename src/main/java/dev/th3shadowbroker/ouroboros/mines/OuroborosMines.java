@@ -24,6 +24,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import dev.th3shadowbroker.ouroboros.mines.commands.OmCommand;
 import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialException;
 import dev.th3shadowbroker.ouroboros.mines.listeners.BlockBreakListener;
+import dev.th3shadowbroker.ouroboros.mines.listeners.DepositDiscoveryListener;
 import dev.th3shadowbroker.ouroboros.mines.util.MaterialManager;
 import dev.th3shadowbroker.ouroboros.mines.util.MineableMaterial;
 import dev.th3shadowbroker.ouroboros.mines.util.RegionConfiguration;
@@ -32,11 +33,15 @@ import org.bstats.bukkit.MetricsLite;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.th3shadowbroker.ouroboros.update.comparison.Comparator;
 import org.th3shadowbroker.ouroboros.update.spiget.SpigetUpdater;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Optional;
 
 public class OuroborosMines extends JavaPlugin {
@@ -70,6 +75,7 @@ public class OuroborosMines extends JavaPlugin {
         //Config
         getLogger().info("Loading configuration...");
         saveDefaultConfig();
+        updateConfig();
         PREFIX = ChatColor.translateAlternateColorCodes('&', getConfig().getString("chat.prefix", "&9[OM]") + "&r ");
 
         //Register flag
@@ -85,6 +91,7 @@ public class OuroborosMines extends JavaPlugin {
 
         loadMineMaterials();
         getServer().getPluginManager().registerEvents( new BlockBreakListener(), this );
+        getServer().getPluginManager().registerEvents( new DepositDiscoveryListener(), this );
 
         getCommand("om").setExecutor(new OmCommand());
 
@@ -125,6 +132,23 @@ public class OuroborosMines extends JavaPlugin {
         //Load region specific rules
         if (!RegionConfiguration.REGION_CONFIG_DIR.exists()) RegionConfiguration.REGION_CONFIG_DIR.mkdirs();
         materialManager.loadRegionConfigurations();
+    }
+
+    private void updateConfig() {
+         Optional<InputStream> defaultConfigInput = Optional.ofNullable(getResource("config.yml"));
+         if (defaultConfigInput.isPresent()) {
+             FileConfiguration defaultConfig = YamlConfiguration.loadConfiguration( new InputStreamReader( defaultConfigInput.get() ));
+
+             //Patch messages into existing config
+             if (!getConfig().isSet("chat.messages")) {
+                getConfig().createSection("chat.messages", defaultConfig.getConfigurationSection("chat.messages").getValues(false));
+                saveConfig();
+                reloadConfig();
+                getLogger().info("Configuration patch for chat.messages applied!");
+             }
+         } else {
+             getLogger().severe("Unable to load default-configuration to patch existing configuration!");
+         }
     }
 
     private void checkForUpdates() {
