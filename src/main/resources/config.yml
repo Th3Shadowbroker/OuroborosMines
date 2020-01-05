@@ -8,6 +8,16 @@ default: false
 # prefix - The plugins prefix in chat-messages.
 chat:
   prefix: '&9[OM]'
+  messages:
+    consoleOnly: "&cThis command can not be executed from console!"
+    unrecognizedArgument: "&cUnrecognized argument"
+    regionCustomize: "&2A new configuration file for &b%region%&2 has been created!"
+    regionAlreadyCustomized: "&cThere's already a configuration file for this region!"
+    regionNotFound: "&cNo region found at your position!"
+    reloadingConfig: "&2Reloading configuration..."
+    reloadingRegionConfigurations: "&2Reloading region-configurations..."
+    reloadedRegionConfigurations: "&2Loaded %count% region-specific configurations"
+    depositDiscovered: "&2You've discovered an &e%material%&2 deposit!"
 
 # This keys define all materials that can be mined.
 # In error-logs these materials are known as mining- or mine-materials.
@@ -62,3 +72,15 @@ materials:
     replacements:
       - stone
     cooldown: 120
+
+# The effects listed below are played when specific events occur.
+# An effect-definition can consist of two types of effects. One sound effect and one particle effect.
+#
+# Effects are structured the following way:
+# deposit_discovered: <-- The event that triggers this effects.
+#    sound: entity_player_levelup <-- The name of the sound that should be played.
+#    sound-volume: 1 <-- The sound-volume has to be a float with a maximum of 1 and a minimum of 0.0 (1 by default).
+#    sound-pitch: 0 <-- The sound-pitch has to be a float with a maximum of 1 and a minimum of 0.0 (0 by default).
+effects:
+  deposit_discovered:
+    sound: entity_player_levelup

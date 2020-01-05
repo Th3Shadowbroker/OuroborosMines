@@ -22,10 +22,12 @@ package dev.th3shadowbroker.ouroboros.mines.listeners;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
+import dev.th3shadowbroker.ouroboros.mines.events.DepositDiscoveredEvent;
 import dev.th3shadowbroker.ouroboros.mines.util.MetaUtils;
 import dev.th3shadowbroker.ouroboros.mines.util.MineableMaterial;
 import dev.th3shadowbroker.ouroboros.mines.util.ReplacementTask;
 import dev.th3shadowbroker.ouroboros.mines.util.WorldUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -51,6 +53,7 @@ public class BlockBreakListener implements Listener {
                         int drawnRichness = minedMaterial.get().getDrawnRichness();
                         if (drawnRichness > 0) {
                             MetaUtils.setRichness(event.getBlock(), drawnRichness);
+                            Bukkit.getPluginManager().callEvent(new DepositDiscoveredEvent(event.getBlock(), event.getPlayer(), minedMaterial.get(),drawnRichness + 1));
                         }
                     }
 

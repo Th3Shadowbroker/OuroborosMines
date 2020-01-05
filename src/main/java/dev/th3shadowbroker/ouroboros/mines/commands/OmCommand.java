@@ -24,6 +24,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.util.Permissions;
 import dev.th3shadowbroker.ouroboros.mines.util.RegionConfiguration;
+import dev.th3shadowbroker.ouroboros.mines.util.TemplateMessage;
 import dev.th3shadowbroker.ouroboros.mines.util.WorldUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -34,7 +35,7 @@ import java.util.Optional;
 
 public class OmCommand implements CommandExecutor {
 
-    private final String consoleNotAllowed = "This command can only be executed ingame!";
+    private final String consoleNotAllowed = TemplateMessage.from("chat.messages.consoleOnly").colorize().toString();
 
     private final OuroborosMines plugin = OuroborosMines.INSTANCE;
 
@@ -58,12 +59,12 @@ public class OmCommand implements CommandExecutor {
                             if (region.isPresent()) {
                                 if (!RegionConfiguration.configExists(region.get().getId(), player.getWorld().getName())) {
                                     new RegionConfiguration(region.get().getId(), player.getWorld().getName());
-                                    sender.sendMessage(OuroborosMines.PREFIX + "§2A new configuration file for §b" + region.get().getId() + " §2has been created!");
+                                    sender.sendMessage(TemplateMessage.from("chat.messages.regionCustomize").insert("region", region.get().getId()).colorize().toString());
                                 } else {
-                                    sender.sendMessage(OuroborosMines.PREFIX + "§cThere's already a configuration file for this region!");
+                                    sender.sendMessage(TemplateMessage.from("chat.messages.regionAlreadyCustomized").colorize().toString());
                                 }
                             } else {
-                                sender.sendMessage(OuroborosMines.PREFIX + "§cNo region found at your position!");
+                                sender.sendMessage(TemplateMessage.from("chat.messages.regionNotFound").colorize().toString());
                             }
                         } else {
                             sender.sendMessage(consoleNotAllowed);
@@ -75,18 +76,18 @@ public class OmCommand implements CommandExecutor {
 
                 case "reload":
                     if (sender.hasPermission(Permissions.COMMAND_RELOAD.permission)) {
-                        sender.sendMessage(OuroborosMines.PREFIX + "§2Reloading configuration...");
+                        sender.sendMessage(TemplateMessage.from("chat.messages.reloadingConfig").colorize().toString());
                         plugin.reloadConfig();
-                        sender.sendMessage(OuroborosMines.PREFIX + "§2Reloading region-configurations...");
+                        sender.sendMessage(TemplateMessage.from("chat.messages.reloadingRegionConfigurations").colorize().toString());
                         plugin.getMaterialManager().reloadRegionConfigurations();
-                        sender.sendMessage(OuroborosMines.PREFIX + "§2Loaded " + plugin.getMaterialManager().getMineableMaterialOverrides().size() + " region-specific configurations");
+                        sender.sendMessage(TemplateMessage.from("chat.messages.reloadedRegionConfigurations").insert("count", String.valueOf(plugin.getMaterialManager().getMinableMaterials().size())).colorize().toString());
                     } else {
                         sender.sendMessage(cmd.getPermissionMessage());
                     }
                     break;
 
                 default:
-                    sender.sendMessage(OuroborosMines.PREFIX + "§cUnrecognized argument");
+                    sender.sendMessage(TemplateMessage.from("chat.messages.unrecognizedArgument").colorize().toString());
                     sender.sendMessage(cmd.getUsage());
                     break;
             }

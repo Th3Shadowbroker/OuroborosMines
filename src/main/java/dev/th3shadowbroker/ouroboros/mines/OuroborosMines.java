@@ -24,19 +24,21 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import dev.th3shadowbroker.ouroboros.mines.commands.OmCommand;
 import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialException;
 import dev.th3shadowbroker.ouroboros.mines.listeners.BlockBreakListener;
-import dev.th3shadowbroker.ouroboros.mines.util.MaterialManager;
-import dev.th3shadowbroker.ouroboros.mines.util.MineableMaterial;
-import dev.th3shadowbroker.ouroboros.mines.util.RegionConfiguration;
-import dev.th3shadowbroker.ouroboros.mines.util.TaskManager;
+import dev.th3shadowbroker.ouroboros.mines.listeners.DepositDiscoveryListener;
+import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bstats.bukkit.MetricsLite;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.th3shadowbroker.ouroboros.update.comparison.Comparator;
 import org.th3shadowbroker.ouroboros.update.spiget.SpigetUpdater;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Optional;
 
 public class OuroborosMines extends JavaPlugin {
@@ -48,6 +50,8 @@ public class OuroborosMines extends JavaPlugin {
     public static StateFlag FLAG;
 
     private MaterialManager materialManager;
+
+    private EffectManager effectManager;
 
     private TaskManager taskManager;
 
@@ -65,11 +69,13 @@ public class OuroborosMines extends JavaPlugin {
 
         //Internal stuff
         materialManager = new MaterialManager();
+        effectManager = new EffectManager();
         taskManager = new TaskManager();
 
         //Config
         getLogger().info("Loading configuration...");
         saveDefaultConfig();
+        updateConfig();
         PREFIX = ChatColor.translateAlternateColorCodes('&', getConfig().getString("chat.prefix", "&9[OM]") + "&r ");
 
         //Register flag
@@ -84,7 +90,9 @@ public class OuroborosMines extends JavaPlugin {
         }
 
         loadMineMaterials();
+        loadEffects();
         getServer().getPluginManager().registerEvents( new BlockBreakListener(), this );
+        getServer().getPluginManager().registerEvents( new DepositDiscoveryListener(), this );
 
         getCommand("om").setExecutor(new OmCommand());
 
@@ -127,6 +135,45 @@ public class OuroborosMines extends JavaPlugin {
         materialManager.loadRegionConfigurations();
     }
 
+    private void loadEffects() {
+        Optional<ConfigurationSection> parentSection = Optional.ofNullable(getConfig().getConfigurationSection("effects"));
+        if (parentSection.isPresent()) {
+            for (String childSectionKey : parentSection.get().getKeys(false))
+            {
+                Optional<ConfigurationSection> childSection = Optional.ofNullable(parentSection.get().getConfigurationSection(childSectionKey));
+                if (childSection.isPresent()) {
+                    try
+                    {
+                        effectManager.register(TriggeredEffect.fromSection(childSection.get()));
+                    } catch (Exception e) {
+                        getLogger().severe("Unable to parse effect of type " + childSectionKey + ": " + e.getMessage());
+                    }
+                } else {
+                    getLogger().severe("Expected " + childSectionKey + " to be a section!");
+                }
+            }
+        } else {
+            getLogger().info("No effects defined");
+        }
+    }
+
+    private void updateConfig() {
+         Optional<InputStream> defaultConfigInput = Optional.ofNullable(getResource("config.yml"));
+         if (defaultConfigInput.isPresent()) {
+             FileConfiguration defaultConfig = YamlConfiguration.loadConfiguration( new InputStreamReader( defaultConfigInput.get() ));
+
+             //Patch messages into existing config
+             if (!getConfig().isSet("chat.messages")) {
+                getConfig().createSection("chat.messages", defaultConfig.getConfigurationSection("chat.messages").getValues(false));
+                saveConfig();
+                reloadConfig();
+                getLogger().info("Configuration patch for chat.messages applied!");
+             }
+         } else {
+             getLogger().severe("Unable to load default-configuration to patch existing configuration!");
+         }
+    }
+
     private void checkForUpdates() {
         SpigetUpdater spigetUpdater = new SpigetUpdater(Comparator.SEMANTIC, this,72325);
         spigetUpdater.checkForUpdate();
@@ -134,6 +181,10 @@ public class OuroborosMines extends JavaPlugin {
 
     public MaterialManager getMaterialManager() {
         return materialManager;
+    }
+
+    public EffectManager getEffectManager() {
+        return effectManager;
     }
 
     public TaskManager getTaskManager() {
