@@ -81,15 +81,6 @@ materials:
 #    sound: entity_player_levelup <-- The name of the sound that should be played.
 #    sound-volume: 1 <-- The sound-volume has to be a float with a maximum of 1 and a minimum of 0.0 (1 by default).
 #    sound-pitch: 0 <-- The sound-pitch has to be a float with a maximum of 1 and a minimum of 0.0 (0 by default).
-#    particle: totem <-- The name of the particle that should be spawned.
-#    particle-amount: 5 <-- The amount of particles that should be spawned (5 by default).
-#    particle-color: <-- Defines the color of the spawned particle. This is only supported by redstone particles! (0, 0, 0 by default).
-#       r: 0 <-- The amount of red.
-#       g: 0 <-- The amount of green.
-#       b: 0 <-- The amount of blue.
-#    particle-size: 1 <-- The particle size. This is only supported by redstone particles! (1 by default)
-#    particle-pattern: center <-- The pattern in which the particles are spawned. (center by default)
 effects:
   deposit_discovered:
     sound: entity_player_levelup
-    particle: totem
