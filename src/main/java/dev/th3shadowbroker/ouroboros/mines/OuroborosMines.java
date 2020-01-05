@@ -146,7 +146,7 @@ public class OuroborosMines extends JavaPlugin {
                     {
                         effectManager.register(TriggeredEffect.fromSection(childSection.get()));
                     } catch (Exception e) {
-                        getLogger().severe("Unable to parse effect of type " + childSectionKey + "!");
+                        getLogger().severe("Unable to parse effect of type " + childSectionKey + ": " + e.getMessage());
                     }
                 } else {
                     getLogger().severe("Expected " + childSectionKey + " to be a section!");

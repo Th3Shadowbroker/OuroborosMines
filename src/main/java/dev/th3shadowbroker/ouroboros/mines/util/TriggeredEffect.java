@@ -19,13 +19,11 @@
 
 package dev.th3shadowbroker.ouroboros.mines.util;
 
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.util.Vector;
 
 import java.util.Optional;
 
@@ -126,9 +124,7 @@ public class TriggeredEffect {
     }
 
     public static enum Pattern {
-        CENTER,
-        BORDERS,
-        COVER
+        CENTER
     }
 
 }
