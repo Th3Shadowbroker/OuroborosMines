@@ -95,12 +95,58 @@ public class TriggeredEffect {
         getParticle().ifPresent( particle -> Optional.ofNullable(location.getWorld()).ifPresent( world -> {
             Location blockCenter = location.add(location.getX() > 0 ? 0.5:-0.5,0.5,location.getZ() > 0 ? 0.5:-0.5);
             switch (particlePattern) {
+                case BORDERS:
+
+                    /*
+                                Block map
+                            B1  B2      T1  T2
+
+                            B3  B4      T3  T4
+
+                            B = Bottom
+                            T = Top
+                     */
+
+                    // Locations
+                    Location b1 = blockCenter.clone().subtract(-0.5, 0.5, 0.5);
+                    Location b2 = blockCenter.clone().subtract(-0.5, 0.5, -0.5);
+                    Location b3 = blockCenter.clone().subtract(0.5, 0.5, 0.5);
+                    Location b4 = blockCenter.clone().subtract(0.5, 0.5, -0.5);
+
+                    Location t1 = blockCenter.clone().subtract(-0.5, -0.5, 0.5);
+                    Location t2 = blockCenter.clone().subtract(-0.5, -0.5, -0.5);
+                    Location t3 = blockCenter.clone().subtract(0.5, -0.5, 0.5);
+                    Location t4 = blockCenter.clone().subtract(0.5, -0.5, -0.5);
+
+                    // Dust options for redstone particles
+                    Particle.DustOptions dustOptions = particle == Particle.REDSTONE ? new Particle.DustOptions(particleColor, particleSize) : null;
+
+                    ParticleUtils.getLocationsBetween(b1, b2, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
+                    ParticleUtils.getLocationsBetween(b3, b4, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
+                    ParticleUtils.getLocationsBetween(b1, b3, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
+                    ParticleUtils.getLocationsBetween(b2, b4, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
+
+                    ParticleUtils.getLocationsBetween(t1, t2, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
+                    ParticleUtils.getLocationsBetween(t3, t4, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
+                    ParticleUtils.getLocationsBetween(t1, t3, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
+                    ParticleUtils.getLocationsBetween(t2, t4, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
+
+                    ParticleUtils.getLocationsBetween(t1, b1, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
+                    ParticleUtils.getLocationsBetween(t2, b2, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
+                    ParticleUtils.getLocationsBetween(t3, b3, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
+                    ParticleUtils.getLocationsBetween(t4, b4, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
+                    break;
+
                 default:
                 case CENTER:
-                    world.spawnParticle(particle, blockCenter, particleCount, particle == Particle.REDSTONE ? new Particle.DustOptions(particleColor, particleSize) : null);
+                    spawnParticle(particle, blockCenter, particleCount, null);
                     break;
             }
         }));
+    }
+
+    private void spawnParticle(Particle particle, Location location, int particleCount, Particle.DustOptions dustOptions) {
+        location.getWorld().spawnParticle(particle, location, particleCount, dustOptions);
     }
 
     public static TriggeredEffect fromSection(ConfigurationSection section) {
@@ -124,7 +170,8 @@ public class TriggeredEffect {
     }
 
     public static enum Pattern {
-        CENTER
+        CENTER,
+        BORDERS
     }
 
 }
