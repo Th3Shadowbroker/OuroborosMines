@@ -139,7 +139,7 @@ public class TriggeredEffect {
 
                 default:
                 case CENTER:
-                    spawnParticle(particle, blockCenter, particleCount, null);
+                    spawnParticle(particle, blockCenter, particleCount, particle == Particle.REDSTONE ? new Particle.DustOptions(particleColor, particleSize) : null);
                     break;
             }
         }));
