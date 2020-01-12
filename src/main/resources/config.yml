@@ -17,7 +17,11 @@ chat:
     reloadingConfig: "&2Reloading configuration..."
     reloadingRegionConfigurations: "&2Reloading region-configurations..."
     reloadedRegionConfigurations: "&2Loaded %count% region-specific configurations"
-    depositDiscovered: "&2You've discovered an &e%material%&2 deposit!"
+    depositDiscovered: "&2You've discovered a %size% &e%material%&2 deposit!"
+    depositSizes:
+      small: "small"
+      medium: "medium"
+      large: "large"
 
 # This keys define all materials that can be mined.
 # In error-logs these materials are known as mining- or mine-materials.

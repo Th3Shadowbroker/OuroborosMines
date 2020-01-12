@@ -65,6 +65,14 @@ public class MineableMaterial {
         return replacements;
     }
 
+    public int getDepositMin() {
+        return richAmountMin;
+    }
+
+    public int getDepositMax() {
+        return richAmountMax;
+    }
+
     public boolean canBeRich() {
         return richChance > 0 && richAmountMin > 0 && richAmountMax > 0;
     }

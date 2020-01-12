@@ -32,8 +32,25 @@ public class DepositDiscoveryListener implements Listener {
 
     @EventHandler
     public void onDepositDiscovered(DepositDiscoveredEvent event) {
-        event.getPlayer().sendMessage(TemplateMessage.from("chat.messages.depositDiscovered").insert("material", event.getMineableMaterial().getMaterial().name().toLowerCase().replace("_"," ")).colorize().toString());
+        event.getPlayer().sendMessage(TemplateMessage.from("chat.messages.depositDiscovered")
+                .insert("material", event.getMineableMaterial().getMaterial().name().toLowerCase().replace("_"," "))
+                .insert("size", getDepositSize(event.getRichness(), event.getMineableMaterial().getDepositMax()))
+                .colorize().toString());
         plugin.getEffectManager().getAllTriggeredBy(TriggeredEffect.Trigger.DEPOSIT_DISCOVERED).forEach(effect -> effect.playAt(event.getBlock().getLocation()));
+    }
+
+    private String getDepositSize(int drawnSize, int maxSize) {
+        double step = (double) maxSize / 3;
+        double mediumThreshold = step * 2;
+        double largeThreshold = step * 3;
+
+        if (drawnSize >= largeThreshold) {
+            return plugin.getConfig().getString("chat.messages.depositSizes.large");
+        } else if (drawnSize >= mediumThreshold) {
+            return plugin.getConfig().getString("chat.messages.depositSizes.medium");
+        } else {
+            return plugin.getConfig().getString("chat.messages.depositSizes.small");
+        }
     }
 
 }
