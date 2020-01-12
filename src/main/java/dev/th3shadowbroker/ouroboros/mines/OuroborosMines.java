@@ -163,11 +163,11 @@ public class OuroborosMines extends JavaPlugin {
              FileConfiguration defaultConfig = YamlConfiguration.loadConfiguration( new InputStreamReader( defaultConfigInput.get() ));
 
              //Patch messages into existing config
-             if (!getConfig().isSet("chat.messages")) {
-                getConfig().createSection("chat.messages", defaultConfig.getConfigurationSection("chat.messages").getValues(false));
+             if (!getConfig().isSet("chat.messages.depositSizes")) {
+                getConfig().createSection("chat.messages.depositSizes", defaultConfig.getConfigurationSection("chat.messages.depositSizes").getValues(false));
                 saveConfig();
                 reloadConfig();
-                getLogger().info("Configuration patch for chat.messages applied!");
+                getLogger().info("Configuration patch for chat.messages.depositSizes applied!");
              }
          } else {
              getLogger().severe("Unable to load default-configuration to patch existing configuration!");
