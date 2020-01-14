@@ -169,6 +169,14 @@ public class OuroborosMines extends JavaPlugin {
                 reloadConfig();
                 getLogger().info("Configuration patch for chat.messages.depositSizes applied!");
              }
+
+             //Patch worldNotFound message into config
+             if (!getConfig().isSet("chat.messages.worldNotFound")) {
+                 getConfig().set("chat.messages.worldNotFound", defaultConfig.getString("chat.messages.worldNotFound"));
+                 saveConfig();
+                 reloadConfig();
+                 getLogger().info("Configuration patch for chat.messages.worldNotFound applied!");
+             }
          } else {
              getLogger().severe("Unable to load default-configuration to patch existing configuration!");
          }

@@ -26,6 +26,8 @@ import dev.th3shadowbroker.ouroboros.mines.util.Permissions;
 import dev.th3shadowbroker.ouroboros.mines.util.RegionConfiguration;
 import dev.th3shadowbroker.ouroboros.mines.util.TemplateMessage;
 import dev.th3shadowbroker.ouroboros.mines.util.WorldUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -54,17 +56,27 @@ public class OmCommand implements CommandExecutor {
                     if (sender.hasPermission(Permissions.COMMAND_CUSTOMIZE.permission)) {
                         if (sender instanceof Player) {
                             Player player = (Player) sender;
-                            Optional<ApplicableRegionSet> regionSet = WorldUtils.getPlayerRegions(player);
-                            Optional<ProtectedRegion> region = regionSet.flatMap(WorldUtils::getTopRegion);
-                            if (region.isPresent()) {
-                                if (!RegionConfiguration.configExists(region.get().getId(), player.getWorld().getName())) {
-                                    new RegionConfiguration(region.get().getId(), player.getWorld().getName());
-                                    sender.sendMessage(TemplateMessage.from("chat.messages.regionCustomize").insert("region", region.get().getId()).colorize().toString());
+                            if (args.length == 1) {
+                                Optional<ApplicableRegionSet> regionSet = WorldUtils.getPlayerRegions(player);
+                                Optional<ProtectedRegion> region = regionSet.flatMap(WorldUtils::getTopRegion);
+                                if (region.isPresent()) {
+                                    createRegionConfiguration(region.get(), player);
                                 } else {
-                                    sender.sendMessage(TemplateMessage.from("chat.messages.regionAlreadyCustomized").colorize().toString());
+                                    sender.sendMessage(TemplateMessage.from("chat.messages.regionNotFound").colorize().toString());
                                 }
                             } else {
-                                sender.sendMessage(TemplateMessage.from("chat.messages.regionNotFound").colorize().toString());
+                                String regionId = args[1];
+                                Optional<World> world = Optional.ofNullable(args.length >= 3 ? Bukkit.getWorld(args[2]) : player.getWorld());
+                                if (world.isPresent()) {
+                                    Optional<ProtectedRegion> region = WorldUtils.getRegion(regionId, world.get());
+                                    if (region.isPresent()) {
+                                        createRegionConfiguration(region.get(), player);
+                                    } else {
+                                        sender.sendMessage(TemplateMessage.from("chat.messages.regionNotFound").colorize().toString());
+                                    }
+                                } else {
+                                    sender.sendMessage(TemplateMessage.from("chat.messages.worldNotFound").insert("world", args[2]).colorize().toString());
+                                }
                             }
                         } else {
                             sender.sendMessage(consoleNotAllowed);
@@ -93,5 +105,14 @@ public class OmCommand implements CommandExecutor {
             }
         }
         return true;
+    }
+
+    private void createRegionConfiguration(ProtectedRegion region, Player player) {
+        if (!RegionConfiguration.configExists(region.getId(), player.getWorld().getName())) {
+            new RegionConfiguration(region.getId(), player.getWorld().getName());
+            player.sendMessage(TemplateMessage.from("chat.messages.regionCustomize").insert("region", region.getId()).colorize().toString());
+        } else {
+            player.sendMessage(TemplateMessage.from("chat.messages.regionAlreadyCustomized").colorize().toString());
+        }
     }
 }

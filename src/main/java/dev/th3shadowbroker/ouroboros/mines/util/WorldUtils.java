@@ -28,6 +28,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -37,8 +38,7 @@ import java.util.Optional;
 public class WorldUtils {
 
     public static Optional<ApplicableRegionSet> getBlockRegions(Block block) {
-        Optional<RegionManager> regionManager = Optional.ofNullable( WorldGuard.getInstance().getPlatform().getRegionContainer().get( BukkitAdapter.adapt(block.getWorld()) ) );
-        return regionManager.map(manager -> manager.getApplicableRegions(BukkitAdapter.asBlockVector(block.getLocation())));
+        return getRegionManager(block.getWorld()).map(manager -> manager.getApplicableRegions(BukkitAdapter.asBlockVector(block.getLocation())));
     }
 
     public static Optional<ProtectedRegion> getTopRegion(ApplicableRegionSet regionSet) {
@@ -46,8 +46,16 @@ public class WorldUtils {
     }
 
     public static Optional<ApplicableRegionSet> getPlayerRegions(Player player) {
-        Optional<RegionManager> regionManager = Optional.ofNullable( WorldGuard.getInstance().getPlatform().getRegionContainer().get( BukkitAdapter.adapt(player.getWorld()) ) );
-        return regionManager.map(manager -> manager.getApplicableRegions(BukkitAdapter.adapt(player.getLocation()).toVector().toBlockPoint()));
+        return getRegionManager(player.getWorld()).map(manager -> manager.getApplicableRegions(BukkitAdapter.adapt(player.getLocation()).toVector().toBlockPoint()));
+    }
+
+    public static Optional<RegionManager> getRegionManager(World world) {
+        return Optional.ofNullable( WorldGuard.getInstance().getPlatform().getRegionContainer().get( BukkitAdapter.adapt(world) ) );
+    }
+
+    public static Optional<ProtectedRegion> getRegion(String id, World world) {
+        Optional<RegionManager> regionManager = getRegionManager(world);
+        return regionManager.map(manager -> manager.getRegion(id));
     }
 
     public static boolean isAccessible(Block block) {
