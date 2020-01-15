@@ -17,6 +17,7 @@ chat:
     reloadingConfig: "&2Reloading configuration..."
     reloadingRegionConfigurations: "&2Reloading region-configurations..."
     reloadedRegionConfigurations: "&2Loaded %count% region-specific configurations"
+    worldNotFound: "&cWorld &e%world% &cnot found!"
     depositDiscovered: "&2You've discovered a %size% &e%material%&2 deposit!"
     depositSizes:
       small: "small"
