@@ -23,6 +23,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.events.DepositDiscoveredEvent;
+import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
 import dev.th3shadowbroker.ouroboros.mines.util.MetaUtils;
 import dev.th3shadowbroker.ouroboros.mines.util.MineableMaterial;
 import dev.th3shadowbroker.ouroboros.mines.util.ReplacementTask;
@@ -62,6 +63,10 @@ public class BlockBreakListener implements Listener {
                         event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
                         event.getBlock().setType(minedMaterial.get().getMaterial());
                         MetaUtils.decreaseRichness(event.getBlock());
+
+                        //Fire event for mined material
+                        Bukkit.getPluginManager().callEvent(new MaterialMinedEvent(minedMaterial.get(), event.getBlock(), true, event.getPlayer()));
+
                         event.setCancelled(true);
                         return;
                     }
@@ -72,6 +77,10 @@ public class BlockBreakListener implements Listener {
                     new ReplacementTask(event.getBlock().getLocation(), event.getBlock().getType(), minedMaterial.get().getCooldown());
                 }
 
+                //Fire event for mined material
+                Bukkit.getPluginManager().callEvent(new MaterialMinedEvent(minedMaterial.get(), event.getBlock(), false, event.getPlayer()));
+
+                //Break it! Replace it!
                 event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
                 event.getBlock().setType(minedMaterial.get().getReplacement());
             }
