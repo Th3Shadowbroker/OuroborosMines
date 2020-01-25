@@ -92,7 +92,7 @@ public class OmCommand implements CommandExecutor {
                         plugin.reloadConfig();
                         sender.sendMessage(TemplateMessage.from("chat.messages.reloadingRegionConfigurations").colorize().toString());
                         plugin.getMaterialManager().reloadRegionConfigurations();
-                        sender.sendMessage(TemplateMessage.from("chat.messages.reloadedRegionConfigurations").insert("count", String.valueOf(plugin.getMaterialManager().getMinableMaterials().size())).colorize().toString());
+                        sender.sendMessage(TemplateMessage.from("chat.messages.reloadedRegionConfigurations").insert("count", String.valueOf(plugin.getMaterialManager().getMineableMaterialOverrides().size())).colorize().toString());
                     } else {
                         sender.sendMessage(cmd.getPermissionMessage());
                     }

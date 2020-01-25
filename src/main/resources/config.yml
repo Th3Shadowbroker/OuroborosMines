@@ -98,3 +98,10 @@ materials:
 effects:
   deposit_discovered:
     sound: entity_player_levelup
+
+# Use this section for experience-related settings.
+#
+# spawnOrbs: When false no experience will be spawned. Instead
+#            the player get's the experience-points directly.
+experience:
+  spawnOrbs: true
