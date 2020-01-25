@@ -25,6 +25,7 @@ import dev.th3shadowbroker.ouroboros.mines.commands.OmCommand;
 import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialException;
 import dev.th3shadowbroker.ouroboros.mines.listeners.BlockBreakListener;
 import dev.th3shadowbroker.ouroboros.mines.listeners.DepositDiscoveryListener;
+import dev.th3shadowbroker.ouroboros.mines.listeners.ExperienceListener;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bstats.bukkit.MetricsLite;
 import org.bukkit.Bukkit;
@@ -91,8 +92,10 @@ public class OuroborosMines extends JavaPlugin {
 
         loadMineMaterials();
         loadEffects();
+
         getServer().getPluginManager().registerEvents( new BlockBreakListener(), this );
         getServer().getPluginManager().registerEvents( new DepositDiscoveryListener(), this );
+        getServer().getPluginManager().registerEvents( new ExperienceListener(), this );
 
         getCommand("om").setExecutor(new OmCommand());
 
@@ -176,6 +179,14 @@ public class OuroborosMines extends JavaPlugin {
                  saveConfig();
                  reloadConfig();
                  getLogger().info("Configuration patch for chat.messages.worldNotFound applied!");
+             }
+
+             //Patch experience settings into config
+             if (!getConfig().isSet("experience.spawnOrbs")) {
+                 getConfig().set("experience.spawnOrbs", true);
+                 saveConfig();
+                 reloadConfig();
+                 getLogger().info("Configuration patch for experience.spawnOrbs applied!");
              }
          } else {
              getLogger().severe("Unable to load default-configuration to patch existing configuration!");
