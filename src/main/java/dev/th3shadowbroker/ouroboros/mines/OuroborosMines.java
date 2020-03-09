@@ -26,6 +26,7 @@ import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialExcepti
 import dev.th3shadowbroker.ouroboros.mines.listeners.BlockBreakListener;
 import dev.th3shadowbroker.ouroboros.mines.listeners.DepositDiscoveryListener;
 import dev.th3shadowbroker.ouroboros.mines.listeners.ExperienceListener;
+import dev.th3shadowbroker.ouroboros.mines.thirdparty.QuestsSupport;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bstats.bukkit.MetricsLite;
 import org.bukkit.Bukkit;
@@ -98,6 +99,8 @@ public class OuroborosMines extends JavaPlugin {
         getServer().getPluginManager().registerEvents( new ExperienceListener(), this );
 
         getCommand("om").setExecutor(new OmCommand());
+
+        checkForSupportedPlugins();
 
         new MetricsLite(this);
         checkForUpdates();
@@ -191,6 +194,13 @@ public class OuroborosMines extends JavaPlugin {
          } else {
              getLogger().severe("Unable to load default-configuration to patch existing configuration!");
          }
+    }
+
+    private void checkForSupportedPlugins() {
+        if (QuestsSupport.isAvailable()) {
+            getLogger().info("Quests support is enabled!");
+            new QuestsSupport();
+        }
     }
 
     private void checkForUpdates() {
