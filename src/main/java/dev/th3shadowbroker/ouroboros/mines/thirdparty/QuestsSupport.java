@@ -66,7 +66,6 @@ public class QuestsSupport implements Listener {
 
     @EventHandler
     public void onMaterialMined(MaterialMinedEvent event) {
-        System.out.println("Material mined. Adding progress!");
         addProgress(event.getPlayer(), event.getMaterial().getMaterial());
     }
 
