@@ -49,7 +49,7 @@ public class QuestsSupport implements Listener {
             quester.getCurrentQuests().keySet().forEach(
                     quest -> {
                         // Modify progress manually
-                        quester.getCurrentStage(quest).getBlocksToBreak().stream().filter(itemStack -> itemStack.getType() == material).findFirst().ifPresent(
+                        quester.getCurrentStage(quest).getBlocksToBreak().stream().filter(itemStack -> itemStack.getType() == material).forEach(
                                 itemStack -> {
                                     quester.breakBlock(quest, new ItemStack(material));
                                 }
