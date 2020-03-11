@@ -16,4 +16,4 @@ Donations are always welcome and help me to keep my servers up and running or fi
 
 [![](https://c5.patreon.com/external/logo/become_a_patron_button.png)](https://patreon.com/m4taiori)
 
-[![](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/O4O112IMF)
+[![](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V0GYAP)
