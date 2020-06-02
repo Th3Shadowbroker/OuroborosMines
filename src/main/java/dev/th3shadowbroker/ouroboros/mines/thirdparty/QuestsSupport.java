@@ -32,7 +32,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class QuestsSupport implements Listener {
 
-    private static final String PLUGIN_NAME = "Quests";
+    public static final String PLUGIN_NAME = "Quests";
 
     public QuestsSupport() {
         Bukkit.getPluginManager().registerEvents(this, OuroborosMines.INSTANCE);
@@ -58,10 +58,6 @@ public class QuestsSupport implements Listener {
         } catch (NullPointerException ex) {
             OuroborosMines.INSTANCE.getLogger().warning("Unable to manipulate Quests quest-progress. It seems the plugin isn't installed anymore.");
         }
-    }
-
-    public static boolean isAvailable() {
-        return Bukkit.getServer().getPluginManager().isPluginEnabled(PLUGIN_NAME);
     }
 
     @EventHandler

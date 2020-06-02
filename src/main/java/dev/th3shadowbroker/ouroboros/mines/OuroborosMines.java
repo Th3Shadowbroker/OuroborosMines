@@ -198,13 +198,15 @@ public class OuroborosMines extends JavaPlugin {
     }
 
     private void checkForSupportedPlugins() {
-        if (QuestsSupport.isAvailable()) {
+        boolean questsInstalled = getServer().getPluginManager().isPluginEnabled(QuestsSupport.PLUGIN_NAME);
+        if (questsInstalled) {
             getLogger().info("Quests support is enabled!");
             new QuestsSupport();
         }
 
-        if (JobsRebornSupport.isAvailable()) {
-            getLogger().info("JobsReborn support is enabled!");
+        boolean jobsRebornInstalled = getServer().getPluginManager().isPluginEnabled(JobsRebornSupport.PLUGIN_NAME);
+        if (jobsRebornInstalled) {
+            getLogger().info("Jobs support is enabled!");
             new JobsRebornSupport();
         }
     }

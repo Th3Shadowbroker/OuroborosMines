@@ -32,7 +32,7 @@ import org.bukkit.event.Listener;
 
 public class JobsRebornSupport implements Listener {
 
-    private static final String PLUGIN_NAME = "Jobs";
+    public static final String PLUGIN_NAME = "Jobs";
 
     public JobsRebornSupport() {
         Bukkit.getPluginManager().registerEvents(this, OuroborosMines.INSTANCE);
@@ -45,10 +45,6 @@ public class JobsRebornSupport implements Listener {
     @EventHandler
     public void onMaterialMined(MaterialMinedEvent event) {
         addProgress(event.getPlayer(), event.getBlock());
-    }
-
-    public static boolean isAvailable() {
-        return Bukkit.getPluginManager().isPluginEnabled(PLUGIN_NAME);
     }
 
 }
