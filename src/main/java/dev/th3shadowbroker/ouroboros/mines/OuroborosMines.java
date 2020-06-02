@@ -26,6 +26,7 @@ import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialExcepti
 import dev.th3shadowbroker.ouroboros.mines.listeners.BlockBreakListener;
 import dev.th3shadowbroker.ouroboros.mines.listeners.DepositDiscoveryListener;
 import dev.th3shadowbroker.ouroboros.mines.listeners.ExperienceListener;
+import dev.th3shadowbroker.ouroboros.mines.thirdparty.JobsRebornSupport;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.QuestsSupport;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bstats.bukkit.MetricsLite;
@@ -200,6 +201,11 @@ public class OuroborosMines extends JavaPlugin {
         if (QuestsSupport.isAvailable()) {
             getLogger().info("Quests support is enabled!");
             new QuestsSupport();
+        }
+
+        if (JobsRebornSupport.isAvailable()) {
+            getLogger().info("JobsReborn support is enabled!");
+            new JobsRebornSupport();
         }
     }
 

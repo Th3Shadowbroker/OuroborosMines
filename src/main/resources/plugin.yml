@@ -4,7 +4,7 @@ version: ${plugin.version}
 description: ${plugin.description}
 website: ${plugin.website}
 main: ${plugin.main}
-softdepend: [WorldGuard,Quests]
+softdepend: [WorldGuard,Quests,Jobs]
 api-version: 1.13
 
 commands:
