@@ -33,12 +33,17 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 
 public class BlockBreakListener implements Listener {
 
     private final OuroborosMines plugin = OuroborosMines.INSTANCE;
+
+    private final boolean autoPickup = plugin.getConfig().getBoolean("autoPickup", false);
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockBreak(BlockBreakEvent event) {
@@ -60,7 +65,8 @@ public class BlockBreakListener implements Listener {
 
                     //If rich
                     if (MetaUtils.isRich(event.getBlock())) {
-                        event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+                        //event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+                        breakBlock(event, event.getPlayer().getInventory().getItemInMainHand());
                         event.getBlock().setType(minedMaterial.get().getMaterial());
                         MetaUtils.decreaseRichness(event.getBlock());
 
@@ -81,11 +87,24 @@ public class BlockBreakListener implements Listener {
                 Bukkit.getPluginManager().callEvent(new MaterialMinedEvent(minedMaterial.get(), event.getBlock(), false, event.getPlayer()));
 
                 //Break it! Replace it!
-                event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+                //event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+                breakBlock(event, event.getPlayer().getInventory().getItemInMainHand());
                 event.getBlock().setType(minedMaterial.get().getReplacement());
             }
 
             event.setCancelled(true);
+        }
+    }
+
+    private void breakBlock(BlockBreakEvent event, ItemStack tool) {
+        if (!autoPickup) {
+            event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+        } else {
+            ItemStack[] drops = event.getBlock().getDrops(event.getPlayer().getInventory().getItemInMainHand()).stream().toArray(ItemStack[]::new);
+            Map<Integer, ItemStack> overflow = event.getPlayer().getInventory().addItem(drops);
+            if (overflow.size() > 0) {
+                overflow.forEach((slot, item) -> event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), item));
+            }
         }
     }
 

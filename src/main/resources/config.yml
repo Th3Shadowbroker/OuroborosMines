@@ -105,3 +105,9 @@ effects:
 #            the player get's the experience-points directly.
 experience:
   spawnOrbs: true
+
+# Drop related settings
+#
+# autoPickup: When set to true all mined items will be directly added to the players inventory.
+#
+autoPickup: false
