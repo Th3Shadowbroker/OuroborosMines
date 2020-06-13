@@ -24,10 +24,7 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.events.DepositDiscoveredEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
-import dev.th3shadowbroker.ouroboros.mines.util.MetaUtils;
-import dev.th3shadowbroker.ouroboros.mines.util.MineableMaterial;
-import dev.th3shadowbroker.ouroboros.mines.util.ReplacementTask;
-import dev.th3shadowbroker.ouroboros.mines.util.WorldUtils;
+import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -47,6 +44,15 @@ public class BlockBreakListener implements Listener {
         if ( blockRegions.isPresent() && blockRegions.get().testState(null, OuroborosMines.FLAG)) {
             Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType(), WorldUtils.getTopRegion(blockRegions.get()).get(), BukkitAdapter.adapt(event.getBlock().getWorld()));
             if (minedMaterial.isPresent()) {
+
+                // Abort if opening hours are enabled an the mines are closed
+                if (plugin.getAnnouncementHandler().isPresent()) {
+                    if (!TimeUtils.minesAreOpen(plugin.getAnnouncementHandler().get().getOpeningHours(), event.getBlock().getWorld().getTime())) {
+                        event.getPlayer().sendMessage(TemplateMessage.from("chat.messages.minesClosed").colorize().toString());
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
 
                 if (minedMaterial.get().canBeRich()) {
                     //Draw for richness

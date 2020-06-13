@@ -23,6 +23,10 @@ chat:
       small: "small"
       medium: "medium"
       large: "large"
+    announcements:
+      opening: "&2The mines are open!"
+      closing: "&cThe mines are now closed. Come back tomorrow!"
+    minesClosed: "&cThe mines are closed come back later."
 
 # This keys define all materials that can be mined.
 # In error-logs these materials are known as mining- or mine-materials.
@@ -105,3 +109,17 @@ effects:
 #            the player get's the experience-points directly.
 experience:
   spawnOrbs: true
+
+# Opening hours
+# These options can be used to define "opening hours" for your mines.
+#
+# See https://minecraft.gamepedia.com/Day-night_cycle for details.
+#
+openingHours:
+  enabled: false
+  time: 0-12000
+  announcements:
+    opening: true
+    closing: true
+    worlds:
+      - world

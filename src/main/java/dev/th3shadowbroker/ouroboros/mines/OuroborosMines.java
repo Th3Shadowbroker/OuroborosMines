@@ -58,6 +58,8 @@ public class OuroborosMines extends JavaPlugin {
 
     private TaskManager taskManager;
 
+    private AnnouncementHandler announcementHandler;
+
     private boolean worldGuardFound = false;
 
     @Override
@@ -98,6 +100,10 @@ public class OuroborosMines extends JavaPlugin {
         getServer().getPluginManager().registerEvents( new BlockBreakListener(), this );
         getServer().getPluginManager().registerEvents( new DepositDiscoveryListener(), this );
         getServer().getPluginManager().registerEvents( new ExperienceListener(), this );
+
+        if (getConfig().getBoolean("openingHours.enabled")) {
+            announcementHandler = new AnnouncementHandler();
+        }
 
         getCommand("om").setExecutor(new OmCommand());
 
@@ -227,4 +233,9 @@ public class OuroborosMines extends JavaPlugin {
     public TaskManager getTaskManager() {
         return taskManager;
     }
+
+    public Optional<AnnouncementHandler> getAnnouncementHandler() {
+        return Optional.ofNullable(announcementHandler);
+    }
+
 }
