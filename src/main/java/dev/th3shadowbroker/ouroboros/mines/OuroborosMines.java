@@ -101,7 +101,7 @@ public class OuroborosMines extends JavaPlugin {
         getServer().getPluginManager().registerEvents( new DepositDiscoveryListener(), this );
         getServer().getPluginManager().registerEvents( new ExperienceListener(), this );
 
-        if (getConfig().getBoolean("openingHours.enabled")) {
+        if (getConfig().getBoolean("openingHours.enabled", false)) {
             announcementHandler = new AnnouncementHandler();
         }
 
