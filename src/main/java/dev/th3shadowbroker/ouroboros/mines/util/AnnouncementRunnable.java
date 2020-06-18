@@ -24,9 +24,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
 public class AnnouncementRunnable implements Runnable {
 
-    private final World world;
+    private final List<World> worlds;
 
     private final String message;
 
@@ -34,15 +39,19 @@ public class AnnouncementRunnable implements Runnable {
 
     private long delay;
 
-    public AnnouncementRunnable(World world, String message) {
-        this.world = world;
+    public AnnouncementRunnable(String message, List<World> worlds) {
+        this.worlds = worlds;
         this.message = message;
     }
 
     @Override
     public void run() {
         //System.out.println(String.format("Executable ran for %s", world.getName()));
-        world.getPlayers().forEach(player -> player.sendMessage(message));
+        if (worlds.size() > 0) {
+            worlds.forEach(world -> world.getPlayers().forEach(player -> player.sendMessage(message)));
+        } else {
+            Bukkit.getServer().broadcastMessage(message);
+        }
     }
 
     public BukkitTask getTask() {
@@ -66,8 +75,32 @@ public class AnnouncementRunnable implements Runnable {
         //System.out.println(String.format("Scheduled announcement: \"%s\" in world \"%s\" has been cancelled.", message, world.getName()));
     }
 
-    public static AnnouncementRunnable schedule(long delay, long period, World world, String message) {
-        AnnouncementRunnable runnable = new AnnouncementRunnable(world, message);
+    public static AnnouncementRunnable schedule(long delay, long period, String message, List<String> worlds) {
+
+        List<World> parsedWorlds = new ArrayList<>();
+        worlds.forEach(worldName -> {
+            Optional<World> world = Optional.ofNullable(Bukkit.getServer().getWorld(worldName));
+            world.ifPresent(parsedWorlds::add);
+        });
+
+        AnnouncementRunnable runnable = new AnnouncementRunnable(message, parsedWorlds);
+        BukkitTask task = Bukkit.getServer().getScheduler().runTaskTimer(OuroborosMines.INSTANCE, runnable, delay, period);
+        runnable.setTask(task);
+        runnable.setDelay(delay);
+        return runnable;
+    }
+
+    public static AnnouncementRunnable schedule(long delay, long period, String message, String... worlds) {
+
+        List<World> parsedWorlds = new ArrayList<>();
+        List<String> worldList = Arrays.asList(worlds);
+
+        worldList.forEach(worldName -> {
+            Optional<World> world = Optional.ofNullable(Bukkit.getServer().getWorld(worldName));
+            world.ifPresent(parsedWorlds::add);
+        });
+
+        AnnouncementRunnable runnable = new AnnouncementRunnable(message, parsedWorlds);
         BukkitTask task = Bukkit.getServer().getScheduler().runTaskTimer(OuroborosMines.INSTANCE, runnable, delay, period);
         runnable.setTask(task);
         runnable.setDelay(delay);

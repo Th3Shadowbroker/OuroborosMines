@@ -47,6 +47,8 @@ public class RegionConfiguration {
 
     private final boolean inheritDefaults;
 
+    private final OpeningHours openingHours;
+
     private static final OuroborosMines plugin = OuroborosMines.INSTANCE;
 
     public static final File REGION_CONFIG_DIR = new File(plugin.getDataFolder() + "/regions");
@@ -58,6 +60,19 @@ public class RegionConfiguration {
         this.configuration = YamlConfiguration.loadConfiguration(configurationFile);
         this.materialList = new ArrayList<>();
         this.inheritDefaults = configuration.getBoolean("inherit", false);
+
+        // A bit tricky ~_~
+        this.openingHours = configuration.isConfigurationSection("openingHours") ?
+
+                // If section exists in region-config
+                OpeningHours.fromSection(configuration.getConfigurationSection("openingHours")) :
+
+                // If section does not exists, check the default config
+                plugin.getConfig().getBoolean("openingHours.enabled", false) ?
+
+                        // Apply setting from config.yml or don't
+                        OpeningHours.fromSection(plugin.getConfig().getConfigurationSection("openingHours")) : null;
+
         this.loadMaterialOverrides();
     }
 
@@ -80,8 +95,20 @@ public class RegionConfiguration {
             });
         } else {
             configuration.set("inherit", false);
+
+            /* NOTE: Commented, as this isn't the main-purpose of region-specific settings.
+            String[] messagesToCopy = {"minesClosed", "announcements"};
+            for (String messageToCopy : messagesToCopy) configuration.set("chat.messages." + messageToCopy, plugin.getConfig().get("chat.messages." + messageToCopy));
+            */
+
             Optional<ConfigurationSection> materialSection = Optional.ofNullable(plugin.getConfig().getConfigurationSection("materials"));
             materialSection.ifPresent(configurationSection -> configuration.createSection(configurationSection.getName(), configurationSection.getValues(true)));
+
+            /* NOTE: Commented, as this isn't the main-purpose of region-specific settings.
+            Optional<ConfigurationSection> openingHoursSection = Optional.ofNullable(plugin.getConfig().getConfigurationSection("openingHours"));
+            openingHoursSection.ifPresent(configurationSection -> configuration.createSection(configurationSection.getName(), configurationSection.getValues(true)));
+             */
+
             save();
         }
     }
@@ -108,6 +135,14 @@ public class RegionConfiguration {
 
     public Optional<MineableMaterial> getMaterialProperties(Material material) {
         return materialList.stream().filter(mineableMaterial -> mineableMaterial.getMaterial() == material).findFirst();
+    }
+
+    public Optional<OpeningHours> getOpeningHours() {
+        return Optional.ofNullable(openingHours);
+    }
+
+    public boolean minesAreOpen() {
+        return TimeUtils.minesAreOpen(this);
     }
 
     public boolean isInheritingDefaults() {

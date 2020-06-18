@@ -21,6 +21,7 @@ package dev.th3shadowbroker.ouroboros.mines.listeners;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.events.DepositDiscoveredEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
@@ -46,9 +47,22 @@ public class BlockBreakListener implements Listener {
             if (minedMaterial.isPresent()) {
 
                 // Abort if opening hours are enabled an the mines are closed
-                if (plugin.getAnnouncementHandler().isPresent()) {
-                    if (!TimeUtils.minesAreOpen(plugin.getAnnouncementHandler().get().getOpeningHours(), event.getBlock().getWorld().getTime())) {
-                        event.getPlayer().sendMessage(TemplateMessage.from("chat.messages.minesClosed").colorize().toString());
+                if (plugin.getAnnouncementManager().hasAny()) {
+                    Optional<RegionConfiguration> matchingConfig = plugin.getMaterialManager().getMineableMaterialOverrides().stream().filter(rc -> {
+                        boolean worldMatches = rc.getWorld() == event.getBlock().getWorld();
+                        boolean idMatches = false;
+
+                        Optional<ProtectedRegion> topRegion = WorldUtils.getTopRegion(blockRegions.get());
+                        System.out.println(topRegion.isPresent());
+                        if (topRegion.isPresent() && topRegion.get().getId().equals(rc.getRegionId())) {
+                            idMatches = true;
+                        }
+
+                        return worldMatches && idMatches;
+                    }).findFirst();
+
+                    if (matchingConfig.isPresent() && !matchingConfig.get().minesAreOpen()) {
+                        event.getPlayer().sendMessage(TemplateMessage.from("chat.messages.minesClosed", matchingConfig.get().getConfiguration()).colorize().toString());
                         event.setCancelled(true);
                         return;
                     }

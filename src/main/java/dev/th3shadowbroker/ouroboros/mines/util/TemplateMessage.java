@@ -21,6 +21,7 @@ package dev.th3shadowbroker.ouroboros.mines.util;
 
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
 
 public class TemplateMessage {
 
@@ -48,6 +49,13 @@ public class TemplateMessage {
     @Override
     public String toString() {
         return OuroborosMines.PREFIX + template;
+    }
+
+    public static TemplateMessage from(String templatePath, FileConfiguration alternativeConfiguration) {
+        if (alternativeConfiguration.isSet(templatePath)) {
+            return new TemplateMessage(alternativeConfiguration.getString(templatePath, "&cNo message found for &f" + templatePath + "&c!"));
+        }
+        return TemplateMessage.from(templatePath);
     }
 
     public static TemplateMessage from(String templatePath) {
