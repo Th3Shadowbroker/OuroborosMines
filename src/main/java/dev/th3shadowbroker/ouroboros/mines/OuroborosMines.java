@@ -43,6 +43,8 @@ import org.th3shadowbroker.ouroboros.update.spiget.SpigetUpdater;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 public class OuroborosMines extends JavaPlugin {
@@ -199,6 +201,25 @@ public class OuroborosMines extends JavaPlugin {
                  reloadConfig();
                  getLogger().info("Configuration patch for experience.spawnOrbs applied!");
              }
+
+             //Patch messages that are part of the clan-update
+             List<String> pathsToCopy = Arrays.asList(
+                     "chat.messages.announcements",
+                     "chat.messages.minesClosed",
+                     "chat.messages.error",
+                     "autoPickup",
+                     "openingHours"
+             );
+             pathsToCopy.forEach(path -> {
+                 if (!getConfig().isSet(path)) {
+                     getLogger().info("Configuration patch for " + path + " applied!");
+                     getConfig().set(path, defaultConfig.get(path));
+
+                     saveConfig();
+                     reloadConfig();
+                 }
+             });
+
          } else {
              getLogger().severe("Unable to load default-configuration to patch existing configuration!");
          }
