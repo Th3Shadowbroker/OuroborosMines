@@ -79,7 +79,7 @@ public class OpeningHours {
                 hasDuration ? Duration.fromString(configurationSection.getString("realtime")) : null,
                 configurationSection.getBoolean("announcements.opening", true),
                 configurationSection.getBoolean("announcements.closing", true),
-                configurationSection.getStringList("worlds")
+                configurationSection.getStringList("announcements.worlds")
         );
     }
 
