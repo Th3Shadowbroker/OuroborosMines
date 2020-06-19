@@ -53,7 +53,6 @@ public class BlockBreakListener implements Listener {
                         boolean idMatches = false;
 
                         Optional<ProtectedRegion> topRegion = WorldUtils.getTopRegion(blockRegions.get());
-                        System.out.println(topRegion.isPresent());
                         if (topRegion.isPresent() && topRegion.get().getId().equals(rc.getRegionId())) {
                             idMatches = true;
                         }
