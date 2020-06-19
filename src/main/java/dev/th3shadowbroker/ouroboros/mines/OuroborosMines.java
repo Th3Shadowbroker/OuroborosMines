@@ -26,6 +26,7 @@ import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialExcepti
 import dev.th3shadowbroker.ouroboros.mines.listeners.BlockBreakListener;
 import dev.th3shadowbroker.ouroboros.mines.listeners.DepositDiscoveryListener;
 import dev.th3shadowbroker.ouroboros.mines.listeners.ExperienceListener;
+import dev.th3shadowbroker.ouroboros.mines.listeners.TimeSkipListener;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.JobsRebornSupport;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.QuestsSupport;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
@@ -100,6 +101,7 @@ public class OuroborosMines extends JavaPlugin {
         getServer().getPluginManager().registerEvents( new BlockBreakListener(), this );
         getServer().getPluginManager().registerEvents( new DepositDiscoveryListener(), this );
         getServer().getPluginManager().registerEvents( new ExperienceListener(), this );
+        getServer().getPluginManager().registerEvents( new TimeSkipListener(), this );
 
         announcementManager = new AnnouncementManager();
         announcementManager.createTasks();
