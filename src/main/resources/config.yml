@@ -27,6 +27,7 @@ chat:
       opening: "&2The mines are open!"
       closing: "&cThe mines are now closed. Come back tomorrow!"
     minesClosed: "&cThe mines are closed come back later."
+    error: "&cAn error occurred: %error%"
 
 # This keys define all materials that can be mined.
 # In error-logs these materials are known as mining- or mine-materials.
