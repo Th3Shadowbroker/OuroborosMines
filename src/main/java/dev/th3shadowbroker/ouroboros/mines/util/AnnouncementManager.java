@@ -112,10 +112,7 @@ public class AnnouncementManager {
     }
 
     public boolean hasAny() {
-        //@TODO Use shortcut when done with debugging this shit!
-        boolean b = taskMap.size() > 0;
-        System.out.println("Currently there are " + (b ? taskMap.size() : "no") + " announcements managed!");
-        return b;
+        return taskMap.size() > 0;
     }
 
 }
