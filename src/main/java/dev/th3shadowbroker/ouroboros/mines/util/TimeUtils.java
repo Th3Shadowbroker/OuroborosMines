@@ -19,9 +19,12 @@
 
 package dev.th3shadowbroker.ouroboros.mines.util;
 
+import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
+import java.util.TimeZone;
 
 public class TimeUtils {
 
@@ -46,8 +49,20 @@ public class TimeUtils {
         }
     }
 
+    public static Calendar getCalendarWithTimezone() {
+        Calendar calendar = (Calendar) Calendar.getInstance().clone();
+
+        String timezone = OuroborosMines.INSTANCE.getConfig().getString("timezone", "auto");
+        boolean useSystemTimezone = timezone.equalsIgnoreCase("auto");
+        if (!useSystemTimezone) {
+            calendar.setTimeZone(TimeZone.getTimeZone(timezone));
+        }
+
+        return calendar;
+    }
+
     public static Date now() {
-        return Calendar.getInstance().getTime();
+        return getCalendarWithTimezone().getTime();
     }
 
     public static boolean minesAreOpen(Range openingHours, long time) {

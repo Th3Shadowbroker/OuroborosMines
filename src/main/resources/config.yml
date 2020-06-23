@@ -121,6 +121,9 @@ autoPickup: false
 # These options can be used to define "opening hours" for your mines.
 #
 # See https://minecraft.gamepedia.com/Day-night_cycle for details.
+# Alternatively you can use the realtime option to define opening-hours based on your servers time.
+# IMPORTANT: Use 24h format. Not 12h!
+# Example: 10:00-14:00
 #
 openingHours:
   enabled: false
@@ -130,3 +133,9 @@ openingHours:
     closing: true
     worlds:
       - world
+
+# Timezone
+#
+# If your server uses another timezone, you can adjust it here.
+# auto: If the timezone is set to 'auto', om will use the servers' timezone.
+timezone: auto

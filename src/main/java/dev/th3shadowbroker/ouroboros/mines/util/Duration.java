@@ -19,7 +19,6 @@
 
 package dev.th3shadowbroker.ouroboros.mines.util;
 
-import java.time.Instant;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -29,13 +28,14 @@ public class Duration {
 
     private final Date end;
 
-    private final Calendar calendar = Calendar.getInstance();
+    private final Calendar calendar;
 
     public static final long DAY_SECONDS = 86400;
 
     public Duration(Date start, Date end) {
         this.start = start;
         this.end = end;
+        this.calendar = TimeUtils.getCalendarWithTimezone();
     }
 
     public Date getStart() {
@@ -95,7 +95,7 @@ public class Duration {
         maxString[0] = maxSplitted[0];
         maxString[1] = maxSplitted.length > 1 ? maxSplitted[1] : "00";
 
-        Calendar calendar = (Calendar) Calendar.getInstance().clone();
+        Calendar calendar = TimeUtils.getCalendarWithTimezone();
         calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(minString[0]));
         calendar.set(Calendar.MINUTE, Integer.parseInt(minString[1]));
         calendar.set(Calendar.SECOND, 0);
