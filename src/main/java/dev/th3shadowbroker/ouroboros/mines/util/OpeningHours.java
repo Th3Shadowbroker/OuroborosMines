@@ -21,6 +21,7 @@ package dev.th3shadowbroker.ouroboros.mines.util;
 
 import org.bukkit.configuration.ConfigurationSection;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +31,7 @@ public class OpeningHours {
 
     private final Range tickRange;
 
-    private final Duration realtimeRange;
+    private final List<Duration> realtimeRange;
 
     private final boolean announceOpening;
 
@@ -38,7 +39,7 @@ public class OpeningHours {
 
     private final List<String> announcementWorlds;
 
-    private OpeningHours(boolean enabled, Range tickRange, Duration realtimeRange, boolean announceOpening, boolean announceClosing, List<String> announcementWorlds) {
+    private OpeningHours(boolean enabled, Range tickRange, List<Duration> realtimeRange, boolean announceOpening, boolean announceClosing, List<String> announcementWorlds) {
         this.enabled = enabled;
         this.tickRange = tickRange;
         this.realtimeRange = realtimeRange;
@@ -59,8 +60,8 @@ public class OpeningHours {
         return announcementWorlds;
     }
 
-    public Optional<Duration> getRealtimeRange() {
-        return Optional.ofNullable(realtimeRange);
+    public List<Duration> getRealtimeRange() {
+        return realtimeRange;
     }
 
     public boolean isAnnounceOpening() {
@@ -72,11 +73,17 @@ public class OpeningHours {
     }
 
     public static OpeningHours fromSection(ConfigurationSection configurationSection) {
-        boolean hasDuration = configurationSection.isSet("realtime");
+        //boolean hasDuration = configurationSection.isSet("realtime");
+        List<String> rawDurations = configurationSection.getStringList("realtime");
+        List<Duration> durations = new ArrayList<>();
+
+        if (configurationSection.isString("realtime")) rawDurations.add(configurationSection.getString("realtime"));
+        rawDurations.forEach(s -> durations.add(Duration.fromString(s)));
+
         return new OpeningHours(
                 configurationSection.getBoolean("enabled", false),
                 Range.fromString(configurationSection.getString("time", "0-12000")),
-                hasDuration ? Duration.fromString(configurationSection.getString("realtime")) : null,
+                durations,
                 configurationSection.getBoolean("announcements.opening", true),
                 configurationSection.getBoolean("announcements.closing", true),
                 configurationSection.getStringList("announcements.worlds")

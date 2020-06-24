@@ -47,17 +47,19 @@ public class AnnouncementManager {
                     // Opening announcement
                     if (openingHours.isAnnounceOpening()) {
                         String openingMessage = TemplateMessage.from("chat.messages.announcements.opening", regionConfiguration.getConfiguration()).colorize().toString();
-                        Optional<Duration> realtimeRange = openingHours.getRealtimeRange();
+                        List<Duration> realtimeRanges = openingHours.getRealtimeRange();
 
                         // Entry missing?
                         if (!taskMap.containsKey(regionConfiguration)) taskMap.put(regionConfiguration, new ArrayList<>());
 
                         long delay;
                         // Realtime should be used
-                        if (realtimeRange.isPresent()) {
-                            // Get it ready!
-                            delay = realtimeRange.get().getTicksUntilStart();
-                            taskMap.get(regionConfiguration).add(AnnouncementRunnable.schedule(delay, Duration.DAY_SECONDS, openingMessage, openingHours.getAnnouncementWorlds()));
+                        if (!realtimeRanges.isEmpty()) {
+                            for (Duration realtimeRange : realtimeRanges) {
+                                // Get it ready!
+                                delay = realtimeRange.getTicksUntilStart();
+                                taskMap.get(regionConfiguration).add(AnnouncementRunnable.schedule(delay, Duration.DAY_SECONDS, openingMessage, openingHours.getAnnouncementWorlds()));
+                            }
                         }
 
                         // Use game-time (in ticks)
@@ -71,17 +73,19 @@ public class AnnouncementManager {
                     // Closing announcement
                     if (openingHours.isAnnounceClosing()) {
                         String closingMessage = TemplateMessage.from("chat.messages.announcements.closing", regionConfiguration.getConfiguration()).colorize().toString();
-                        Optional<Duration> realtimeRange = openingHours.getRealtimeRange();
+                        List<Duration> realtimeRanges = openingHours.getRealtimeRange();
 
                         // Entry missing?
                         if (!taskMap.containsKey(regionConfiguration)) taskMap.put(regionConfiguration, new ArrayList<>());
 
                         long delay;
                         // Realtime should be used
-                        if (realtimeRange.isPresent()) {
-                            // Get it ready!
-                            delay = realtimeRange.get().getTicksUntilEnd();
-                            taskMap.get(regionConfiguration).add(AnnouncementRunnable.schedule(delay, Duration.DAY_SECONDS * 20, closingMessage, openingHours.getAnnouncementWorlds()));
+                        if (!realtimeRanges.isEmpty()) {
+                            for (Duration realtimeRange : realtimeRanges) {
+                                // Get it ready!
+                                delay = realtimeRange.getTicksUntilEnd();
+                                taskMap.get(regionConfiguration).add(AnnouncementRunnable.schedule(delay, Duration.DAY_SECONDS * 20, closingMessage, openingHours.getAnnouncementWorlds()));
+                            }
                         }
 
                         // Use game-time (in ticks)

@@ -21,10 +21,7 @@ package dev.th3shadowbroker.ouroboros.mines.util;
 
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Optional;
-import java.util.TimeZone;
+import java.util.*;
 
 public class TimeUtils {
 
@@ -71,9 +68,15 @@ public class TimeUtils {
 
     public static boolean minesAreOpen(RegionConfiguration regionConfiguration) {
         if (regionConfiguration.getOpeningHours().isPresent()) {
-            Optional<Duration> realtimeRange = regionConfiguration.getOpeningHours().get().getRealtimeRange();
-            if (realtimeRange.isPresent()) {
-                return realtimeRange.get().isBetween(TimeUtils.now());
+            List<Duration> durations = regionConfiguration.getOpeningHours().get().getRealtimeRange();
+
+            if (!durations.isEmpty()) {
+                for (Duration duration : durations) {
+                    if (duration.isBetween(TimeUtils.now())) {
+                        return true;
+                    }
+                }
+                return false;
             } else {
                 return minesAreOpen(regionConfiguration.getOpeningHours().get().getTickRange(), regionConfiguration.getWorld().getTime());
             }
