@@ -67,7 +67,7 @@ public class TimeUtils {
     }
 
     public static boolean minesAreOpen(RegionConfiguration regionConfiguration) {
-        if (regionConfiguration.getOpeningHours().isPresent()) {
+        if (regionConfiguration.getOpeningHours().isPresent() && regionConfiguration.getOpeningHours().get().isEnabled()) {
             List<Duration> realtimeRanges = regionConfiguration.getOpeningHours().get().getRealtimeRange();
 
             if (!realtimeRanges.isEmpty()) {
