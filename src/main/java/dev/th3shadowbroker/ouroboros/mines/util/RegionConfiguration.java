@@ -68,7 +68,7 @@ public class RegionConfiguration {
                 OpeningHours.fromSection(configuration.getConfigurationSection("openingHours")) :
 
                 // If section does not exists, check the default config
-                plugin.getConfig().getBoolean("openingHours.enabled", false) ?
+                plugin.getConfig().getBoolean("openingHours.enabled", false) && configuration.getBoolean("inherit", false) ?
 
                         // Apply setting from config.yml or don't
                         OpeningHours.fromSection(plugin.getConfig().getConfigurationSection("openingHours")) : null;
