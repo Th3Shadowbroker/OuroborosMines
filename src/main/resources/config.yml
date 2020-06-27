@@ -131,8 +131,6 @@ openingHours:
   announcements:
     opening: true
     closing: true
-    worlds:
-      - world
 
 # Timezone
 #
