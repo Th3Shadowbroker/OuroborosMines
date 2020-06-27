@@ -58,7 +58,7 @@ public class AnnouncementManager {
                             for (Duration realtimeRange : realtimeRanges) {
                                 // Get it ready!
                                 delay = realtimeRange.getTicksUntilStart();
-                                taskMap.get(regionConfiguration).add(AnnouncementRunnable.schedule(delay, Duration.DAY_SECONDS, openingMessage, openingHours.getAnnouncementWorlds()));
+                                taskMap.get(regionConfiguration).add(AnnouncementRunnable.schedule(delay, Duration.DAY_SECONDS * 20, openingMessage, openingHours.getAnnouncementWorlds()));
                             }
                         }
 
