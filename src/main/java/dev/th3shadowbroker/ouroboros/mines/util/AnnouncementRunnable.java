@@ -24,10 +24,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class AnnouncementRunnable implements Runnable {
 
@@ -37,9 +34,12 @@ public class AnnouncementRunnable implements Runnable {
 
     private BukkitTask task;
 
+    private Date time;
+
     private long delay;
 
-    public AnnouncementRunnable(String message, List<World> worlds) {
+    public AnnouncementRunnable(Date time, String message, List<World> worlds) {
+        this.time = time;
         this.worlds = worlds;
         this.message = message;
     }
@@ -70,6 +70,13 @@ public class AnnouncementRunnable implements Runnable {
         this.delay = delay;
     }
 
+    public String getRemainingTimeString() {
+        /*
+            @TODO Implement return at this point!
+         */
+        throw new UnsupportedOperationException();
+    }
+
     public void cancel() {
         task.cancel();
         //System.out.println(String.format("Scheduled announcement: \"%s\" in world \"%s\" has been cancelled.", message, world.getName()));
@@ -83,7 +90,10 @@ public class AnnouncementRunnable implements Runnable {
             world.ifPresent(parsedWorlds::add);
         });
 
-        AnnouncementRunnable runnable = new AnnouncementRunnable(message, parsedWorlds);
+        Calendar timeCalendar = TimeUtils.getCalendarWithTimezone();
+        timeCalendar.add(Calendar.SECOND, (int) delay / 20);
+
+        AnnouncementRunnable runnable = new AnnouncementRunnable(timeCalendar.getTime(), message, parsedWorlds);
         BukkitTask task = Bukkit.getServer().getScheduler().runTaskTimer(OuroborosMines.INSTANCE, runnable, delay, period);
         runnable.setTask(task);
         runnable.setDelay(delay);
@@ -100,7 +110,10 @@ public class AnnouncementRunnable implements Runnable {
             world.ifPresent(parsedWorlds::add);
         });
 
-        AnnouncementRunnable runnable = new AnnouncementRunnable(message, parsedWorlds);
+        Calendar timeCalendar = TimeUtils.getCalendarWithTimezone();
+        timeCalendar.add(Calendar.SECOND, (int) delay / 20);
+
+        AnnouncementRunnable runnable = new AnnouncementRunnable(timeCalendar.getTime(), message, parsedWorlds);
         BukkitTask task = Bukkit.getServer().getScheduler().runTaskTimer(OuroborosMines.INSTANCE, runnable, delay, period);
         runnable.setTask(task);
         runnable.setDelay(delay);
