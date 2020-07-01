@@ -137,5 +137,5 @@ openingHours:
 # Timezone
 #
 # If your server uses another timezone, you can adjust it here.
-# auto: If the timezone is set to 'auto', om will use the servers' timezone.
+# auto: If the timezone is set to 'auto', om will use the server's timezone.
 timezone: auto
