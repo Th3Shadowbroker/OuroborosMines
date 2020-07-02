@@ -21,24 +21,27 @@ package dev.th3shadowbroker.ouroboros.mines.listeners;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.events.DepositDiscoveredEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
-import dev.th3shadowbroker.ouroboros.mines.util.MetaUtils;
-import dev.th3shadowbroker.ouroboros.mines.util.MineableMaterial;
-import dev.th3shadowbroker.ouroboros.mines.util.ReplacementTask;
-import dev.th3shadowbroker.ouroboros.mines.util.WorldUtils;
+import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 
 public class BlockBreakListener implements Listener {
 
     private final OuroborosMines plugin = OuroborosMines.INSTANCE;
+
+    private final boolean autoPickup = plugin.getConfig().getBoolean("autoPickup", false);
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockBreak(BlockBreakEvent event) {
@@ -47,6 +50,27 @@ public class BlockBreakListener implements Listener {
         if ( blockRegions.isPresent() && blockRegions.get().testState(null, OuroborosMines.FLAG)) {
             Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType(), WorldUtils.getTopRegion(blockRegions.get()).get(), BukkitAdapter.adapt(event.getBlock().getWorld()));
             if (minedMaterial.isPresent()) {
+
+                // Abort if opening hours are enabled an the mines are closed
+                if (plugin.getAnnouncementManager().hasAny()) {
+                    Optional<RegionConfiguration> matchingConfig = plugin.getMaterialManager().getMineableMaterialOverrides().stream().filter(rc -> {
+                        boolean worldMatches = rc.getWorld() == event.getBlock().getWorld();
+                        boolean idMatches = false;
+
+                        Optional<ProtectedRegion> topRegion = WorldUtils.getTopRegion(blockRegions.get());
+                        if (topRegion.isPresent() && topRegion.get().getId().equals(rc.getRegionId())) {
+                            idMatches = true;
+                        }
+
+                        return worldMatches && idMatches;
+                    }).findFirst();
+
+                    if (matchingConfig.isPresent() && !matchingConfig.get().minesAreOpen()) {
+                        event.getPlayer().sendMessage(TemplateMessage.from("chat.messages.minesClosed", matchingConfig.get().getConfiguration()).colorize().toString());
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
 
                 if (minedMaterial.get().canBeRich()) {
                     //Draw for richness
@@ -60,7 +84,8 @@ public class BlockBreakListener implements Listener {
 
                     //If rich
                     if (MetaUtils.isRich(event.getBlock())) {
-                        event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+                        //event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+                        breakBlock(event, event.getPlayer().getInventory().getItemInMainHand());
                         event.getBlock().setType(minedMaterial.get().getMaterial());
                         MetaUtils.decreaseRichness(event.getBlock());
 
@@ -81,11 +106,24 @@ public class BlockBreakListener implements Listener {
                 Bukkit.getPluginManager().callEvent(new MaterialMinedEvent(minedMaterial.get(), event.getBlock(), false, event.getPlayer()));
 
                 //Break it! Replace it!
-                event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+                //event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+                breakBlock(event, event.getPlayer().getInventory().getItemInMainHand());
                 event.getBlock().setType(minedMaterial.get().getReplacement());
             }
 
             event.setCancelled(true);
+        }
+    }
+
+    private void breakBlock(BlockBreakEvent event, ItemStack tool) {
+        if (!autoPickup) {
+            event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+        } else {
+            ItemStack[] drops = event.getBlock().getDrops(event.getPlayer().getInventory().getItemInMainHand()).stream().toArray(ItemStack[]::new);
+            Map<Integer, ItemStack> overflow = event.getPlayer().getInventory().addItem(drops);
+            if (overflow.size() > 0) {
+                overflow.forEach((slot, item) -> event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), item));
+            }
         }
     }
 

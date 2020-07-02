@@ -26,6 +26,7 @@ import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialExcepti
 import dev.th3shadowbroker.ouroboros.mines.listeners.BlockBreakListener;
 import dev.th3shadowbroker.ouroboros.mines.listeners.DepositDiscoveryListener;
 import dev.th3shadowbroker.ouroboros.mines.listeners.ExperienceListener;
+import dev.th3shadowbroker.ouroboros.mines.listeners.TimeSkipListener;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.JobsRebornSupport;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.QuestsSupport;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
@@ -42,6 +43,8 @@ import org.th3shadowbroker.ouroboros.update.spiget.SpigetUpdater;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 public class OuroborosMines extends JavaPlugin {
@@ -57,6 +60,8 @@ public class OuroborosMines extends JavaPlugin {
     private EffectManager effectManager;
 
     private TaskManager taskManager;
+
+    private AnnouncementManager announcementManager;
 
     private boolean worldGuardFound = false;
 
@@ -98,6 +103,10 @@ public class OuroborosMines extends JavaPlugin {
         getServer().getPluginManager().registerEvents( new BlockBreakListener(), this );
         getServer().getPluginManager().registerEvents( new DepositDiscoveryListener(), this );
         getServer().getPluginManager().registerEvents( new ExperienceListener(), this );
+        getServer().getPluginManager().registerEvents( new TimeSkipListener(), this );
+
+        announcementManager = new AnnouncementManager();
+        announcementManager.createTasks();
 
         getCommand("om").setExecutor(new OmCommand());
 
@@ -192,6 +201,25 @@ public class OuroborosMines extends JavaPlugin {
                  reloadConfig();
                  getLogger().info("Configuration patch for experience.spawnOrbs applied!");
              }
+
+             //Patch messages that are part of the clan-update
+             List<String> pathsToCopy = Arrays.asList(
+                     "chat.messages.announcements",
+                     "chat.messages.minesClosed",
+                     "chat.messages.error",
+                     "autoPickup",
+                     "openingHours"
+             );
+             pathsToCopy.forEach(path -> {
+                 if (!getConfig().isSet(path)) {
+                     getLogger().info("Configuration patch for " + path + " applied!");
+                     getConfig().set(path, defaultConfig.get(path));
+
+                     saveConfig();
+                     reloadConfig();
+                 }
+             });
+
          } else {
              getLogger().severe("Unable to load default-configuration to patch existing configuration!");
          }
@@ -227,4 +255,9 @@ public class OuroborosMines extends JavaPlugin {
     public TaskManager getTaskManager() {
         return taskManager;
     }
+
+    public AnnouncementManager getAnnouncementManager() {
+        return announcementManager;
+    }
+    
 }

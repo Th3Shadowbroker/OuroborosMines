@@ -42,7 +42,19 @@ public class WorldUtils {
     }
 
     public static Optional<ProtectedRegion> getTopRegion(ApplicableRegionSet regionSet) {
-        return regionSet.getRegions().stream().filter(region -> region.getFlags().get(OuroborosMines.FLAG) == StateFlag.State.ALLOW).findFirst();
+        ProtectedRegion[] regions = regionSet.getRegions().stream().filter(region -> region.getFlags().get(OuroborosMines.FLAG) == StateFlag.State.ALLOW).toArray(ProtectedRegion[]::new);
+        ProtectedRegion highestRegion = null;
+
+        for (ProtectedRegion protectedRegion : regions) {
+            if (highestRegion != null) {
+                if (protectedRegion.getPriority() > highestRegion.getPriority()) {
+                    highestRegion = protectedRegion;
+                }
+            } else {
+                highestRegion = protectedRegion;
+            }
+        }
+        return Optional.ofNullable(highestRegion);
     }
 
     public static Optional<ApplicableRegionSet> getPlayerRegions(Player player) {

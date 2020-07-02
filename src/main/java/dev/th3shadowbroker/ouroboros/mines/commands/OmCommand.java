@@ -88,11 +88,16 @@ public class OmCommand implements CommandExecutor {
 
                 case "reload":
                     if (sender.hasPermission(Permissions.COMMAND_RELOAD.permission)) {
-                        sender.sendMessage(TemplateMessage.from("chat.messages.reloadingConfig").colorize().toString());
-                        plugin.reloadConfig();
-                        sender.sendMessage(TemplateMessage.from("chat.messages.reloadingRegionConfigurations").colorize().toString());
-                        plugin.getMaterialManager().reloadRegionConfigurations();
-                        sender.sendMessage(TemplateMessage.from("chat.messages.reloadedRegionConfigurations").insert("count", String.valueOf(plugin.getMaterialManager().getMineableMaterialOverrides().size())).colorize().toString());
+                        try {
+                            sender.sendMessage(TemplateMessage.from("chat.messages.reloadingConfig").colorize().toString());
+                            plugin.reloadConfig();
+                            sender.sendMessage(TemplateMessage.from("chat.messages.reloadingRegionConfigurations").colorize().toString());
+                            plugin.getMaterialManager().reloadRegionConfigurations();
+                            sender.sendMessage(TemplateMessage.from("chat.messages.reloadedRegionConfigurations").insert("count", String.valueOf(plugin.getMaterialManager().getMineableMaterialOverrides().size())).colorize().toString());
+                            plugin.getAnnouncementManager().flush();
+                        } catch (Exception ex) {
+                            sender.sendMessage(TemplateMessage.from("chat.messages.error").colorize().insert("error", ex.getMessage()).toString());
+                        }
                     } else {
                         sender.sendMessage(cmd.getPermissionMessage());
                     }
