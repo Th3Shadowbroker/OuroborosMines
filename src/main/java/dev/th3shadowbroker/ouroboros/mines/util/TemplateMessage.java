@@ -27,7 +27,7 @@ public class TemplateMessage {
 
     private String template;
 
-    private TemplateMessage(String template) {
+    public TemplateMessage(String template) {
         this.template = template;
     }
 
@@ -49,6 +49,10 @@ public class TemplateMessage {
     @Override
     public String toString() {
         return OuroborosMines.PREFIX + template;
+    }
+
+    public String toRawString() {
+        return template;
     }
 
     public static TemplateMessage from(String templatePath, FileConfiguration alternativeConfiguration) {
