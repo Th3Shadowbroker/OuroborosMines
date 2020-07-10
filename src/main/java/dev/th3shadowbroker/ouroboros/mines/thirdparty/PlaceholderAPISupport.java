@@ -22,6 +22,7 @@ package dev.th3shadowbroker.ouroboros.mines.thirdparty;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.util.AnnouncementRunnable;
 import dev.th3shadowbroker.ouroboros.mines.util.RegionConfiguration;
+import dev.th3shadowbroker.ouroboros.mines.util.TemplateMessage;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 
@@ -57,6 +58,9 @@ public class PlaceholderAPISupport extends PlaceholderExpansion {
             // For remaining time
             case "oh":
             case "opening":
+                // Abort if there are not enough fragments.
+                if (fragments.length < 3) return "Invalid placeholder!";
+
                 String regionWorld = fragments[1];
                 String regionId = fragments[2];
 
@@ -77,15 +81,23 @@ public class PlaceholderAPISupport extends PlaceholderExpansion {
                                     remainingTime = runnable.getRemainingTime();
                                 }
                             }
-                            //                      ms -> s s->m m->h
+
                             long h = (remainingTime / 1000  / 60 / 60) % 24;
                             long m = (remainingTime / 1000 / 60) % 60;
                             long s = (remainingTime / 1000) % 60;
 
-                            //@TODO Testing not finished. Remaining cases:
-                            // - Single opening hour
+                            String result = new TemplateMessage(OuroborosMines.INSTANCE.getConfig().getString("placeholders.openingHours.format", "%h%:%m%:%s%"))
+                                            .insert("h", String.format("%02d", h))
+                                            .insert("m", String.format("%02d", m))
+                                            .insert("s", String.format("%02d", s))
+                                            .colorize().toRawString();
 
-                            return String.format("%02d:%02d:%02d", h , m, s);
+                            //@TODO Testing not finished. Remaining cases:
+                            // - Single opening hour (Works!)
+                            //@FIXME The date doesn't get reset even though the runnables are scheduled for a 24h cycle, which leads to negative results.
+
+                            //return String.format("%02d:%02d:%02d", h , m, s);
+                            return result;
                         } else {
                             return "Now!";
                         }
@@ -94,7 +106,7 @@ public class PlaceholderAPISupport extends PlaceholderExpansion {
 
             // Not specified
             default:
-                return "";
+                return "Invalid placeholder!";
         }
     }
 
