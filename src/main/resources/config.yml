@@ -120,10 +120,13 @@ autoPickup: false
 # Opening hours
 # These options can be used to define "opening hours" for your mines.
 #
-# See https://minecraft.gamepedia.com/Day-night_cycle for details.
-# Alternatively you can use the realtime option to define opening-hours based on your servers time.
+# It's highly recommended to have a look at the wiki first: https://github.com/Th3Shadowbroker/OuroborosMines/wiki/Configuration#opening-hours.
+# If you need help with setting up opening-hours, feel free to join Th3Shadowbroker's Discord. You can find the link on the plugins spigot page.
+#
+# Alternatively to the time option you can use the realtime option to define opening-hours based on your servers time.
 # IMPORTANT: Use 24h format. Not 12h!
-# Example: 10:00-14:00
+# Example:
+#   realtime: 10:00-14:00
 #
 openingHours:
   enabled: false
@@ -137,5 +140,5 @@ openingHours:
 # Timezone
 #
 # If your server uses another timezone, you can adjust it here.
-# auto: If the timezone is set to 'auto', om will use the servers' timezone.
+# auto: If the timezone is set to 'auto', om will use the server's timezone.
 timezone: auto
