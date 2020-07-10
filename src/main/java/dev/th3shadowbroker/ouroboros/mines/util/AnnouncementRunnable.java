@@ -70,11 +70,9 @@ public class AnnouncementRunnable implements Runnable {
         this.delay = delay;
     }
 
-    public String getRemainingTimeString() {
-        /*
-            @TODO Implement return at this point!
-         */
-        throw new UnsupportedOperationException();
+    public long getRemainingTime() {
+        long r = time.getTime() - TimeUtils.now().getTime();
+        return r >= 0 ? r : 0;
     }
 
     public void cancel() {
