@@ -146,3 +146,4 @@ timezone: auto
 placeholders:
   openingHours:
     format: "%h%:%m%:%s%"
+    open: "Now!"

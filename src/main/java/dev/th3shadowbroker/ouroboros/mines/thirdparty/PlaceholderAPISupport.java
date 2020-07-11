@@ -95,11 +95,13 @@ public class PlaceholderAPISupport extends PlaceholderExpansion {
                             //@TODO Testing not finished. Remaining cases:
                             // - Single opening hour (Works!)
                             //@FIXME The date doesn't get reset even though the runnables are scheduled for a 24h cycle, which leads to negative results.
+                            //@TODO Idea. Add one day when the current date lays in the past!
+                            //@TODO Hand over test build to tester
 
                             //return String.format("%02d:%02d:%02d", h , m, s);
                             return result;
                         } else {
-                            return "Now!";
+                            return TemplateMessage.from("placeholders.openingHours.open").colorize().toRawString();
                         }
                     }
                 }
