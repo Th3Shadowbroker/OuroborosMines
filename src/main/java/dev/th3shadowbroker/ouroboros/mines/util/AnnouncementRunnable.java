@@ -34,12 +34,14 @@ public class AnnouncementRunnable implements Runnable {
 
     private BukkitTask task;
 
-    private Date time;
+    private Date executionTime;
 
     private long delay;
 
-    public AnnouncementRunnable(Date time, String message, List<World> worlds) {
-        this.time = time;
+    private long period;
+
+    public AnnouncementRunnable(Date executionTime, String message, List<World> worlds) {
+        this.executionTime = executionTime;
         this.worlds = worlds;
         this.message = message;
     }
@@ -52,6 +54,13 @@ public class AnnouncementRunnable implements Runnable {
         } else {
             Bukkit.getServer().broadcastMessage(message);
         }
+        resetExecutionTime();
+    }
+
+    private void resetExecutionTime() {
+        Calendar calendar = TimeUtils.getCalendarWithTimezone();
+        calendar.add(Calendar.SECOND, (int) (period == TimeUtils.DAY_END ? TimeUtils.DAY_END : Duration.DAY_SECONDS));
+        this.executionTime = calendar.getTime();
     }
 
     public BukkitTask getTask() {
@@ -70,8 +79,16 @@ public class AnnouncementRunnable implements Runnable {
         this.delay = delay;
     }
 
+    public long getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(long period) {
+        this.period = period;
+    }
+
     public long getRemainingTime() {
-        long r = time.getTime() - TimeUtils.now().getTime();
+        long r = executionTime.getTime() - TimeUtils.now().getTime();
         return r >= 0 ? r : 0;
     }
 
@@ -95,9 +112,11 @@ public class AnnouncementRunnable implements Runnable {
         BukkitTask task = Bukkit.getServer().getScheduler().runTaskTimer(OuroborosMines.INSTANCE, runnable, delay, period);
         runnable.setTask(task);
         runnable.setDelay(delay);
+        runnable.setPeriod(period);
         return runnable;
     }
 
+    @Deprecated
     public static AnnouncementRunnable schedule(long delay, long period, String message, String... worlds) {
 
         List<World> parsedWorlds = new ArrayList<>();
@@ -115,6 +134,7 @@ public class AnnouncementRunnable implements Runnable {
         BukkitTask task = Bukkit.getServer().getScheduler().runTaskTimer(OuroborosMines.INSTANCE, runnable, delay, period);
         runnable.setTask(task);
         runnable.setDelay(delay);
+        runnable.setPeriod(period);
         return runnable;
     }
 
