@@ -20,6 +20,9 @@
 package dev.th3shadowbroker.ouroboros.mines.util;
 
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
+import dev.th3shadowbroker.ouroboros.mines.thirdparty.PlaceholderAPISupport;
+import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -27,7 +30,7 @@ public class TemplateMessage {
 
     private String template;
 
-    private TemplateMessage(String template) {
+    public TemplateMessage(String template) {
         this.template = template;
     }
 
@@ -48,7 +51,15 @@ public class TemplateMessage {
 
     @Override
     public String toString() {
-        return OuroborosMines.PREFIX + template;
+        if (!Bukkit.getServer().getPluginManager().isPluginEnabled(PlaceholderAPISupport.PLUGIN_NAME)) {
+            return OuroborosMines.PREFIX + template;
+        } else {
+            return OuroborosMines.PREFIX + PlaceholderAPI.setPlaceholders(null, template);
+        }
+    }
+
+    public String toRawString() {
+        return template;
     }
 
     public static TemplateMessage from(String templatePath, FileConfiguration alternativeConfiguration) {

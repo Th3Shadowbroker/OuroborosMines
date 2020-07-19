@@ -119,4 +119,14 @@ public class AnnouncementManager {
         return taskMap.size() > 0;
     }
 
+    public List<AnnouncementRunnable> getRunnablesForRegion(String worldName, String regionId) {
+        List<AnnouncementRunnable> runnables = new ArrayList<>();
+
+        taskMap.keySet().stream().filter(rc -> rc.getWorld().getName().equals(worldName) && rc.getRegionId().equals(regionId)).forEach(rc -> {
+            runnables.addAll(taskMap.get(rc));
+        });
+
+        return runnables;
+    }
+
 }

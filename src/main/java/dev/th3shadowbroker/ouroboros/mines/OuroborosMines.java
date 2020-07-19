@@ -28,6 +28,7 @@ import dev.th3shadowbroker.ouroboros.mines.listeners.DepositDiscoveryListener;
 import dev.th3shadowbroker.ouroboros.mines.listeners.ExperienceListener;
 import dev.th3shadowbroker.ouroboros.mines.listeners.TimeSkipListener;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.JobsRebornSupport;
+import dev.th3shadowbroker.ouroboros.mines.thirdparty.PlaceholderAPISupport;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.QuestsSupport;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bstats.bukkit.MetricsLite;
@@ -236,6 +237,15 @@ public class OuroborosMines extends JavaPlugin {
         if (jobsRebornInstalled) {
             getLogger().info("Jobs support is enabled!");
             new JobsRebornSupport();
+        }
+
+        boolean placeholderApiInstalled = getServer().getPluginManager().isPluginEnabled(PlaceholderAPISupport.PLUGIN_NAME);
+        if (placeholderApiInstalled) {
+            getLogger().info("PlaceholderAPI support is enabled!");
+            boolean success  = new PlaceholderAPISupport().register();
+            if (!success) {
+                getLogger().warning("Unable to register placeholders. Skipping!");
+            }
         }
     }
 
