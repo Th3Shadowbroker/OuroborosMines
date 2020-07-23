@@ -21,6 +21,7 @@ package dev.th3shadowbroker.ouroboros.mines.util;
 
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class TimeUtils {
@@ -40,7 +41,7 @@ public class TimeUtils {
 
         // Aimed time is behind current in-game time
         else {
-            long diffToNextCycle = Math.abs(DAY_END - worldTime);
+            long diffToNextCycle = Math.abs(TimeConstants.INGAME_DAY_TICKS - worldTime);
             //System.out.println(String.format("Diffs. Start: %s | World: %s", diffToNextCycle, aimedTime));
             return diffToNextCycle + aimedTime;
         }
@@ -68,11 +69,11 @@ public class TimeUtils {
 
     public static boolean minesAreOpen(RegionConfiguration regionConfiguration) {
         if (regionConfiguration.getOpeningHours().isPresent() && regionConfiguration.getOpeningHours().get().isEnabled()) {
-            List<Duration> realtimeRanges = regionConfiguration.getOpeningHours().get().getRealtimeRange();
+            List<OMDuration> realtimeRanges = regionConfiguration.getOpeningHours().get().getRealtimeRange();
 
             if (!realtimeRanges.isEmpty()) {
-                for (Duration realtimeRange : realtimeRanges) {
-                    if (realtimeRange.isBetween(TimeUtils.now())) {
+                for (OMDuration realtimeRange : realtimeRanges) {
+                    if (realtimeRange.isInBetween(LocalDateTime.now(InstantUtilities.getTimeZone()))) {
                         return true;
                     }
                 }

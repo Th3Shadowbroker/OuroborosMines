@@ -117,7 +117,7 @@ public class OmCommand implements CommandExecutor {
             new RegionConfiguration(region.getId(), player.getWorld().getName());
             player.sendMessage(TemplateMessage.from("chat.messages.regionCustomize").insert("region", region.getId()).colorize().toString());
         } else {
-            player.sendMessage(TemplateMessage.from("chat.messages.regionAlreadyCustomized").colorize().toString());
+            player.sendMessage(TemplateMessage.from("chat.messages.regionAlreadyCustomized").insert("region", region.getId()).colorize().toString());
         }
     }
 }

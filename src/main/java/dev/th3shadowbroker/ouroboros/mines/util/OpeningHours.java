@@ -23,7 +23,6 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class OpeningHours {
 
@@ -31,7 +30,7 @@ public class OpeningHours {
 
     private final Range tickRange;
 
-    private final List<Duration> realtimeRange;
+    private final List<OMDuration> realtimeRange;
 
     private final boolean announceOpening;
 
@@ -39,7 +38,7 @@ public class OpeningHours {
 
     private final List<String> announcementWorlds;
 
-    private OpeningHours(boolean enabled, Range tickRange, List<Duration> realtimeRange, boolean announceOpening, boolean announceClosing, List<String> announcementWorlds) {
+    private OpeningHours(boolean enabled, Range tickRange, List<OMDuration> realtimeRange, boolean announceOpening, boolean announceClosing, List<String> announcementWorlds) {
         this.enabled = enabled;
         this.tickRange = tickRange;
         this.realtimeRange = realtimeRange;
@@ -60,7 +59,7 @@ public class OpeningHours {
         return announcementWorlds;
     }
 
-    public List<Duration> getRealtimeRange() {
+    public List<OMDuration> getRealtimeRange() {
         return realtimeRange;
     }
 
@@ -75,10 +74,10 @@ public class OpeningHours {
     public static OpeningHours fromSection(ConfigurationSection configurationSection) {
         //boolean hasDuration = configurationSection.isSet("realtime");
         List<String> rawDurations = configurationSection.getStringList("realtime");
-        List<Duration> durations = new ArrayList<>();
+        List<OMDuration> durations = new ArrayList<>();
 
         if (configurationSection.isString("realtime")) rawDurations.add(configurationSection.getString("realtime"));
-        rawDurations.forEach(s -> durations.add(Duration.fromString(s)));
+        rawDurations.forEach(s -> durations.add(InstantUtilities.durationFromString(s)));
 
         return new OpeningHours(
                 configurationSection.getBoolean("enabled", false),

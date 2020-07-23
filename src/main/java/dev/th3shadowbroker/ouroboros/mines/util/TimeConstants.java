@@ -17,37 +17,12 @@
  * SOFTWARE.
  */
 
-import dev.th3shadowbroker.ouroboros.mines.util.Duration;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+package dev.th3shadowbroker.ouroboros.mines.util;
 
-import java.util.Calendar;
-import java.util.Date;
+public final class TimeConstants {
 
-public class RealtimeTest {
+    public static final long REALTIME_DAY_SECONDS = 86400;
 
-    @Test
-    public void test() {
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.HOUR, 10);
-        calendar.set(Calendar.MINUTE, 0);
-        Date d1 = calendar.getTime();
-
-        calendar.set(Calendar.HOUR, 11);
-        calendar.set(Calendar.MINUTE, 0);
-        Date d2 = calendar.getTime();
-
-        Duration d = new Duration(d1, d2);
-
-        System.out.println("Time until start: " + d.getTicksUntilStart());
-        System.out.println("Time until end: " + d.getTicksUntilStart());
-        System.out.println("Time in between: " + d.getTicksBetween());
-
-        calendar.add(Calendar.SECOND, 1319980 / 20);
-        System.out.println(calendar.getTime());
-
-        Assertions.assertEquals(d.getTicksBetween(), 3600 * 20);
-    }
+    public static final long INGAME_DAY_TICKS = 24000;
 
 }

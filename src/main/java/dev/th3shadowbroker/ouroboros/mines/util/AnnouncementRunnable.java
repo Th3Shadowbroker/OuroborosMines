@@ -59,7 +59,7 @@ public class AnnouncementRunnable implements Runnable {
 
     private void resetExecutionTime() {
         Calendar calendar = TimeUtils.getCalendarWithTimezone();
-        calendar.add(Calendar.SECOND, (int) (period == TimeUtils.DAY_END ? TimeUtils.DAY_END : Duration.DAY_SECONDS));
+        calendar.add(Calendar.SECOND, (int) (period == TimeConstants.INGAME_DAY_TICKS ? TimeConstants.INGAME_DAY_TICKS / 20 : TimeConstants.REALTIME_DAY_SECONDS));
         this.executionTime = calendar.getTime();
     }
 
@@ -101,28 +101,6 @@ public class AnnouncementRunnable implements Runnable {
 
         List<World> parsedWorlds = new ArrayList<>();
         worlds.forEach(worldName -> {
-            Optional<World> world = Optional.ofNullable(Bukkit.getServer().getWorld(worldName));
-            world.ifPresent(parsedWorlds::add);
-        });
-
-        Calendar timeCalendar = TimeUtils.getCalendarWithTimezone();
-        timeCalendar.add(Calendar.SECOND, (int) delay / 20);
-
-        AnnouncementRunnable runnable = new AnnouncementRunnable(timeCalendar.getTime(), message, parsedWorlds);
-        BukkitTask task = Bukkit.getServer().getScheduler().runTaskTimer(OuroborosMines.INSTANCE, runnable, delay, period);
-        runnable.setTask(task);
-        runnable.setDelay(delay);
-        runnable.setPeriod(period);
-        return runnable;
-    }
-
-    @Deprecated
-    public static AnnouncementRunnable schedule(long delay, long period, String message, String... worlds) {
-
-        List<World> parsedWorlds = new ArrayList<>();
-        List<String> worldList = Arrays.asList(worlds);
-
-        worldList.forEach(worldName -> {
             Optional<World> world = Optional.ofNullable(Bukkit.getServer().getWorld(worldName));
             world.ifPresent(parsedWorlds::add);
         });
