@@ -209,7 +209,9 @@ public class OuroborosMines extends JavaPlugin {
                      "chat.messages.minesClosed",
                      "chat.messages.error",
                      "autoPickup",
-                     "openingHours"
+                     "openingHours",
+                     "timezone",
+                     "placeholders"
              );
              pathsToCopy.forEach(path -> {
                  if (!getConfig().isSet(path)) {
