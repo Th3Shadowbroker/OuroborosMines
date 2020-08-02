@@ -19,14 +19,13 @@
 
 package dev.th3shadowbroker.ouroboros.mines;
 
-import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import dev.th3shadowbroker.ouroboros.mines.commands.OmCommand;
 import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialException;
 import dev.th3shadowbroker.ouroboros.mines.listeners.BlockBreakListener;
 import dev.th3shadowbroker.ouroboros.mines.listeners.DepositDiscoveryListener;
 import dev.th3shadowbroker.ouroboros.mines.listeners.ExperienceListener;
-import dev.th3shadowbroker.ouroboros.mines.listeners.TimeSkipListener;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.JobsRebornSupport;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.PlaceholderAPISupport;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.QuestsSupport;
@@ -88,7 +87,12 @@ public class OuroborosMines extends JavaPlugin {
         PREFIX = ChatColor.translateAlternateColorCodes('&', getConfig().getString("chat.prefix", "&9[OM]") + "&r ");
 
         //Register flag
-        WorldGuard.getInstance().getFlagRegistry().register(FLAG);
+        Optional<Plugin> worldGuard = Optional.ofNullable(Bukkit.getServer().getPluginManager().getPlugin("WorldGuard"));
+        if (worldGuard.isPresent() && worldGuard.get() instanceof WorldGuardPlugin) {
+            ((WorldGuardPlugin) worldGuard.get()).getFlagRegistry().register(FLAG);
+        } else {
+            getLogger().severe("WorldGuard not found. If you are using WorldGuard 7 you should use the most recent version.");
+        }
     }
 
     @Override
@@ -104,7 +108,6 @@ public class OuroborosMines extends JavaPlugin {
         getServer().getPluginManager().registerEvents( new BlockBreakListener(), this );
         getServer().getPluginManager().registerEvents( new DepositDiscoveryListener(), this );
         getServer().getPluginManager().registerEvents( new ExperienceListener(), this );
-        getServer().getPluginManager().registerEvents( new TimeSkipListener(), this );
 
         announcementManager = new AnnouncementManager();
         announcementManager.createTasks();

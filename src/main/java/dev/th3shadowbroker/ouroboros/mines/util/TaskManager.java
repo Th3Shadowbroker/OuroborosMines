@@ -49,6 +49,7 @@ public class TaskManager {
         for (int i = 0; i < tasks.size(); i++) {
             ReplacementTask replacementTask = tasks.get(i);
             replacementTask.getTask().cancel();
+            replacementTask.setCancelled(true);
             plugin.getLogger().info(String.format("Executing task (Id: %s) [%s/%s]", replacementTask.getTask().getTaskId(),i + 1, tasks.size() ));
             replacementTask.run();
         }

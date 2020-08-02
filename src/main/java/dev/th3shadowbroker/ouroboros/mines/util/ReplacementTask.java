@@ -33,6 +33,8 @@ public class ReplacementTask implements Runnable {
 
     private final Location location;
 
+    private boolean cancelled = false;
+
     private final OuroborosMines plugin = OuroborosMines.INSTANCE;
 
     public ReplacementTask(Location blockLocation, Material material, long cooldownSeconds) {
@@ -46,7 +48,7 @@ public class ReplacementTask implements Runnable {
     @Override
     public void run() {
         location.getBlock().setType(minedMaterial);
-        if (!getTask().isCancelled()) plugin.getTaskManager().unregister(this);
+        if (!cancelled) plugin.getTaskManager().unregister(this);
     }
 
     public BukkitTask getTask() {
@@ -59,5 +61,9 @@ public class ReplacementTask implements Runnable {
 
     public Block getBlock() {
         return location.getBlock();
+    }
+
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
     }
 }

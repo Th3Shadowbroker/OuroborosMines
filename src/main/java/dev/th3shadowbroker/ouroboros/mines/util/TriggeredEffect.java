@@ -119,34 +119,32 @@ public class TriggeredEffect {
                     Location t4 = blockCenter.clone().subtract(0.5, -0.5, -0.5);
 
                     // Dust options for redstone particles
-                    Particle.DustOptions dustOptions = particle == Particle.REDSTONE ? new Particle.DustOptions(particleColor, particleSize) : null;
+                    ParticleUtils.getLocationsBetween(b1, b2, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount));
+                    ParticleUtils.getLocationsBetween(b3, b4, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount));
+                    ParticleUtils.getLocationsBetween(b1, b3, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount));
+                    ParticleUtils.getLocationsBetween(b2, b4, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount));
 
-                    ParticleUtils.getLocationsBetween(b1, b2, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
-                    ParticleUtils.getLocationsBetween(b3, b4, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
-                    ParticleUtils.getLocationsBetween(b1, b3, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
-                    ParticleUtils.getLocationsBetween(b2, b4, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
+                    ParticleUtils.getLocationsBetween(t1, t2, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount));
+                    ParticleUtils.getLocationsBetween(t3, t4, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount));
+                    ParticleUtils.getLocationsBetween(t1, t3, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount));
+                    ParticleUtils.getLocationsBetween(t2, t4, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount));
 
-                    ParticleUtils.getLocationsBetween(t1, t2, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
-                    ParticleUtils.getLocationsBetween(t3, t4, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
-                    ParticleUtils.getLocationsBetween(t1, t3, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
-                    ParticleUtils.getLocationsBetween(t2, t4, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
-
-                    ParticleUtils.getLocationsBetween(t1, b1, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
-                    ParticleUtils.getLocationsBetween(t2, b2, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
-                    ParticleUtils.getLocationsBetween(t3, b3, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
-                    ParticleUtils.getLocationsBetween(t4, b4, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount, dustOptions));
+                    ParticleUtils.getLocationsBetween(t1, b1, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount));
+                    ParticleUtils.getLocationsBetween(t2, b2, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount));
+                    ParticleUtils.getLocationsBetween(t3, b3, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount));
+                    ParticleUtils.getLocationsBetween(t4, b4, 0.1).forEach(loc -> spawnParticle(particle, loc, particleCount));
                     break;
 
                 default:
                 case CENTER:
-                    spawnParticle(particle, blockCenter, particleCount, particle == Particle.REDSTONE ? new Particle.DustOptions(particleColor, particleSize) : null);
+                    spawnParticle(particle, blockCenter, particleCount);
                     break;
             }
         }));
     }
 
-    private void spawnParticle(Particle particle, Location location, int particleCount, Particle.DustOptions dustOptions) {
-        location.getWorld().spawnParticle(particle, location, particleCount, dustOptions);
+    private void spawnParticle(Particle particle, Location location, int particleCount) {
+        location.getWorld().spawnParticle(particle, location, particleCount);
     }
 
     public static TriggeredEffect fromSection(ConfigurationSection section) {

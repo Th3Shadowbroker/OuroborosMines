@@ -19,8 +19,7 @@
 
 package dev.th3shadowbroker.ouroboros.mines.util;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -38,7 +37,7 @@ import java.util.Optional;
 public class WorldUtils {
 
     public static Optional<ApplicableRegionSet> getBlockRegions(Block block) {
-        return getRegionManager(block.getWorld()).map(manager -> manager.getApplicableRegions(BukkitAdapter.asBlockVector(block.getLocation())));
+        return getRegionManager(block.getWorld()).map(manager -> manager.getApplicableRegions(block.getLocation()));
     }
 
     public static Optional<ProtectedRegion> getTopRegion(ApplicableRegionSet regionSet) {
@@ -58,11 +57,11 @@ public class WorldUtils {
     }
 
     public static Optional<ApplicableRegionSet> getPlayerRegions(Player player) {
-        return getRegionManager(player.getWorld()).map(manager -> manager.getApplicableRegions(BukkitAdapter.adapt(player.getLocation()).toVector().toBlockPoint()));
+        return getRegionManager(player.getWorld()).map(manager -> manager.getApplicableRegions(player.getLocation()));
     }
 
     public static Optional<RegionManager> getRegionManager(World world) {
-        return Optional.ofNullable( WorldGuard.getInstance().getPlatform().getRegionContainer().get( BukkitAdapter.adapt(world) ) );
+        return Optional.ofNullable(WorldGuardPlugin.inst().getRegionContainer().get( world ) );
     }
 
     public static Optional<ProtectedRegion> getRegion(String id, World world) {
@@ -75,7 +74,7 @@ public class WorldUtils {
         for (BlockFace face : accessibleFaces)
         {
             Material relativeMaterial = block.getRelative(face).getType();
-            if ( relativeMaterial == Material.AIR || relativeMaterial == Material.CAVE_AIR || relativeMaterial == Material.VOID_AIR ) return true;
+            if ( relativeMaterial == Material.AIR ) return true;
         }
         return false;
     }

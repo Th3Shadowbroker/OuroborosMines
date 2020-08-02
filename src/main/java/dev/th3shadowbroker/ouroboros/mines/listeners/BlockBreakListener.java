@@ -19,7 +19,6 @@
 
 package dev.th3shadowbroker.ouroboros.mines.listeners;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
@@ -48,7 +47,7 @@ public class BlockBreakListener implements Listener {
         Optional<ApplicableRegionSet> blockRegions = WorldUtils.getBlockRegions(event.getBlock());
 
         if ( blockRegions.isPresent() && blockRegions.get().testState(null, OuroborosMines.FLAG)) {
-            Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType(), WorldUtils.getTopRegion(blockRegions.get()).get(), BukkitAdapter.adapt(event.getBlock().getWorld()));
+            Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType(), WorldUtils.getTopRegion(blockRegions.get()).get(), event.getBlock().getWorld());
             if (minedMaterial.isPresent()) {
 
                 // Abort if opening hours are enabled an the mines are closed
@@ -107,7 +106,7 @@ public class BlockBreakListener implements Listener {
 
                 //Break it! Replace it!
                 //event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
-                breakBlock(event, event.getPlayer().getInventory().getItemInMainHand());
+                breakBlock(event, event.getPlayer().getInventory().getItemInHand());
                 event.getBlock().setType(minedMaterial.get().getReplacement());
             }
 
@@ -117,9 +116,9 @@ public class BlockBreakListener implements Listener {
 
     private void breakBlock(BlockBreakEvent event, ItemStack tool) {
         if (!autoPickup) {
-            event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+            event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInHand());
         } else {
-            ItemStack[] drops = event.getBlock().getDrops(event.getPlayer().getInventory().getItemInMainHand()).stream().toArray(ItemStack[]::new);
+            ItemStack[] drops = event.getBlock().getDrops(event.getPlayer().getInventory().getItemInHand()).stream().toArray(ItemStack[]::new);
             Map<Integer, ItemStack> overflow = event.getPlayer().getInventory().addItem(drops);
             if (overflow.size() > 0) {
                 overflow.forEach((slot, item) -> event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), item));
