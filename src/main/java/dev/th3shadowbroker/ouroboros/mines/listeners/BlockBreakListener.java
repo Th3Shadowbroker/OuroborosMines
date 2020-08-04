@@ -84,7 +84,7 @@ public class BlockBreakListener implements Listener {
                     //If rich
                     if (MetaUtils.isRich(event.getBlock())) {
                         //event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
-                        breakBlock(event, event.getPlayer().getInventory().getItemInMainHand());
+                        breakBlock(event, event.getPlayer().getInventory().getItemInHand());
                         event.getBlock().setType(minedMaterial.get().getMaterial());
                         MetaUtils.decreaseRichness(event.getBlock());
 
