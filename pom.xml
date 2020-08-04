@@ -186,6 +186,6 @@
       </plugin>
     </plugins>
 
-    <finalName>${project.artifactId}_v${project.version}_LEGACY</finalName>
+    <finalName>${project.artifactId}_v${project.version}-LEGACY</finalName>
   </build>
 </project>
