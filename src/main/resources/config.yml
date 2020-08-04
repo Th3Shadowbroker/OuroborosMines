@@ -102,7 +102,7 @@ materials:
 #    particle-pattern: center <-- The pattern in which the particles are spawned. (center by default)
 effects:
   deposit_discovered:
-    sound: entity_player_levelup
+    sound: level_up
 
 # Use this section for experience-related settings.
 #
