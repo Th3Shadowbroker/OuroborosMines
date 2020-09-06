@@ -217,7 +217,9 @@ public class OuroborosMines extends JavaPlugin {
                      "autoPickup",
                      "openingHours",
                      "timezone",
-                     "placeholders"
+                     "placeholders",
+                     "chat.messages.reloadingDropGroups",
+                     "chat.messages.reloadedDropGroups"
              );
              pathsToCopy.forEach(path -> {
                  if (!getConfig().isSet(path)) {

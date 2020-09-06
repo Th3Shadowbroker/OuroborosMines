@@ -95,6 +95,9 @@ public class OmCommand implements CommandExecutor {
                             plugin.getMaterialManager().reloadRegionConfigurations();
                             sender.sendMessage(TemplateMessage.from("chat.messages.reloadedRegionConfigurations").insert("count", String.valueOf(plugin.getMaterialManager().getMineableMaterialOverrides().size())).colorize().toString());
                             plugin.getAnnouncementManager().flush();
+                            sender.sendMessage(TemplateMessage.from("chat.messages.reloadingDropGroups").colorize().toString());
+                            plugin.getDropManager().reloadGroups();
+                            sender.sendMessage(TemplateMessage.from("chat.messages.reloadedDropGroups").insert("count", String.valueOf(plugin.getDropManager().getGroups().length)).colorize().toString());
                         } catch (Exception ex) {
                             sender.sendMessage(TemplateMessage.from("chat.messages.error").colorize().insert("error", ex.getMessage()).toString());
                         }
