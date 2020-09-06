@@ -27,13 +27,13 @@ import dev.th3shadowbroker.ouroboros.mines.events.DepositDiscoveredEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
@@ -46,7 +46,6 @@ public class BlockBreakListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockBreak(BlockBreakEvent event) {
         Optional<ApplicableRegionSet> blockRegions = WorldUtils.getBlockRegions(event.getBlock());
-
         if ( blockRegions.isPresent() && blockRegions.get().testState(null, OuroborosMines.FLAG)) {
             Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType(), WorldUtils.getTopRegion(blockRegions.get()).get(), BukkitAdapter.adapt(event.getBlock().getWorld()));
             if (minedMaterial.isPresent()) {
@@ -85,7 +84,7 @@ public class BlockBreakListener implements Listener {
                     //If rich
                     if (MetaUtils.isRich(event.getBlock())) {
                         //event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
-                        breakBlock(event, event.getPlayer().getInventory().getItemInMainHand());
+                        breakBlock(event, minedMaterial.get(), event.getPlayer().getInventory().getItemInMainHand());
                         event.getBlock().setType(minedMaterial.get().getMaterial());
                         MetaUtils.decreaseRichness(event.getBlock());
 
@@ -107,7 +106,7 @@ public class BlockBreakListener implements Listener {
 
                 //Break it! Replace it!
                 //event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
-                breakBlock(event, event.getPlayer().getInventory().getItemInMainHand());
+                breakBlock(event, minedMaterial.get(), event.getPlayer().getInventory().getItemInMainHand());
                 event.getBlock().setType(minedMaterial.get().getReplacement());
             }
 
@@ -115,11 +114,24 @@ public class BlockBreakListener implements Listener {
         }
     }
 
-    private void breakBlock(BlockBreakEvent event, ItemStack tool) {
+    // @TODO Implement drops here!
+    private void breakBlock(BlockBreakEvent event, MineableMaterial mineableMaterial, ItemStack tool) {
         if (!autoPickup) {
-            event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+            // Check for drop group
+            if (mineableMaterial.getDropGroup().isPresent()) {
+                event.setDropItems(false);
+
+                for (ItemStack drop : mineableMaterial.getDropGroup().get().drawDrops()) {
+                    event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), drop);
+                }
+
+            // No drop-group assigned
+            } else {
+                event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+            }
         } else {
-            ItemStack[] drops = event.getBlock().getDrops(event.getPlayer().getInventory().getItemInMainHand()).stream().toArray(ItemStack[]::new);
+            // Modified in favour of drop feature
+            ItemStack[] drops = mineableMaterial.getDropGroup().isPresent() ? mineableMaterial.getDropGroup().get().drawDrops() : event.getBlock().getDrops(event.getPlayer().getInventory().getItemInMainHand()).stream().toArray(ItemStack[]::new);
             Map<Integer, ItemStack> overflow = event.getPlayer().getInventory().addItem(drops);
             if (overflow.size() > 0) {
                 overflow.forEach((slot, item) -> event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), item));

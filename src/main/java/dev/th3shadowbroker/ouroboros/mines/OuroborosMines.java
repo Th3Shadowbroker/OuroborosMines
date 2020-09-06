@@ -22,6 +22,7 @@ package dev.th3shadowbroker.ouroboros.mines;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import dev.th3shadowbroker.ouroboros.mines.commands.OmCommand;
+import dev.th3shadowbroker.ouroboros.mines.drops.DropManager;
 import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialException;
 import dev.th3shadowbroker.ouroboros.mines.listeners.BlockBreakListener;
 import dev.th3shadowbroker.ouroboros.mines.listeners.DepositDiscoveryListener;
@@ -42,6 +43,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.th3shadowbroker.ouroboros.update.comparison.Comparator;
 import org.th3shadowbroker.ouroboros.update.spiget.SpigetUpdater;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
@@ -63,6 +65,8 @@ public class OuroborosMines extends JavaPlugin {
     private TaskManager taskManager;
 
     private AnnouncementManager announcementManager;
+
+    private DropManager dropManager;
 
     private boolean worldGuardFound = false;
 
@@ -108,6 +112,8 @@ public class OuroborosMines extends JavaPlugin {
 
         announcementManager = new AnnouncementManager();
         announcementManager.createTasks();
+
+        dropManager = new DropManager(new File(getDataFolder(), "drops.yml"));
 
         getCommand("om").setExecutor(new OmCommand());
 
@@ -271,5 +277,9 @@ public class OuroborosMines extends JavaPlugin {
     public AnnouncementManager getAnnouncementManager() {
         return announcementManager;
     }
-    
+
+    public DropManager getDropManager() {
+        return dropManager;
+    }
+
 }
