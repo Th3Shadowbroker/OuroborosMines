@@ -69,7 +69,7 @@ public class DropGroupCreator {
 
         ConfigurationSection dropsSection = section.createSection("drops");
 
-        List<Drop> drops = Arrays.stream(inventory.getContents()).filter(itemStack -> itemStack != null).map(itemStack -> new Drop(itemStack, 1, new Range(1, 1))).collect(Collectors.toList());
+        List<Drop> drops = Arrays.stream(inventory.getContents()).filter(itemStack -> itemStack != null).map(itemStack -> new Drop(itemStack.clone(), 1, new Range(1, 1))).collect(Collectors.toList());
         for (int i = 0; i < drops.size(); i++) {
             ConfigurationSection dropSection = dropsSection.createSection(String.valueOf(i));
 
