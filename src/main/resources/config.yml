@@ -9,8 +9,13 @@ default: false
 chat:
   prefix: '&9[OM]'
   messages:
+    awaitingRightClick: "&2Right-click the block you want to create the drop group from!"
+    awaitingRightClickCancelled: "&cDrop group creation cancelled!"
     consoleOnly: "&cThis command can not be executed from console!"
+    dropGroupCreated: "&2Saved drop group &e%name%"
+    dropGroupExists: "&cThere's already a drop-group name &e%name%&c!"
     unrecognizedArgument: "&cUnrecognized argument"
+    missingDropGroupName: "&cMissing drop-group name!"
     regionCustomize: "&2A new configuration file for &b%region%&2 has been created!"
     regionAlreadyCustomized: "&cThere's already a configuration file for this region!"
     regionNotFound: "&cNo region found at your position!"

@@ -24,10 +24,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import dev.th3shadowbroker.ouroboros.mines.commands.OmCommand;
 import dev.th3shadowbroker.ouroboros.mines.drops.DropManager;
 import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialException;
-import dev.th3shadowbroker.ouroboros.mines.listeners.BlockBreakListener;
-import dev.th3shadowbroker.ouroboros.mines.listeners.DepositDiscoveryListener;
-import dev.th3shadowbroker.ouroboros.mines.listeners.ExperienceListener;
-import dev.th3shadowbroker.ouroboros.mines.listeners.TimeSkipListener;
+import dev.th3shadowbroker.ouroboros.mines.listeners.*;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.JobsRebornSupport;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.PlaceholderAPISupport;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.QuestsSupport;
@@ -109,6 +106,7 @@ public class OuroborosMines extends JavaPlugin {
         getServer().getPluginManager().registerEvents( new DepositDiscoveryListener(), this );
         getServer().getPluginManager().registerEvents( new ExperienceListener(), this );
         getServer().getPluginManager().registerEvents( new TimeSkipListener(), this );
+        getServer().getPluginManager().registerEvents( new PlayerInteractListener(), this );
 
         announcementManager = new AnnouncementManager();
         announcementManager.createTasks();
@@ -219,7 +217,12 @@ public class OuroborosMines extends JavaPlugin {
                      "timezone",
                      "placeholders",
                      "chat.messages.reloadingDropGroups",
-                     "chat.messages.reloadedDropGroups"
+                     "chat.messages.reloadedDropGroups",
+                     "chat.messages.awaitingRightClick",
+                     "chat.messages.awaitingRightClickCancelled",
+                     "chat.messages.dropGroupCreated",
+                     "chat.messages.dropGroupExists",
+                     "chat.messages.missingDropGroupName"
              );
              pathsToCopy.forEach(path -> {
                  if (!getConfig().isSet(path)) {

@@ -22,6 +22,7 @@ package dev.th3shadowbroker.ouroboros.mines.commands;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
+import dev.th3shadowbroker.ouroboros.mines.drops.DropGroupCreator;
 import dev.th3shadowbroker.ouroboros.mines.util.Permissions;
 import dev.th3shadowbroker.ouroboros.mines.util.RegionConfiguration;
 import dev.th3shadowbroker.ouroboros.mines.util.TemplateMessage;
@@ -33,6 +34,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.io.IOException;
 import java.util.Optional;
 
 public class OmCommand implements CommandExecutor {
@@ -100,6 +102,38 @@ public class OmCommand implements CommandExecutor {
                             sender.sendMessage(TemplateMessage.from("chat.messages.reloadedDropGroups").insert("count", String.valueOf(plugin.getDropManager().getGroups().length)).colorize().toString());
                         } catch (Exception ex) {
                             sender.sendMessage(TemplateMessage.from("chat.messages.error").colorize().insert("error", ex.getMessage()).toString());
+                        }
+                    } else {
+                        sender.sendMessage(cmd.getPermissionMessage());
+                    }
+                    break;
+
+                case "dropgroup":
+                case "dg":
+                    if (sender.hasPermission(Permissions.COMMAND_DROP_GROUP.permission)) {
+                        if (sender instanceof Player) {
+                            Player player = (Player) sender;
+
+                            if (args.length >= 2) {
+                                String dropGroupName = args[1];
+
+                                // Drop group does not exist
+                                if (!OuroborosMines.INSTANCE.getDropManager().getDropGroup(dropGroupName).isPresent()) {
+                                    DropGroupCreator.awaitCreation(player, dropGroupName);
+                                    player.sendMessage(TemplateMessage.from("chat.messages.awaitingRightClick").colorize().toString());
+                                } else {
+                                    player.sendMessage(TemplateMessage.from("chat.messages.dropGroupExists").insert("name", dropGroupName).colorize().toString());
+                                }
+                            } else {
+                                if (DropGroupCreator.creationPending(player)) {
+                                    DropGroupCreator.clearCreationStatus(player);
+                                    sender.sendMessage(TemplateMessage.from("chat.messages.awaitingRightClickCancelled").colorize().toString());
+                                } else {
+                                    sender.sendMessage(TemplateMessage.from("chat.messages.missingDropGroupName").colorize().toString());
+                                }
+                            }
+                        } else {
+                            plugin.getLogger().info(TemplateMessage.from("chat.messages.consoleOnly").colorize().toString());
                         }
                     } else {
                         sender.sendMessage(cmd.getPermissionMessage());
