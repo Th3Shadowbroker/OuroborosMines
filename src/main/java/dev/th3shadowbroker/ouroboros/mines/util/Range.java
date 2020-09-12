@@ -64,7 +64,7 @@ public class Range {
 
     @Override
     public String toString() {
-        return String.format("%s-%s", min, max);
+        return isRange() ? String.format("%s-%s", min, max) : String.valueOf(min);
     }
 
     public static Range zero() {
