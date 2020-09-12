@@ -9,7 +9,7 @@ default: false
 chat:
   prefix: '&9[OM]'
   messages:
-    awaitingRightClick: "&2Right-click the block you want to create the drop group from!"
+    awaitingRightClick: "&2Right-click the chest you want to create the drop group from or type &e/om dg&2 to cancel!"
     awaitingRightClickCancelled: "&cDrop group creation cancelled!"
     consoleOnly: "&cThis command can not be executed from console!"
     dropGroupCreated: "&2Saved drop group &e%name%"
