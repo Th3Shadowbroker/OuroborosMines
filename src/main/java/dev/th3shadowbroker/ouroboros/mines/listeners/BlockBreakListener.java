@@ -114,7 +114,6 @@ public class BlockBreakListener implements Listener {
         }
     }
 
-    // @TODO Implement drops here!
     private void breakBlock(BlockBreakEvent event, MineableMaterial mineableMaterial, ItemStack tool) {
         if (!autoPickup) {
             // Check for drop group
