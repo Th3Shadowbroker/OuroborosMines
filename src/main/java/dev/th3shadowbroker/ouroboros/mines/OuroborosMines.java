@@ -22,11 +22,9 @@ package dev.th3shadowbroker.ouroboros.mines;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import dev.th3shadowbroker.ouroboros.mines.commands.OmCommand;
+import dev.th3shadowbroker.ouroboros.mines.drops.DropManager;
 import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialException;
-import dev.th3shadowbroker.ouroboros.mines.listeners.BlockBreakListener;
-import dev.th3shadowbroker.ouroboros.mines.listeners.DepositDiscoveryListener;
-import dev.th3shadowbroker.ouroboros.mines.listeners.ExperienceListener;
-import dev.th3shadowbroker.ouroboros.mines.listeners.TimeSkipListener;
+import dev.th3shadowbroker.ouroboros.mines.listeners.*;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.JobsRebornSupport;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.PlaceholderAPISupport;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.QuestsSupport;
@@ -42,6 +40,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.th3shadowbroker.ouroboros.update.comparison.Comparator;
 import org.th3shadowbroker.ouroboros.update.spiget.SpigetUpdater;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
@@ -63,6 +62,8 @@ public class OuroborosMines extends JavaPlugin {
     private TaskManager taskManager;
 
     private AnnouncementManager announcementManager;
+
+    private DropManager dropManager;
 
     private boolean worldGuardFound = false;
 
@@ -105,9 +106,12 @@ public class OuroborosMines extends JavaPlugin {
         getServer().getPluginManager().registerEvents( new DepositDiscoveryListener(), this );
         getServer().getPluginManager().registerEvents( new ExperienceListener(), this );
         getServer().getPluginManager().registerEvents( new TimeSkipListener(), this );
+        getServer().getPluginManager().registerEvents( new PlayerInteractListener(), this );
 
         announcementManager = new AnnouncementManager();
         announcementManager.createTasks();
+
+        dropManager = new DropManager(new File(getDataFolder(), "drops.yml"));
 
         getCommand("om").setExecutor(new OmCommand());
 
@@ -211,7 +215,15 @@ public class OuroborosMines extends JavaPlugin {
                      "autoPickup",
                      "openingHours",
                      "timezone",
-                     "placeholders"
+                     "placeholders",
+                     "chat.messages.reloadingDropGroups",
+                     "chat.messages.reloadedDropGroups",
+                     "chat.messages.awaitingRightClick",
+                     "chat.messages.awaitingRightClickCancelled",
+                     "chat.messages.dropGroupCreated",
+                     "chat.messages.dropGroupExists",
+                     "chat.messages.missingDropGroupName",
+                     "chat.messages.consoleNotAllowed"
              );
              pathsToCopy.forEach(path -> {
                  if (!getConfig().isSet(path)) {
@@ -271,5 +283,9 @@ public class OuroborosMines extends JavaPlugin {
     public AnnouncementManager getAnnouncementManager() {
         return announcementManager;
     }
-    
+
+    public DropManager getDropManager() {
+        return dropManager;
+    }
+
 }

@@ -27,7 +27,8 @@ public enum Permissions {
     COMMAND_ROOT("ouroboors.mines.command.*"),
     COMMAND_INFO("ouroboros.mines.command.info"),
     COMMAND_CUSTOMIZE("ouroboros.mines.command.customize"),
-    COMMAND_RELOAD("ouroboros.mines.command.reload");
+    COMMAND_RELOAD("ouroboros.mines.command.reload"),
+    COMMAND_DROP_GROUP("ouroboros.mines.command.dropgroup");
 
     public final String name;
 

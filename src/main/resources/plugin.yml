@@ -10,7 +10,7 @@ api-version: 1.13
 commands:
   om:
     description: General command for ${plugin.name}
-    usage: /om [customize:reload]
+    usage: /om [customize:reload] [world:name] [region]
     permission-message: §cYou're not allowed to do this!
 
 permissions:
@@ -27,6 +27,7 @@ permissions:
       ouroboros.mines.command.info: true
       ouroboros.mines.command.customize: true
       ouroboros.mines.command.reload: true
+      ouroboros.mines.command.dropgroup: true
 
   ouroboros.mines.command.info:
     default: true
@@ -35,4 +36,7 @@ permissions:
     default: op
 
   ouroboros.mines.command.reload:
+    default: op
+
+  ouroboros.mines.command.dropgroup:
     default: op

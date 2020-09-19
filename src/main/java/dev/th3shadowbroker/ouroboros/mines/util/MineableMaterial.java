@@ -20,6 +20,7 @@
 package dev.th3shadowbroker.ouroboros.mines.util;
 
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
+import dev.th3shadowbroker.ouroboros.mines.drops.DropGroup;
 import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialException;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -47,7 +48,9 @@ public class MineableMaterial {
 
     private final Range depositExperience;
 
-    public MineableMaterial(Material material, Material[] replacements, Range cooldown, double richChance, Range richAmount, Range experience, Range depositExperience) {
+    private final String dropGroup;
+
+    public MineableMaterial(Material material, Material[] replacements, Range cooldown, double richChance, Range richAmount, Range experience, Range depositExperience, String dropGroup) {
         this.material = material;
         this.replacements = replacements;
         this.cooldown = cooldown;
@@ -55,6 +58,7 @@ public class MineableMaterial {
         this.richAmount = richAmount;
         this.experience = experience;
         this.depositExperience = depositExperience;
+        this.dropGroup = dropGroup;
     }
 
     public Material getMaterial() {
@@ -107,6 +111,10 @@ public class MineableMaterial {
     public Material getReplacement() {
         if (replacements.length == 1) return replacements[0];
         return replacements[replRandom.nextInt(replacements.length)];
+    }
+
+    public Optional<DropGroup> getDropGroup() {
+        return dropGroup == null ? Optional.empty() : OuroborosMines.INSTANCE.getDropManager().getDropGroup(dropGroup);
     }
 
     public static MineableMaterial fromSection(ConfigurationSection section) throws InvalidMineMaterialException {
@@ -173,6 +181,9 @@ public class MineableMaterial {
             }
         }
 
+        //Parse drop group
+        String dropGroup = section.getString("dropGroup", null);
+
         return new MineableMaterial(
 
                 //Material and replacements
@@ -185,8 +196,10 @@ public class MineableMaterial {
                 //Add range-values
                 richAmount == null ? Range.zero() : richAmount,
                 experience == null ? Range.zero() : experience,
-                depositExperience == null ? Range.zero() : depositExperience
+                depositExperience == null ? Range.zero() : depositExperience,
 
+                //Drop group
+                dropGroup
         );
     }
 

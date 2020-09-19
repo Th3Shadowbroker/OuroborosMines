@@ -9,14 +9,21 @@ default: false
 chat:
   prefix: '&9[OM]'
   messages:
-    consoleOnly: "&cThis command can not be executed from console!"
+    awaitingRightClick: "&2Right-click the chest you want to create the drop group from or type &e/om dg&2 to cancel!"
+    awaitingRightClickCancelled: "&cDrop group creation cancelled!"
+    consoleNotAllowed: "&cThis command can not be executed from console!"
+    dropGroupCreated: "&2Saved drop group &e%name%"
+    dropGroupExists: "&cThere's already a drop-group name &e%name%&c!"
     unrecognizedArgument: "&cUnrecognized argument"
+    missingDropGroupName: "&cMissing drop-group name!"
     regionCustomize: "&2A new configuration file for &b%region%&2 has been created!"
     regionAlreadyCustomized: "&cThere's already a configuration file for this region!"
     regionNotFound: "&cNo region found at your position!"
     reloadingConfig: "&2Reloading configuration..."
     reloadingRegionConfigurations: "&2Reloading region-configurations..."
     reloadedRegionConfigurations: "&2Loaded %count% region-specific configurations"
+    reloadingDropGroups: "&2Reloading drop groups..."
+    reloadedDropGroups: "&2Loaded %count% drop groups"
     worldNotFound: "&cWorld &e%world% &cnot found!"
     depositDiscovered: "&2You've discovered a %size% &e%material%&2 deposit!"
     depositSizes:
