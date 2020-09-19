@@ -37,5 +37,6 @@ permissions:
 
   ouroboros.mines.command.reload:
     default: op
+
   ouroboros.mines.command.dropgroup:
     default: op
