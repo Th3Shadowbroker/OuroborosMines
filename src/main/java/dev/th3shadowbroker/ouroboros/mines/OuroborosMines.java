@@ -222,7 +222,8 @@ public class OuroborosMines extends JavaPlugin {
                      "chat.messages.awaitingRightClickCancelled",
                      "chat.messages.dropGroupCreated",
                      "chat.messages.dropGroupExists",
-                     "chat.messages.missingDropGroupName"
+                     "chat.messages.missingDropGroupName",
+                     "chat.messages.consoleNotAllowed"
              );
              pathsToCopy.forEach(path -> {
                  if (!getConfig().isSet(path)) {

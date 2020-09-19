@@ -34,12 +34,11 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.io.IOException;
 import java.util.Optional;
 
 public class OmCommand implements CommandExecutor {
 
-    private final String consoleNotAllowed = TemplateMessage.from("chat.messages.consoleOnly").colorize().toString();
+    private final String consoleNotAllowed = TemplateMessage.from("chat.messages.consoleNotAllowed").colorize().toString();
 
     private final OuroborosMines plugin = OuroborosMines.INSTANCE;
 
@@ -133,7 +132,7 @@ public class OmCommand implements CommandExecutor {
                                 }
                             }
                         } else {
-                            plugin.getLogger().info(TemplateMessage.from("chat.messages.consoleOnly").colorize().toString());
+                            sender.sendMessage(consoleNotAllowed);
                         }
                     } else {
                         sender.sendMessage(cmd.getPermissionMessage());
