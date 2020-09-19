@@ -21,7 +21,7 @@ permissions:
       ouroboros.mines.command.*: true
 
   ouroboros.mines.command.*:
-    description: Grants permission to al of the plugins commands.
+    description: Grants permission to all of the plugins commands.
     default: false
     children:
       ouroboros.mines.command.info: true
