@@ -57,38 +57,26 @@ public class BeautyQuestsSupport implements Listener {
     @EventHandler
     public void onMaterialMined(MaterialMinedEvent event) {
         PlayerAccount playerAccount = PlayersManager.getPlayerAccount(event.getPlayer());
-        List<Quest> playerQuests = QuestsAPI.getQuestsStarteds(playerAccount);
-
-        playerQuests.forEach(quest -> {
-            Optional<QuestBranch> questBranch = Optional.ofNullable(quest.getBranchesManager().getPlayerBranch(playerAccount));
-            if (!questBranch.isPresent()) return;
-
-            Optional<PlayerQuestDatas> pqd = Optional.ofNullable(playerAccount.getQuestDatas(quest));
-            if (!pqd.isPresent()) return;
-
-            Optional<AbstractStage> stage = Optional.ofNullable(questBranch.get().getRegularStage(pqd.get().getStage()));
-            if (!stage.isPresent()) return;
-
-            if (stage.get().getType() == StageType.getStageType("MINE")) {
-                StageMine stageMine = (StageMine) stage.get();
-                List<Material> matchingMaterials = stageMine.getObjects().values().stream().map(bqBlockIntegerEntry -> bqBlockIntegerEntry.getKey().getMaterial().parseMaterial()).collect(Collectors.toList());
-
-                if (matchingMaterials.contains(event.getMaterial().getMaterial())) {
-                    try
-                    {
-                        Method eventMethod = AbstractCountableStage.class.getDeclaredMethod("event", PlayerAccount.class, Player.class, Object.class, Integer.TYPE);
-                        eventMethod.setAccessible(true);
-                        eventMethod.invoke(stageMine, playerAccount, event.getPlayer(), event.getBlock(), 1);
-                    } catch (NoSuchMethodException e) {
-                        plugin.getLogger().severe("Unable to find method \"event\" in " + AbstractCountableStage.class.getName());
-                    } catch (IllegalAccessException e) {
-                        plugin.getLogger().severe("Unable to access method \"event\" in " + AbstractCountableStage.class.getName());
-                    } catch (InvocationTargetException e) {
-                        plugin.getLogger().severe("Unable to invoke method \"event\" in " + AbstractCountableStage.class.getName());
-                    }
-                }
-            }
-        });
+        playerAccount.getQuestsDatas().forEach(datas -> {
+			if (!datas.hasStarted()) return;
+			
+			Quest quest = datas.getQuest();
+			
+			QuestBranch branch = quest.getBranchesManager().getBranch(datas.getBranch());
+			if (branch == null) return;
+			
+			Stream<AbstractStage> stages;
+			if (datas.isInEndingStages()) {
+				stages = branch.getEndingStages().forEach((stage, leadingBranch) -> handleStage(playerAccount, stage, event.getPlayer(), event.getBlock()));
+			}else stages = handleStage(branch.getRegularStage(playerAccount, datas.getStage()), event.getPlayer(), event.getBlock());
+		});
+    }
+    
+    private void handleStage(AbstractStage stage, PlayerAccount playerAccount, Player player, Block block){
+        if (stage instanceof StageMine) {
+            StageMine stageMine = (StageMine) stage;
+            stageMine.event(playerAccount, player, block, 1);
+        }
     }
 
 }
