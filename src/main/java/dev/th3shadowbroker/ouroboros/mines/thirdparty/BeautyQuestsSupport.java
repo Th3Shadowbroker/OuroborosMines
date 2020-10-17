@@ -21,10 +21,7 @@ package dev.th3shadowbroker.ouroboros.mines.thirdparty;
 
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
-import fr.skytasul.quests.api.QuestsAPI;
-import fr.skytasul.quests.api.stages.AbstractCountableStage;
 import fr.skytasul.quests.api.stages.AbstractStage;
-import fr.skytasul.quests.api.stages.StageType;
 import fr.skytasul.quests.players.PlayerAccount;
 import fr.skytasul.quests.players.PlayerQuestDatas;
 import fr.skytasul.quests.players.PlayersManager;
@@ -32,43 +29,37 @@ import fr.skytasul.quests.stages.StageMine;
 import fr.skytasul.quests.structure.Quest;
 import fr.skytasul.quests.structure.QuestBranch;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class BeautyQuestsSupport implements Listener {
 
     public static final String PLUGIN_NAME = "BeautyQuests";
 
-    private final OuroborosMines plugin;
-
     public BeautyQuestsSupport() {
-        this.plugin = OuroborosMines.INSTANCE;
         Bukkit.getServer().getPluginManager().registerEvents(this, OuroborosMines.INSTANCE);
     }
 
     @EventHandler
     public void onMaterialMined(MaterialMinedEvent event) {
         PlayerAccount playerAccount = PlayersManager.getPlayerAccount(event.getPlayer());
-        playerAccount.getQuestsDatas().forEach(datas -> {
-			if (!datas.hasStarted()) return;
+        playerAccount.getQuestsDatas().stream().filter(PlayerQuestDatas::hasStarted).forEach(data -> {
+			Quest quest = data.getQuest();
 			
-			Quest quest = datas.getQuest();
-			
-			QuestBranch branch = quest.getBranchesManager().getBranch(datas.getBranch());
-			if (branch == null) return;
-			
-			Stream<AbstractStage> stages;
-			if (datas.isInEndingStages()) {
-				stages = branch.getEndingStages().forEach((stage, leadingBranch) -> handleStage(playerAccount, stage, event.getPlayer(), event.getBlock()));
-			}else stages = handleStage(branch.getRegularStage(playerAccount, datas.getStage()), event.getPlayer(), event.getBlock());
+			Optional<QuestBranch> branch = Optional.ofNullable(quest.getBranchesManager().getBranch(data.getBranch()));
+			branch.ifPresent(questBranch -> {
+                if (data.isInEndingStages()) {
+                    questBranch.getEndingStages().forEach((stage, leadingBranch) -> {
+                        handleStage(stage, playerAccount, event.getPlayer(), event.getBlock());
+                    });
+                } else {
+                    handleStage(questBranch.getRegularStage(data.getStage()), playerAccount, event.getPlayer(), event.getBlock());
+                }
+            });
 		});
     }
     
