@@ -25,6 +25,7 @@ import dev.th3shadowbroker.ouroboros.mines.commands.OmCommand;
 import dev.th3shadowbroker.ouroboros.mines.drops.DropManager;
 import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialException;
 import dev.th3shadowbroker.ouroboros.mines.listeners.*;
+import dev.th3shadowbroker.ouroboros.mines.thirdparty.BeautyQuestsSupport;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.JobsRebornSupport;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.PlaceholderAPISupport;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.QuestsSupport;
@@ -245,6 +246,12 @@ public class OuroborosMines extends JavaPlugin {
         if (questsInstalled) {
             getLogger().info("Quests support is enabled!");
             new QuestsSupport();
+        }
+
+        boolean beautyQuestInstalled = getServer().getPluginManager().isPluginEnabled(BeautyQuestsSupport.PLUGIN_NAME);
+        if (beautyQuestInstalled) {
+            getLogger().info("BeautyQuests support is enabled!");
+            new BeautyQuestsSupport();
         }
 
         boolean jobsRebornInstalled = getServer().getPluginManager().isPluginEnabled(JobsRebornSupport.PLUGIN_NAME);
