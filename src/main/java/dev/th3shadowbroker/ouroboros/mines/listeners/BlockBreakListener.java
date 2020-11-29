@@ -27,7 +27,6 @@ import dev.th3shadowbroker.ouroboros.mines.events.DepositDiscoveredEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -148,7 +147,7 @@ public class BlockBreakListener implements Listener {
         Optional<ItemStack> miningTool = Optional.ofNullable(tool);
         miningTool.ifPresent( itemStack -> {
             ItemMeta meta = itemStack.getItemMeta();
-            if (meta instanceof Damageable && isTool(itemStack.getType())) {
+            if (meta instanceof Damageable && tool.getType().getMaxDurability() > 0) {
                 Damageable damageable = (Damageable) meta;
                 if (damageable.getDamage() + 1 < tool.getType().getMaxDurability()) {
                     damageable.setDamage(damageable.getDamage() + 1);
@@ -159,15 +158,6 @@ public class BlockBreakListener implements Listener {
                 }
             }
         });
-    }
-
-    private boolean isTool(Material material) {
-        String materialName = material.toString();
-        return materialName.endsWith("_SHOVEL") ||
-               materialName.endsWith("_PICKAXE") ||
-               materialName.endsWith("_AXE") ||
-               materialName.endsWith("_HOE") ||
-               materialName.equals("SHEARS");
     }
 
 }
