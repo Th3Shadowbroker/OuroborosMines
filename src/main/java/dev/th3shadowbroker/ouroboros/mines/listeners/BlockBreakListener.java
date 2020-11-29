@@ -147,7 +147,7 @@ public class BlockBreakListener implements Listener {
         Optional<ItemStack> miningTool = Optional.ofNullable(tool);
         miningTool.ifPresent( itemStack -> {
             ItemMeta meta = itemStack.getItemMeta();
-            if (meta instanceof Damageable) {
+            if (meta instanceof Damageable && tool.getType().getMaxDurability() > 0) {
                 Damageable damageable = (Damageable) meta;
                 if (damageable.getDamage() + 1 < tool.getType().getMaxDurability()) {
                     damageable.setDamage(damageable.getDamage() + 1);
