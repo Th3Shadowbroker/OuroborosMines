@@ -27,7 +27,9 @@ import dev.th3shadowbroker.ouroboros.mines.events.DepositDiscoveredEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -141,6 +143,11 @@ public class BlockBreakListener implements Listener {
         }
 
         decreaseToolDurability(event.getPlayer(), tool);
+        updateStats(event.getPlayer(), mineableMaterial.getMaterial());
+    }
+
+    private void updateStats(Player player, Material material) {
+        player.incrementStatistic(Statistic.MINE_BLOCK, material);
     }
 
     private void decreaseToolDurability(Player player, ItemStack tool) {
