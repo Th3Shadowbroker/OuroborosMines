@@ -43,4 +43,4 @@ permissions:
 
   ouroboros.mines.autopickup:
     description: Grants permission to make use of the autopickup feature - if enabled.
-    default: true
+    default: op
