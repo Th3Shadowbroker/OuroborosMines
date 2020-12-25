@@ -23,6 +23,7 @@ import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.scheduler.BukkitTask;
 
 public class ReplacementTask implements Runnable {
@@ -33,19 +34,23 @@ public class ReplacementTask implements Runnable {
 
     private final Location location;
 
+    private final BlockData blockData;
+
     private final OuroborosMines plugin = OuroborosMines.INSTANCE;
 
     public ReplacementTask(Location blockLocation, Material material, long cooldownSeconds) {
-        location = blockLocation;
-        minedMaterial = material;
-        task = plugin.getServer().getScheduler().runTaskLater(plugin, this, cooldownSeconds);
-        plugin.getTaskManager().register(this);
+        this.location = blockLocation;
+        this.minedMaterial = material;
+        this.task = plugin.getServer().getScheduler().runTaskLater(plugin, this, cooldownSeconds);
+        this.plugin.getTaskManager().register(this);
+        this.blockData = blockLocation.getBlock().getBlockData();
         //plugin.getLogger().info(String.format("Scheduled restoration of %s %s %s in %s as %s", location.getX(), location.getY(), location.getZ(), cooldownSeconds, minedMaterial.name()));
     }
 
     @Override
     public void run() {
         location.getBlock().setType(minedMaterial);
+        location.getBlock().setBlockData(blockData);
         if (!getTask().isCancelled()) plugin.getTaskManager().unregister(this);
     }
 
