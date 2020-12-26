@@ -23,22 +23,45 @@ import dev.th3shadowbroker.ouroboros.mines.util.Range;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class Drop {
 
     private final ItemStack itemStack;
+
+    private final List<String> commands;
 
     private final double dropChance;
 
     private final Range dropAmount;
 
-    public Drop(ItemStack itemStack, double dropChance, Range dropAmount) {
+    public Drop(ItemStack itemStack, List<String> commands, double dropChance, Range dropAmount) {
         this.itemStack = itemStack;
+        this.commands = commands;
         this.dropChance = dropChance;
         this.dropAmount = dropAmount;
     }
 
+    public Drop(ItemStack itemStack, double dropChance, Range dropAmount) {
+        this.itemStack = itemStack;
+        this.commands = new ArrayList<>();
+        this.dropChance = dropChance;
+        this.dropAmount = dropAmount;
+    }
+
+    public boolean hasItemStack() {
+        return itemStack != null;
+    }
+
     public ItemStack getItemStack() {
         return itemStack;
+    }
+
+    public List<String> getCommands() {
+        return commands;
     }
 
     public double getDropChance() {
@@ -50,6 +73,7 @@ public class Drop {
     }
 
     public ItemStack drawDropstack() {
+        if (itemStack == null) return null;
         ItemStack dropStack = itemStack.clone();
         dropStack.setAmount(dropAmount.isRange() ? dropAmount.getRandomWithin() : dropAmount.getMin());
         return dropStack;
@@ -57,9 +81,10 @@ public class Drop {
 
     public static Drop fromSection(ConfigurationSection section) {
         ItemStack itemStack = section.getItemStack("item");
+        List<String> commands = section.isString("commands") ? Collections.singletonList(section.getString("commands")) : section.getStringList("commands");
         double dropChance = section.getDouble("chance", 1);
         Range dropAmount = Range.fromString(section.getString("amount", "1"));
-        return new Drop(itemStack, dropChance, dropAmount);
+        return new Drop(itemStack, commands, dropChance, dropAmount);
     }
 
 }

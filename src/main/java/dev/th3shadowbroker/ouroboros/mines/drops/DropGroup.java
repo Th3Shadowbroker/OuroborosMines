@@ -19,6 +19,8 @@
 
 package dev.th3shadowbroker.ouroboros.mines.drops;
 
+import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
+import org.bukkit.Server;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -62,7 +64,17 @@ public class DropGroup {
                         Random rnd = new Random();
                         boolean shallDrop = ((double) rnd.nextInt(100) / 100) <= drop.getDropChance();
                         if (shallDrop) {
-                            drops.add(drop.drawDropstack());
+                            ItemStack drawnStack = drop.drawDropstack();
+
+                            // If-clause implemented in favour of command-drops
+                            if (drawnStack != null) {
+                                drops.add(drawnStack);
+                            } else {
+                                Server server = OuroborosMines.INSTANCE.getServer();
+                                drop.getCommands().forEach(command -> {
+                                    server.dispatchCommand(server.getConsoleSender(), command);
+                                });
+                            }
                         }
                     }
 
@@ -82,7 +94,18 @@ public class DropGroup {
             boolean shallDrop = drawnChance <= drop.getDropChance() + offset;
 
             if (shallDrop) {
-                dropStack = drop.drawDropstack();
+                ItemStack drawnStack = drop.drawDropstack();
+
+                // If-clause implemented in favour of command-drops
+                if (drawnStack != null) {
+                    dropStack = drawnStack;
+                } else {
+                    Server server = OuroborosMines.INSTANCE.getServer();
+                    drop.getCommands().forEach(command -> {
+                        server.dispatchCommand(server.getConsoleSender(), command);
+                    });
+                }
+
                 break;
             } else {
                 offset += drop.getDropChance();
