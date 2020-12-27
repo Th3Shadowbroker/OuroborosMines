@@ -35,7 +35,7 @@ public class DropManager {
 
     private final File file;
 
-    private final FileConfiguration configuration;
+    private FileConfiguration configuration;
 
     private final Map<String, DropGroup> dropGroups;
 
@@ -85,6 +85,7 @@ public class DropManager {
 
     public void reloadGroups() {
         dropGroups.clear();
+        configuration = YamlConfiguration.loadConfiguration(file);
         loadGroups();
     }
 
