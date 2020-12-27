@@ -129,7 +129,7 @@ public class BlockBreakListener implements Listener {
                     event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
                 }
 
-                for (ItemStack drop : mineableMaterial.getDropGroup().get().drawDrops()) {
+                for (ItemStack drop : mineableMaterial.getDropGroup().get().drawDrops(event.getPlayer())) {
                     event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), drop);
                 }
 
@@ -139,7 +139,7 @@ public class BlockBreakListener implements Listener {
             }
         } else {
             // Modified in favour of drop feature
-            ItemStack[] drops = mineableMaterial.getDropGroup().isPresent() ? mineableMaterial.getDropGroup().get().drawDrops() : event.getBlock().getDrops(event.getPlayer().getInventory().getItemInMainHand()).stream().toArray(ItemStack[]::new);
+            ItemStack[] drops = mineableMaterial.getDropGroup().isPresent() ? mineableMaterial.getDropGroup().get().drawDrops(event.getPlayer()) : event.getBlock().getDrops(event.getPlayer().getInventory().getItemInMainHand()).stream().toArray(ItemStack[]::new);
             Map<Integer, ItemStack> overflow = event.getPlayer().getInventory().addItem(drops);
             if (overflow.size() > 0) {
                 overflow.forEach((slot, item) -> event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), item));

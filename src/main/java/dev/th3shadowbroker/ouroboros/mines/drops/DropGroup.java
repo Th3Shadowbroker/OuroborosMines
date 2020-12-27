@@ -21,6 +21,7 @@ package dev.th3shadowbroker.ouroboros.mines.drops;
 
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import org.bukkit.Server;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class DropGroup {
         return override;
     }
 
-    private ItemStack[] drawMultidrop() {
+    private ItemStack[] drawMultidrop(Player player) {
         final List<ItemStack> drops = new ArrayList<>();
         this.drops.forEach(
                 drop -> {
@@ -72,7 +73,7 @@ public class DropGroup {
                         } else {
                             Server server = OuroborosMines.INSTANCE.getServer();
                             drop.getCommands().forEach(command -> {
-                                server.dispatchCommand(server.getConsoleSender(), command);
+                                server.dispatchCommand(server.getConsoleSender(), command.replaceAll("%player%", player.getName()));
                             });
                         }
 
@@ -89,7 +90,7 @@ public class DropGroup {
                             } else {
                                 Server server = OuroborosMines.INSTANCE.getServer();
                                 drop.getCommands().forEach(command -> {
-                                    server.dispatchCommand(server.getConsoleSender(), command);
+                                    server.dispatchCommand(server.getConsoleSender(), command.replaceAll("%player%", player.getName()));
                                 });
                             }
                         }
@@ -100,7 +101,7 @@ public class DropGroup {
         return drops.stream().toArray(ItemStack[]::new);
     }
 
-    private ItemStack[] drawSingledrop() {
+    private ItemStack[] drawSingledrop(Player player) {
         ItemStack dropStack = null;
         Random rnd = new Random();
 
@@ -119,7 +120,7 @@ public class DropGroup {
                 } else {
                     Server server = OuroborosMines.INSTANCE.getServer();
                     drop.getCommands().forEach(command -> {
-                        server.dispatchCommand(server.getConsoleSender(), command);
+                        server.dispatchCommand(server.getConsoleSender(), command.replaceAll("%player%", player.getName()));
                     });
                 }
 
@@ -132,8 +133,8 @@ public class DropGroup {
         return dropStack == null ? new ItemStack[0] : new ItemStack[]{ dropStack };
     }
 
-    public ItemStack[] drawDrops() {
-        return multidrop ? drawMultidrop() : drawSingledrop();
+    public ItemStack[] drawDrops(Player player) {
+        return multidrop ? drawMultidrop(player) : drawSingledrop(player);
     }
 
 }
