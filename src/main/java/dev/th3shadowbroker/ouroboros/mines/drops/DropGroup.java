@@ -33,9 +33,12 @@ public class DropGroup {
 
     private final boolean multidrop;
 
-    public DropGroup(List<Drop> drops, boolean multidrop) {
+    private final boolean override;
+
+    public DropGroup(List<Drop> drops, boolean multidrop, boolean override) {
         this.drops = drops;
         this.multidrop = multidrop;
+        this.override = override;
     }
 
     public boolean isValid() {
@@ -50,6 +53,10 @@ public class DropGroup {
         return multidrop;
     }
 
+    public boolean isOverriding() {
+        return override;
+    }
+
     private ItemStack[] drawMultidrop() {
         final List<ItemStack> drops = new ArrayList<>();
         this.drops.forEach(
@@ -57,7 +64,17 @@ public class DropGroup {
 
                     // Drop chance 100 or higher
                     if (drop.getDropChance() >= 1) {
-                        drops.add(drop.drawDropstack());
+
+                        //@FIXME Optimization needed
+                        ItemStack drawnStack = drop.drawDropstack();
+                        if (drawnStack != null) {
+                            drops.add(drawnStack);
+                        } else {
+                            Server server = OuroborosMines.INSTANCE.getServer();
+                            drop.getCommands().forEach(command -> {
+                                server.dispatchCommand(server.getConsoleSender(), command);
+                            });
+                        }
 
                     // Drop chance below 100
                     } else {

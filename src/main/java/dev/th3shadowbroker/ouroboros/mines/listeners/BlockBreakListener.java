@@ -123,7 +123,11 @@ public class BlockBreakListener implements Listener {
         if (!autoPickup) {
             // Check for drop group
             if (mineableMaterial.getDropGroup().isPresent()) {
-                event.setDropItems(false);
+                if (mineableMaterial.getDropGroup().get().isOverriding()) {
+                    event.setDropItems(false);
+                } else {
+                    event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+                }
 
                 for (ItemStack drop : mineableMaterial.getDropGroup().get().drawDrops()) {
                     event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), drop);
