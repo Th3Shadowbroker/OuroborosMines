@@ -120,7 +120,7 @@ public class BlockBreakListener implements Listener {
     }
 
     private void breakBlock(BlockBreakEvent event, MineableMaterial mineableMaterial, ItemStack tool) {
-        if(autoPickup || event.getPlayer().hasPermission("ouroboros.mines.autopickup")){
+        if(autoPickup || event.getPlayer().hasPermission(Permissions.FEATURE_AUTO_PICKUP.permission)){
             // Modified in favour of drop feature
             ItemStack[] drops = mineableMaterial.getDropGroup().isPresent() ? mineableMaterial.getDropGroup().get().drawDrops() : event.getBlock().getDrops(event.getPlayer().getInventory().getItemInMainHand()).stream().toArray(ItemStack[]::new);
             Map<Integer, ItemStack> overflow = event.getPlayer().getInventory().addItem(drops);
