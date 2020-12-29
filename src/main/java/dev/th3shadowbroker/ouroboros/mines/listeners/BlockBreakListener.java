@@ -122,7 +122,7 @@ public class BlockBreakListener implements Listener {
     private void breakBlock(BlockBreakEvent event, MineableMaterial mineableMaterial, ItemStack tool) {
         if(autoPickup || event.getPlayer().hasPermission(Permissions.FEATURE_AUTO_PICKUP.permission)){
             // Modified in favour of drop feature
-            ItemStack[] drops = mineableMaterial.getDropGroup().isPresent() ? mineableMaterial.getDropGroup().get().drawDrops() : event.getBlock().getDrops(event.getPlayer().getInventory().getItemInMainHand()).stream().toArray(ItemStack[]::new);
+            ItemStack[] drops = mineableMaterial.getDropGroup().isPresent() ? mineableMaterial.getDropGroup().get().drawDrops(event.getPlayer()) : event.getBlock().getDrops(event.getPlayer().getInventory().getItemInMainHand()).stream().toArray(ItemStack[]::new);
             Map<Integer, ItemStack> overflow = event.getPlayer().getInventory().addItem(drops);
             if (overflow.size() > 0) {
                 overflow.forEach((slot, item) -> event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), item));
@@ -131,9 +131,13 @@ public class BlockBreakListener implements Listener {
             // Either Autopickup is disabled or player does not have the permission
             // Check for drop group
             if (mineableMaterial.getDropGroup().isPresent()) {
-                event.setDropItems(false);
+                if (mineableMaterial.getDropGroup().get().isOverriding()) {
+                    event.setDropItems(false);
+                } else {
+                    event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+                }
 
-                for (ItemStack drop : mineableMaterial.getDropGroup().get().drawDrops()) {
+                for (ItemStack drop : mineableMaterial.getDropGroup().get().drawDrops(event.getPlayer())) {
                     event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), drop);
                 }
 

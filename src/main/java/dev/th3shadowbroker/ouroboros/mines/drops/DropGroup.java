@@ -19,6 +19,9 @@
 
 package dev.th3shadowbroker.ouroboros.mines.drops;
 
+import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
+import org.bukkit.Server;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -31,9 +34,12 @@ public class DropGroup {
 
     private final boolean multidrop;
 
-    public DropGroup(List<Drop> drops, boolean multidrop) {
+    private final boolean override;
+
+    public DropGroup(List<Drop> drops, boolean multidrop, boolean override) {
         this.drops = drops;
         this.multidrop = multidrop;
+        this.override = override;
     }
 
     public boolean isValid() {
@@ -48,21 +54,45 @@ public class DropGroup {
         return multidrop;
     }
 
-    private ItemStack[] drawMultidrop() {
+    public boolean isOverriding() {
+        return override;
+    }
+
+    private ItemStack[] drawMultidrop(Player player) {
         final List<ItemStack> drops = new ArrayList<>();
         this.drops.forEach(
                 drop -> {
 
                     // Drop chance 100 or higher
                     if (drop.getDropChance() >= 1) {
-                        drops.add(drop.drawDropstack());
+
+                        //@FIXME Optimization needed
+                        ItemStack drawnStack = drop.drawDropstack();
+                        if (drawnStack != null) {
+                            drops.add(drawnStack);
+                        } else {
+                            Server server = OuroborosMines.INSTANCE.getServer();
+                            drop.getCommands().forEach(command -> {
+                                server.dispatchCommand(server.getConsoleSender(), command.replaceAll("%player%", player.getName()));
+                            });
+                        }
 
                     // Drop chance below 100
                     } else {
                         Random rnd = new Random();
                         boolean shallDrop = ((double) rnd.nextInt(100) / 100) <= drop.getDropChance();
                         if (shallDrop) {
-                            drops.add(drop.drawDropstack());
+                            ItemStack drawnStack = drop.drawDropstack();
+
+                            // If-clause implemented in favour of command-drops
+                            if (drawnStack != null) {
+                                drops.add(drawnStack);
+                            } else {
+                                Server server = OuroborosMines.INSTANCE.getServer();
+                                drop.getCommands().forEach(command -> {
+                                    server.dispatchCommand(server.getConsoleSender(), command.replaceAll("%player%", player.getName()));
+                                });
+                            }
                         }
                     }
 
@@ -71,7 +101,7 @@ public class DropGroup {
         return drops.stream().toArray(ItemStack[]::new);
     }
 
-    private ItemStack[] drawSingledrop() {
+    private ItemStack[] drawSingledrop(Player player) {
         ItemStack dropStack = null;
         Random rnd = new Random();
 
@@ -82,7 +112,18 @@ public class DropGroup {
             boolean shallDrop = drawnChance <= drop.getDropChance() + offset;
 
             if (shallDrop) {
-                dropStack = drop.drawDropstack();
+                ItemStack drawnStack = drop.drawDropstack();
+
+                // If-clause implemented in favour of command-drops
+                if (drawnStack != null) {
+                    dropStack = drawnStack;
+                } else {
+                    Server server = OuroborosMines.INSTANCE.getServer();
+                    drop.getCommands().forEach(command -> {
+                        server.dispatchCommand(server.getConsoleSender(), command.replaceAll("%player%", player.getName()));
+                    });
+                }
+
                 break;
             } else {
                 offset += drop.getDropChance();
@@ -92,8 +133,8 @@ public class DropGroup {
         return dropStack == null ? new ItemStack[0] : new ItemStack[]{ dropStack };
     }
 
-    public ItemStack[] drawDrops() {
-        return multidrop ? drawMultidrop() : drawSingledrop();
+    public ItemStack[] drawDrops(Player player) {
+        return multidrop ? drawMultidrop(player) : drawSingledrop(player);
     }
 
 }

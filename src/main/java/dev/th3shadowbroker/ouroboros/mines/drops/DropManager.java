@@ -35,7 +35,7 @@ public class DropManager {
 
     private final File file;
 
-    private final FileConfiguration configuration;
+    private FileConfiguration configuration;
 
     private final Map<String, DropGroup> dropGroups;
 
@@ -67,13 +67,14 @@ public class DropManager {
             try {
                 ConfigurationSection dropSection = groupSection.getConfigurationSection("drops");
                 boolean multidrop = groupSection.getBoolean("multidrop", false);
+                boolean override = groupSection.getBoolean("override", true);
 
                 final List<Drop> drops = new ArrayList<>();
                 dropSection.getKeys(false).forEach( key -> {
                     drops.add(Drop.fromSection(dropSection.getConfigurationSection(key)));
                 } );
 
-                dropGroups.put(groupName, new DropGroup(drops, multidrop));
+                dropGroups.put(groupName, new DropGroup(drops, multidrop, override));
             } catch (Exception ex) {
                 log.warning(String.format("Unable to evaluate the %s section of %s. Please check the wiki. Skipping.", groupName, file.getAbsolutePath()));
             }
@@ -84,6 +85,7 @@ public class DropManager {
 
     public void reloadGroups() {
         dropGroups.clear();
+        configuration = YamlConfiguration.loadConfiguration(file);
         loadGroups();
     }
 

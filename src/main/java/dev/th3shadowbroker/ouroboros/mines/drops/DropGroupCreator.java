@@ -64,6 +64,7 @@ public class DropGroupCreator {
 
         ConfigurationSection section = dropManager.getConfiguration().createSection(dropGroupName);
         section.set("multidrop", true);
+        section.set("override", true);
 
         ConfigurationSection dropsSection = section.createSection("drops");
 
