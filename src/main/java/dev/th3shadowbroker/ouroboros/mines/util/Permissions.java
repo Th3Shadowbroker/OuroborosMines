@@ -19,7 +19,12 @@
 
 package dev.th3shadowbroker.ouroboros.mines.util;
 
+import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
+
+import java.util.List;
+import java.util.Optional;
 
 public enum Permissions {
 
@@ -38,6 +43,11 @@ public enum Permissions {
     Permissions(String name) {
         this.name = name;
         this.permission = new Permission(name);
+
+        List<Permission> permissions = OuroborosMines.INSTANCE.getDescription().getPermissions();
+        Optional<Permission> permission = permissions.stream().filter(p -> p.getName().equals(name)).findFirst();
+
+        this.permission.setDefault(permission.map(Permission::getDefault).orElse(PermissionDefault.FALSE));
     }
 
     @Override

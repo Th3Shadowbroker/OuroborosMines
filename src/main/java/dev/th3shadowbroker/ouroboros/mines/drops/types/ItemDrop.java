@@ -20,6 +20,7 @@
 package dev.th3shadowbroker.ouroboros.mines.drops.types;
 
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
+import dev.th3shadowbroker.ouroboros.mines.util.Permissions;
 import dev.th3shadowbroker.ouroboros.mines.util.Range;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -54,7 +55,7 @@ public class ItemDrop extends AbstractDrop {
         ItemStack itemStack = this.itemStack.clone();
         itemStack.setAmount(amount.isRange() ? amount.getRandomWithin() : amount.getMin());
 
-        if (OuroborosMines.INSTANCE.getConfig().getBoolean("autoPickup", false)) {
+        if (OuroborosMines.INSTANCE.getConfig().getBoolean("autoPickup", false) || player.hasPermission(Permissions.FEATURE_AUTO_PICKUP.permission)) {
             Map<Integer, ItemStack> overflow = player.getInventory().addItem(itemStack);
             overflow.values().forEach(i -> blockLocation.getWorld().dropItem(blockLocation, i));
         } else {
