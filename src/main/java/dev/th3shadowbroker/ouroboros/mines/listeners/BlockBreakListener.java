@@ -128,7 +128,7 @@ public class BlockBreakListener implements Listener {
                 overflow.forEach((slot, item) -> event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), item));
             }
         } else {
-            //Either Autopickup is disabled or player does not have the permission
+            // Either Autopickup is disabled or player does not have the permission
             // Check for drop group
             if (mineableMaterial.getDropGroup().isPresent()) {
                 event.setDropItems(false);
@@ -137,7 +137,7 @@ public class BlockBreakListener implements Listener {
                     event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), drop);
                 }
 
-                // No drop-group assigned
+            // No drop-group assigned
             } else {
                 event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
             }
