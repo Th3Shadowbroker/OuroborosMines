@@ -27,6 +27,7 @@ import dev.th3shadowbroker.ouroboros.mines.events.DepositDiscoveredEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -118,36 +119,33 @@ public class BlockBreakListener implements Listener {
     }
 
     private void breakBlock(BlockBreakEvent event, MineableMaterial mineableMaterial, ItemStack tool) {
-      
+        boolean autoPickup = OuroborosMines.INSTANCE.getConfig().getBoolean("autoPickup", false) || event.getPlayer().hasPermission(Permissions.FEATURE_AUTO_PICKUP.permission);
+
         // Check for drop group
         if (mineableMaterial.getDropGroup().isPresent()) {
-
-            //@TODO Perform check for autoPickup!
-            if (mineableMaterial.getDropGroup().get().isOverriding()) {
-                if (OuroborosMines.INSTANCE.getConfig().getBoolean("autoPickup", false) || event.getPlayer().hasPermission(Permissions.FEATURE_AUTO_PICKUP.permission)) {
-                    event.setDropItems(false);
-                    Collection<ItemStack> drops = event.getBlock().getDrops();
-
-                    Player player = event.getPlayer();
-                    Location blockLocation = event.getBlock().getLocation();
-                    Map<Integer, ItemStack> overflow = player.getInventory().addItem(drops.stream().toArray(ItemStack[]::new));
-                    overflow.values().forEach(i -> blockLocation.getWorld().dropItem(blockLocation, i));
-                } else {
-                    event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
-                }
-            } else {
-                event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
-            }
-
+            breakNaturally(event, !mineableMaterial.getDropGroup().get().isOverriding(), autoPickup);
             mineableMaterial.getDropGroup().get().drop(event.getPlayer(), event.getBlock().getLocation());
-
         // No drop-group assigned
         } else {
-            event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+            breakNaturally(event, true, autoPickup);
         }
 
         decreaseToolDurability(event.getPlayer(), tool);
         updateStats(event.getPlayer(), mineableMaterial.getMaterial());
+    }
+
+    private void breakNaturally(BlockBreakEvent event, boolean dropNaturalItems, boolean autoPickup) {
+        if (autoPickup) {
+            event.setDropItems(dropNaturalItems);
+            Collection<ItemStack> drops = event.getBlock().getDrops();
+
+            Player player = event.getPlayer();
+            Location blockLocation = event.getBlock().getLocation();
+            Map<Integer, ItemStack> overflow = player.getInventory().addItem(drops.stream().toArray(ItemStack[]::new));
+            overflow.values().forEach(i -> blockLocation.getWorld().dropItem(blockLocation, i));
+        } else {
+            event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+        }
     }
 
     private void updateStats(Player player, Material material) {
