@@ -120,30 +120,22 @@ public class BlockBreakListener implements Listener {
     }
 
     private void breakBlock(BlockBreakEvent event, MineableMaterial mineableMaterial, ItemStack tool) {
-        if (!autoPickup) {
-            // Check for drop group
-            if (mineableMaterial.getDropGroup().isPresent()) {
-                if (mineableMaterial.getDropGroup().get().isOverriding()) {
-                    event.setDropItems(false);
-                } else {
-                    event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
-                }
 
-                for (ItemStack drop : mineableMaterial.getDropGroup().get().drawDrops(event.getPlayer())) {
-                    event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), drop);
-                }
+        // Check for drop group
+        if (mineableMaterial.getDropGroup().isPresent()) {
 
-            // No drop-group assigned
+            //@TODO Perform check for autoPickup!
+            if (mineableMaterial.getDropGroup().get().isOverriding()) {
+                event.setDropItems(false);
             } else {
                 event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
             }
+
+            mineableMaterial.getDropGroup().get().drop(event.getPlayer(), event.getBlock().getLocation());
+
+        // No drop-group assigned
         } else {
-            // Modified in favour of drop feature
-            ItemStack[] drops = mineableMaterial.getDropGroup().isPresent() ? mineableMaterial.getDropGroup().get().drawDrops(event.getPlayer()) : event.getBlock().getDrops(event.getPlayer().getInventory().getItemInMainHand()).stream().toArray(ItemStack[]::new);
-            Map<Integer, ItemStack> overflow = event.getPlayer().getInventory().addItem(drops);
-            if (overflow.size() > 0) {
-                overflow.forEach((slot, item) -> event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), item));
-            }
+            event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
         }
 
         decreaseToolDurability(event.getPlayer(), tool);

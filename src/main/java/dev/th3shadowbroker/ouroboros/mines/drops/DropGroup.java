@@ -19,35 +19,27 @@
 
 package dev.th3shadowbroker.ouroboros.mines.drops;
 
-import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
-import org.bukkit.Server;
+import dev.th3shadowbroker.ouroboros.mines.drops.types.AbstractDrop;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 public class DropGroup {
 
-    private final List<Drop> drops;
+    private final List<AbstractDrop> drops;
 
     private final boolean multidrop;
 
     private final boolean override;
 
-    public DropGroup(List<Drop> drops, boolean multidrop, boolean override) {
+    public DropGroup(List<AbstractDrop> drops, boolean multidrop, boolean override) {
         this.drops = drops;
         this.multidrop = multidrop;
         this.override = override;
-    }
-
-    public boolean isValid() {
-        return multidrop || drops.stream().mapToDouble(Drop::getDropChance).sum() <= 1;
-    }
-
-    public List<Drop> getDrops() {
-        return drops;
     }
 
     public boolean isMultidrop() {
@@ -58,83 +50,50 @@ public class DropGroup {
         return override;
     }
 
-    private ItemStack[] drawMultidrop(Player player) {
-        final List<ItemStack> drops = new ArrayList<>();
-        this.drops.forEach(
-                drop -> {
+    public AbstractDrop[] drawMultidrop() {
+        List<AbstractDrop> drops = new ArrayList<>();
+        this.drops.forEach(drop -> {
+            if (drop.getChance() >= 1) {
+                drops.add(drop);
+            } else {
+                Random rnd = new Random();
+                boolean shallDrop = ((double) rnd.nextInt(100) / 100) <= drop.getChance();
+                if (shallDrop) drops.add(drop);
+            }
+        });
 
-                    // Drop chance 100 or higher
-                    if (drop.getDropChance() >= 1) {
-
-                        //@FIXME Optimization needed
-                        ItemStack drawnStack = drop.drawDropstack();
-                        if (drawnStack != null) {
-                            drops.add(drawnStack);
-                        } else {
-                            Server server = OuroborosMines.INSTANCE.getServer();
-                            drop.getCommands().forEach(command -> {
-                                server.dispatchCommand(server.getConsoleSender(), command.replaceAll("%player%", player.getName()));
-                            });
-                        }
-
-                    // Drop chance below 100
-                    } else {
-                        Random rnd = new Random();
-                        boolean shallDrop = ((double) rnd.nextInt(100) / 100) <= drop.getDropChance();
-                        if (shallDrop) {
-                            ItemStack drawnStack = drop.drawDropstack();
-
-                            // If-clause implemented in favour of command-drops
-                            if (drawnStack != null) {
-                                drops.add(drawnStack);
-                            } else {
-                                Server server = OuroborosMines.INSTANCE.getServer();
-                                drop.getCommands().forEach(command -> {
-                                    server.dispatchCommand(server.getConsoleSender(), command.replaceAll("%player%", player.getName()));
-                                });
-                            }
-                        }
-                    }
-
-                }
-        );
-        return drops.stream().toArray(ItemStack[]::new);
+        return drops.stream().toArray(AbstractDrop[]::new);
     }
 
-    private ItemStack[] drawSingledrop(Player player) {
-        ItemStack dropStack = null;
+    public AbstractDrop drawSingledrop() {
+        AbstractDrop drop = null;
         Random rnd = new Random();
 
-        double drawnChance = ((double) rnd.nextInt(100) / 100);
+        double drawn = ((double) rnd.nextInt(100) / 100);
         double offset = 0;
 
-        for (Drop drop : drops) {
-            boolean shallDrop = drawnChance <= drop.getDropChance() + offset;
-
+        for (AbstractDrop pDrop : drops) {
+            boolean shallDrop = pDrop.getChance() <= drawn + offset;
             if (shallDrop) {
-                ItemStack drawnStack = drop.drawDropstack();
-
-                // If-clause implemented in favour of command-drops
-                if (drawnStack != null) {
-                    dropStack = drawnStack;
-                } else {
-                    Server server = OuroborosMines.INSTANCE.getServer();
-                    drop.getCommands().forEach(command -> {
-                        server.dispatchCommand(server.getConsoleSender(), command.replaceAll("%player%", player.getName()));
-                    });
-                }
-
+                drop = pDrop;
                 break;
             } else {
-                offset += drop.getDropChance();
+                offset += drop.getChance();
             }
         }
 
-        return dropStack == null ? new ItemStack[0] : new ItemStack[]{ dropStack };
+        return drop;
     }
 
-    public ItemStack[] drawDrops(Player player) {
-        return multidrop ? drawMultidrop(player) : drawSingledrop(player);
+    public void drop(Player player, Location blockLocation) {
+        if (multidrop) {
+            for (AbstractDrop d : drawMultidrop()) {
+                d.drop(player, blockLocation);
+            }
+        } else {
+            Optional<AbstractDrop> ad = Optional.ofNullable(drawSingledrop());
+            ad.ifPresent(d -> d.drop(player, blockLocation));
+        }
     }
 
 }
