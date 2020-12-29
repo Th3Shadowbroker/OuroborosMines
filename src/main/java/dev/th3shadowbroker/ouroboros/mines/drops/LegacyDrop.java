@@ -24,11 +24,11 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class Drop {
+@Deprecated
+public class LegacyDrop {
 
     private final ItemStack itemStack;
 
@@ -38,14 +38,14 @@ public class Drop {
 
     private final Range dropAmount;
 
-    public Drop(ItemStack itemStack, List<String> commands, double dropChance, Range dropAmount) {
+    public LegacyDrop(ItemStack itemStack, List<String> commands, double dropChance, Range dropAmount) {
         this.itemStack = itemStack;
         this.commands = commands;
         this.dropChance = dropChance;
         this.dropAmount = dropAmount;
     }
 
-    public Drop(ItemStack itemStack, double dropChance, Range dropAmount) {
+    public LegacyDrop(ItemStack itemStack, double dropChance, Range dropAmount) {
         this.itemStack = itemStack;
         this.commands = new ArrayList<>();
         this.dropChance = dropChance;
@@ -79,12 +79,12 @@ public class Drop {
         return dropStack;
     }
 
-    public static Drop fromSection(ConfigurationSection section) {
+    public static LegacyDrop fromSection(ConfigurationSection section) {
         ItemStack itemStack = section.getItemStack("item");
         List<String> commands = section.isString("commands") ? Collections.singletonList(section.getString("commands")) : section.getStringList("commands");
         double dropChance = section.getDouble("chance", 1);
         Range dropAmount = Range.fromString(section.getString("amount", "1"));
-        return new Drop(itemStack, commands, dropChance, dropAmount);
+        return new LegacyDrop(itemStack, commands, dropChance, dropAmount);
     }
 
 }

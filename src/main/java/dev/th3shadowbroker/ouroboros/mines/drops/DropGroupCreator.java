@@ -20,6 +20,7 @@
 package dev.th3shadowbroker.ouroboros.mines.drops;
 
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
+import dev.th3shadowbroker.ouroboros.mines.drops.types.ItemDrop;
 import dev.th3shadowbroker.ouroboros.mines.util.Range;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -30,6 +31,7 @@ import org.bukkit.metadata.MetadataValue;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class DropGroupCreator {
@@ -68,15 +70,15 @@ public class DropGroupCreator {
 
         ConfigurationSection dropsSection = section.createSection("drops");
 
-        List<Drop> drops = Arrays.stream(inventory.getContents()).filter(itemStack -> itemStack != null).map(itemStack -> new Drop(itemStack.clone(), 1, new Range(1, 1))).collect(Collectors.toList());
+        List<ItemDrop> drops = Arrays.stream(inventory.getContents()).filter(Objects::nonNull).map(itemStack -> new ItemDrop(itemStack.clone(), 1, new Range(1, 1))).collect(Collectors.toList());
         for (int i = 0; i < drops.size(); i++) {
             ConfigurationSection dropSection = dropsSection.createSection(String.valueOf(i));
 
-            Drop drop = drops.get(i);
+            ItemDrop drop = drops.get(i);
             drop.getItemStack().setAmount(1);
 
-            dropSection.set("chance", drop.getDropChance());
-            dropSection.set("amount", Integer.valueOf(drop.getDropAmount().toString()));
+            dropSection.set("chance", drop.getChance());
+            dropSection.set("amount", Integer.valueOf(drop.getAmount().toString()));
             dropSection.set("item", drop.getItemStack());
         }
 

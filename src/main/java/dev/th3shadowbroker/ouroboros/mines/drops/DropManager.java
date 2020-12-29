@@ -20,11 +20,10 @@
 package dev.th3shadowbroker.ouroboros.mines.drops;
 
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
-import org.bukkit.Material;
+import dev.th3shadowbroker.ouroboros.mines.drops.types.AbstractDrop;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,9 +68,9 @@ public class DropManager {
                 boolean multidrop = groupSection.getBoolean("multidrop", false);
                 boolean override = groupSection.getBoolean("override", true);
 
-                final List<Drop> drops = new ArrayList<>();
+                final List<AbstractDrop> drops = new ArrayList<>();
                 dropSection.getKeys(false).forEach( key -> {
-                    drops.add(Drop.fromSection(dropSection.getConfigurationSection(key)));
+                    drops.add(AbstractDrop.fromSection(dropSection.getConfigurationSection(key)));
                 } );
 
                 dropGroups.put(groupName, new DropGroup(drops, multidrop, override));

@@ -120,31 +120,22 @@ public class BlockBreakListener implements Listener {
     }
 
     private void breakBlock(BlockBreakEvent event, MineableMaterial mineableMaterial, ItemStack tool) {
-        if(autoPickup || event.getPlayer().hasPermission(Permissions.FEATURE_AUTO_PICKUP.permission)){
-            // Modified in favour of drop feature
-            ItemStack[] drops = mineableMaterial.getDropGroup().isPresent() ? mineableMaterial.getDropGroup().get().drawDrops(event.getPlayer()) : event.getBlock().getDrops(event.getPlayer().getInventory().getItemInMainHand()).stream().toArray(ItemStack[]::new);
-            Map<Integer, ItemStack> overflow = event.getPlayer().getInventory().addItem(drops);
-            if (overflow.size() > 0) {
-                overflow.forEach((slot, item) -> event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), item));
-            }
-        } else {
-            // Either Autopickup is disabled or player does not have the permission
-            // Check for drop group
-            if (mineableMaterial.getDropGroup().isPresent()) {
-                if (mineableMaterial.getDropGroup().get().isOverriding()) {
-                    event.setDropItems(false);
-                } else {
-                    event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
-                }
+      
+        // Check for drop group
+        if (mineableMaterial.getDropGroup().isPresent()) {
 
-                for (ItemStack drop : mineableMaterial.getDropGroup().get().drawDrops(event.getPlayer())) {
-                    event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), drop);
-                }
-
-            // No drop-group assigned
+            //@TODO Perform check for autoPickup!
+            if (mineableMaterial.getDropGroup().get().isOverriding()) {
+                event.setDropItems(false);
             } else {
                 event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
             }
+
+            mineableMaterial.getDropGroup().get().drop(event.getPlayer(), event.getBlock().getLocation());
+
+        // No drop-group assigned
+        } else {
+            event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
         }
 
         decreaseToolDurability(event.getPlayer(), tool);
