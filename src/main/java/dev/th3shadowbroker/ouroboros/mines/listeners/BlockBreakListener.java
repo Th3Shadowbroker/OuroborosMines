@@ -26,10 +26,7 @@ import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.events.DepositDiscoveredEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.Statistic;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -39,6 +36,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
@@ -126,7 +124,17 @@ public class BlockBreakListener implements Listener {
 
             //@TODO Perform check for autoPickup!
             if (mineableMaterial.getDropGroup().get().isOverriding()) {
-                event.setDropItems(false);
+                if (OuroborosMines.INSTANCE.getConfig().getBoolean("autoPickup", false) || event.getPlayer().hasPermission(Permissions.FEATURE_AUTO_PICKUP.permission)) {
+                    event.setDropItems(false);
+                    Collection<ItemStack> drops = event.getBlock().getDrops();
+
+                    Player player = event.getPlayer();
+                    Location blockLocation = event.getBlock().getLocation();
+                    Map<Integer, ItemStack> overflow = player.getInventory().addItem(drops.stream().toArray(ItemStack[]::new));
+                    overflow.values().forEach(i -> blockLocation.getWorld().dropItem(blockLocation, i));
+                } else {
+                    event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+                }
             } else {
                 event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
             }
