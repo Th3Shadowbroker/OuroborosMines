@@ -120,7 +120,7 @@ public class BlockBreakListener implements Listener {
     }
 
     private void breakBlock(BlockBreakEvent event, MineableMaterial mineableMaterial, ItemStack tool) {
-
+      
         // Check for drop group
         if (mineableMaterial.getDropGroup().isPresent()) {
 
