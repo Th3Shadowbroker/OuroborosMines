@@ -120,7 +120,15 @@ public class BlockBreakListener implements Listener {
     }
 
     private void breakBlock(BlockBreakEvent event, MineableMaterial mineableMaterial, ItemStack tool) {
-        if (!autoPickup) {
+        if(autoPickup || event.getPlayer().hasPermission(Permissions.FEATURE_AUTO_PICKUP.permission)){
+            // Modified in favour of drop feature
+            ItemStack[] drops = mineableMaterial.getDropGroup().isPresent() ? mineableMaterial.getDropGroup().get().drawDrops(event.getPlayer()) : event.getBlock().getDrops(event.getPlayer().getInventory().getItemInMainHand()).stream().toArray(ItemStack[]::new);
+            Map<Integer, ItemStack> overflow = event.getPlayer().getInventory().addItem(drops);
+            if (overflow.size() > 0) {
+                overflow.forEach((slot, item) -> event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), item));
+            }
+        } else {
+            // Either Autopickup is disabled or player does not have the permission
             // Check for drop group
             if (mineableMaterial.getDropGroup().isPresent()) {
                 if (mineableMaterial.getDropGroup().get().isOverriding()) {
@@ -136,13 +144,6 @@ public class BlockBreakListener implements Listener {
             // No drop-group assigned
             } else {
                 event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
-            }
-        } else {
-            // Modified in favour of drop feature
-            ItemStack[] drops = mineableMaterial.getDropGroup().isPresent() ? mineableMaterial.getDropGroup().get().drawDrops(event.getPlayer()) : event.getBlock().getDrops(event.getPlayer().getInventory().getItemInMainHand()).stream().toArray(ItemStack[]::new);
-            Map<Integer, ItemStack> overflow = event.getPlayer().getInventory().addItem(drops);
-            if (overflow.size() > 0) {
-                overflow.forEach((slot, item) -> event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), item));
             }
         }
 
