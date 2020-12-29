@@ -40,3 +40,7 @@ permissions:
 
   ouroboros.mines.command.dropgroup:
     default: op
+
+  ouroboros.mines.autopickup:
+    description: Grants permission to make use of the autopickup feature - if enabled.
+    default: false
