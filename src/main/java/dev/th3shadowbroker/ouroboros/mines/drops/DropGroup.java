@@ -78,7 +78,7 @@ public class DropGroup {
                 drop = pDrop;
                 break;
             } else {
-                offset += drop.getChance();
+                offset += pDrop.getChance();
             }
         }
 
