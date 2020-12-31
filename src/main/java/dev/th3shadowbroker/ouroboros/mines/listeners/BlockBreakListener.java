@@ -27,7 +27,6 @@ import dev.th3shadowbroker.ouroboros.mines.events.DepositDiscoveredEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -44,8 +43,6 @@ import java.util.Optional;
 public class BlockBreakListener implements Listener {
 
     private final OuroborosMines plugin = OuroborosMines.INSTANCE;
-
-    private final boolean autoPickup = plugin.getConfig().getBoolean("autoPickup", false);
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockBreak(BlockBreakEvent event) {
