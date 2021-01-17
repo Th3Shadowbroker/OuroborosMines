@@ -36,7 +36,7 @@ chat:
     minesClosed: "&cThe mines are closed come back later."
     help:
       customize: "Generates a region-configuration."
-      dropgroup: "Generate a drop-group from a chest."
+      dropgroup: "Generates a drop-group from a chest."
       reload: "Reloads all configuration files."
     error: "&cAn error occurred: %error%"
 
