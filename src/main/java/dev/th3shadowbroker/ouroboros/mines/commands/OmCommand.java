@@ -139,6 +139,16 @@ public class OmCommand implements CommandExecutor {
                     }
                     break;
 
+                case "help":
+                    if (sender.hasPermission(Permissions.COMMAND_HELP.permission)) {
+                        sender.sendMessage(OuroborosMines.PREFIX + "§e/om customize §9[region] [world]§r " + TemplateMessage.from("chat.messages.help.customize").colorize().toRawString());
+                        sender.sendMessage(OuroborosMines.PREFIX + "§e/om dropgroup §9<name>§r " + TemplateMessage.from("chat.messages.help.dropgroup").colorize().toRawString());
+                        sender.sendMessage(OuroborosMines.PREFIX + "§e/om reload§r " + TemplateMessage.from("chat.messages.help.reload").colorize().toRawString());
+                    } else {
+                        sender.sendMessage(cmd.getPermissionMessage());
+                    }
+                    break;
+
                 default:
                     sender.sendMessage(TemplateMessage.from("chat.messages.unrecognizedArgument").colorize().toString());
                     sender.sendMessage(cmd.getUsage());

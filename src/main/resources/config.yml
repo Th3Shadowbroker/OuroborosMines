@@ -34,6 +34,10 @@ chat:
       opening: "&2The mines are open!"
       closing: "&cThe mines are now closed. Come back tomorrow!"
     minesClosed: "&cThe mines are closed come back later."
+    help:
+      customize: "Generates a region-configuration."
+      dropgroup: "Generate a drop-group from a chest."
+      reload: "Reloads all configuration files."
     error: "&cAn error occurred: %error%"
 
 # This keys define all materials that can be mined.
