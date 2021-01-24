@@ -76,7 +76,7 @@ public class OuroborosMines extends JavaPlugin {
 
         //Static stuff
         INSTANCE = this;
-        FLAG = new StateFlag("ouroboros-mine", false);
+        FLAG = new StateFlag("ouroboros-mine", getConfig().getBoolean("default", false));
 
         //Internal stuff
         materialManager = new MaterialManager();
