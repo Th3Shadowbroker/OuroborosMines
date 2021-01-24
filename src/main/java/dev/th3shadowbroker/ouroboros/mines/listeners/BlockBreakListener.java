@@ -46,9 +46,11 @@ public class BlockBreakListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockBreak(BlockBreakEvent event) {
+        Location blockLocation = event.getBlock().getLocation();
         Optional<ApplicableRegionSet> blockRegions = WorldUtils.getBlockRegions(event.getBlock());
         if ( blockRegions.isPresent() && blockRegions.get().testState(null, OuroborosMines.FLAG)) {
-            Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType(), WorldUtils.getTopRegion(blockRegions.get()).get(), BukkitAdapter.adapt(event.getBlock().getWorld()));
+            Optional<ProtectedRegion> region = WorldUtils.getTopRegion(blockRegions.get());
+            Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType(), region.orElseGet(() -> WorldUtils.getGlobalRegion(blockLocation.getWorld()).get()), BukkitAdapter.adapt(event.getBlock().getWorld()));
             if (minedMaterial.isPresent()) {
 
                 // Abort if opening hours are enabled an the mines are closed

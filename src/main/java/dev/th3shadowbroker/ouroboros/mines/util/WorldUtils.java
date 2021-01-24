@@ -24,7 +24,9 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.RegionType;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -68,6 +70,23 @@ public class WorldUtils {
     public static Optional<ProtectedRegion> getRegion(String id, World world) {
         Optional<RegionManager> regionManager = getRegionManager(world);
         return regionManager.map(manager -> manager.getRegion(id));
+    }
+
+    public static Optional<GlobalProtectedRegion> getGlobalRegion(World world) {
+        Optional<RegionManager> regionManager = getRegionManager(world);
+
+        if (regionManager.isPresent()) {
+            if (regionManager.get().hasRegion("__global__")) {
+                ProtectedRegion region = regionManager.get().getRegion("__global__");
+                return Optional.ofNullable(region != null && region.getType() == RegionType.GLOBAL ? (GlobalProtectedRegion) region : null);
+            } else {
+                GlobalProtectedRegion region = new GlobalProtectedRegion("__global__");
+                regionManager.get().addRegion(region);
+                return Optional.of(region);
+            }
+        }
+
+        return Optional.empty();
     }
 
     public static boolean isAccessible(Block block) {
