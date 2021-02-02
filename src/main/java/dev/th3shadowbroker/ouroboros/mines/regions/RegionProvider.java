@@ -21,6 +21,7 @@ package dev.th3shadowbroker.ouroboros.mines.regions;
 
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 
 import java.util.Optional;
@@ -39,7 +40,15 @@ public abstract class RegionProvider {
         this.flag = flag;
     }
 
+    public abstract Optional<MiningRegion> getGlobalRegion(Location location);
+
+    public Optional<MiningRegion> getGlobalRegion(Block block) {
+        return getGlobalRegion(block.getLocation());
+    }
+
     public abstract Optional<MiningRegion> getRegion(Location location);
+
+    public abstract Optional<MiningRegion> getRegion(String regionId, World world);
 
     public Optional<MiningRegion> getRegion(Block block) {
         return getRegion(block.getLocation());

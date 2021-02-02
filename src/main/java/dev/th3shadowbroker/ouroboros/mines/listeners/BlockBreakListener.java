@@ -20,11 +20,10 @@
 package dev.th3shadowbroker.ouroboros.mines.listeners;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.events.DepositDiscoveredEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
+import dev.th3shadowbroker.ouroboros.mines.regions.MiningRegion;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -46,11 +45,9 @@ public class BlockBreakListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockBreak(BlockBreakEvent event) {
-        Location blockLocation = event.getBlock().getLocation();
-        Optional<ApplicableRegionSet> blockRegions = WorldUtils.getBlockRegions(event.getBlock());
-        if ( blockRegions.isPresent() && blockRegions.get().testState(null, OuroborosMines.FLAG)) {
-            Optional<ProtectedRegion> region = WorldUtils.getTopRegion(blockRegions.get());
-            Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType(), region.orElseGet(() -> WorldUtils.getGlobalRegion(blockLocation.getWorld()).get()), BukkitAdapter.adapt(event.getBlock().getWorld()));
+        Optional<MiningRegion> region = plugin.getRegionProvider().getRegion(event.getBlock());
+        if ((region.isPresent() && region.get().isMiningRegion()) || plugin.getConfig().getBoolean("default", false)) {
+            Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType(), region.orElseGet(() -> plugin.getRegionProvider().getGlobalRegion(event.getBlock()).get()), BukkitAdapter.adapt(event.getBlock().getWorld()));
             if (minedMaterial.isPresent()) {
 
                 // Abort if opening hours are enabled an the mines are closed
@@ -59,8 +56,8 @@ public class BlockBreakListener implements Listener {
                         boolean worldMatches = rc.getWorld() == event.getBlock().getWorld();
                         boolean idMatches = false;
 
-                        Optional<ProtectedRegion> topRegion = WorldUtils.getTopRegion(blockRegions.get());
-                        if (topRegion.isPresent() && topRegion.get().getId().equals(rc.getRegionId())) {
+                        Optional<MiningRegion> topRegion = plugin.getRegionProvider().getRegion(event.getBlock());
+                        if (topRegion.isPresent() && topRegion.get().getRegionId().equals(rc.getRegionId())) {
                             idMatches = true;
                         }
 
@@ -80,7 +77,7 @@ public class BlockBreakListener implements Listener {
                         int drawnRichness = minedMaterial.get().getDrawnRichness();
                         if (drawnRichness > 0) {
                             MetaUtils.setRichness(event.getBlock(), drawnRichness);
-                            Bukkit.getPluginManager().callEvent(new DepositDiscoveredEvent(event.getBlock(), event.getPlayer(), minedMaterial.get(),drawnRichness + 1));
+                            Bukkit.getPluginManager().callEvent(new DepositDiscoveredEvent(event.getBlock(), event.getPlayer(), minedMaterial.get(), drawnRichness + 1));
                         }
                     }
 

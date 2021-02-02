@@ -20,8 +20,8 @@
 package dev.th3shadowbroker.ouroboros.mines.util;
 
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
+import dev.th3shadowbroker.ouroboros.mines.regions.MiningRegion;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
@@ -48,9 +48,9 @@ public class MaterialManager {
         minableMaterials.add(mineableMaterial);
     }
 
-    public Optional<MineableMaterial> getMaterialProperties(Material material, ProtectedRegion region, World regionWorld) {
+    public Optional<MineableMaterial> getMaterialProperties(Material material, MiningRegion region, World regionWorld) {
          Optional<RegionConfiguration> regionConfiguration = mineableMaterialOverrides.stream()
-                                                             .filter(rc -> rc.getRegionId().equals(region.getId()))
+                                                             .filter(rc -> rc.getRegionId().equals(region.getRegionId()))
                                                              .filter(rc -> rc.getWorld().getName().equals(regionWorld.getName())).findFirst();
 
          //Check for region specific settings
