@@ -19,7 +19,6 @@
 
 package dev.th3shadowbroker.ouroboros.mines.commands;
 
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.drops.DropGroupCreator;
 import dev.th3shadowbroker.ouroboros.mines.regions.MiningRegion;
@@ -154,11 +153,6 @@ public class OmCommand implements CommandExecutor {
             }
         }
         return true;
-    }
-
-    @Deprecated
-    private void createRegionConfiguration(ProtectedRegion region, Player player) {
-        createRegionConfiguration(region.getId(), player);
     }
 
     private void createRegionConfiguration(String regionId, Player player) {

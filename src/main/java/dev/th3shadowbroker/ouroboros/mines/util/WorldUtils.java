@@ -39,12 +39,14 @@ import java.util.Optional;
 
 public class WorldUtils {
 
+    @Deprecated
     public static Optional<ApplicableRegionSet> getBlockRegions(Block block) {
         return getRegionManager(block.getWorld()).map(manager -> manager.getApplicableRegions(BukkitAdapter.asBlockVector(block.getLocation())));
     }
 
+    @Deprecated
     public static Optional<ProtectedRegion> getTopRegion(ApplicableRegionSet regionSet) {
-        ProtectedRegion[] regions = regionSet.getRegions().stream().filter(region -> region.getFlags().get(OuroborosMines.FLAG) == StateFlag.State.ALLOW).toArray(ProtectedRegion[]::new);
+        ProtectedRegion[] regions = regionSet.getRegions().stream().filter(region -> region.getFlags().get((StateFlag) OuroborosMines.INSTANCE.getRegionProvider().getFlag().getPluginFlag()) == StateFlag.State.ALLOW).toArray(ProtectedRegion[]::new);
         ProtectedRegion highestRegion = null;
 
         for (ProtectedRegion protectedRegion : regions) {
@@ -59,19 +61,23 @@ public class WorldUtils {
         return Optional.ofNullable(highestRegion);
     }
 
+    @Deprecated
     public static Optional<ApplicableRegionSet> getPlayerRegions(Player player) {
         return getRegionManager(player.getWorld()).map(manager -> manager.getApplicableRegions(BukkitAdapter.adapt(player.getLocation()).toVector().toBlockPoint()));
     }
 
+    @Deprecated
     public static Optional<RegionManager> getRegionManager(World world) {
         return Optional.ofNullable( WorldGuard.getInstance().getPlatform().getRegionContainer().get( BukkitAdapter.adapt(world) ) );
     }
 
+    @Deprecated
     public static Optional<ProtectedRegion> getRegion(String id, World world) {
         Optional<RegionManager> regionManager = getRegionManager(world);
         return regionManager.map(manager -> manager.getRegion(id));
     }
 
+    @Deprecated
     public static Optional<GlobalProtectedRegion> getGlobalRegion(World world) {
         Optional<RegionManager> regionManager = getRegionManager(world);
 
@@ -89,6 +95,7 @@ public class WorldUtils {
         return Optional.empty();
     }
 
+    @Deprecated
     public static boolean isAccessible(Block block) {
         BlockFace[] accessibleFaces = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
         for (BlockFace face : accessibleFaces)

@@ -19,7 +19,6 @@
 
 package dev.th3shadowbroker.ouroboros.mines;
 
-import com.sk89q.worldguard.protection.flags.StateFlag;
 import dev.th3shadowbroker.ouroboros.mines.commands.OmCommand;
 import dev.th3shadowbroker.ouroboros.mines.drops.DropManager;
 import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialException;
@@ -55,8 +54,6 @@ public class OuroborosMines extends JavaPlugin {
 
     public static String PREFIX;
 
-    public static StateFlag FLAG;
-
     private MaterialManager materialManager;
 
     private EffectManager effectManager;
@@ -79,7 +76,6 @@ public class OuroborosMines extends JavaPlugin {
 
         //Static stuff
         INSTANCE = this;
-        FLAG = new StateFlag("ouroboros-mine", getConfig().getBoolean("default", false));
 
         //Region providers
         Optional<RegionProvider> regionProvider = RegionProvider.getProvider(

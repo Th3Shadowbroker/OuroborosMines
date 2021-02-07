@@ -19,7 +19,6 @@
 
 package dev.th3shadowbroker.ouroboros.mines.listeners;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.events.DepositDiscoveredEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
@@ -47,7 +46,7 @@ public class BlockBreakListener implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         Optional<MiningRegion> region = plugin.getRegionProvider().getRegion(event.getBlock());
         if ((region.isPresent() && region.get().isMiningRegion()) || plugin.getConfig().getBoolean("default", false)) {
-            Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType(), region.orElseGet(() -> plugin.getRegionProvider().getGlobalRegion(event.getBlock()).get()), BukkitAdapter.adapt(event.getBlock().getWorld()));
+            Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType(), region.orElseGet(() -> plugin.getRegionProvider().getGlobalRegion(event.getBlock()).get()), event.getBlock().getWorld());
             if (minedMaterial.isPresent()) {
 
                 // Abort if opening hours are enabled an the mines are closed
@@ -71,6 +70,7 @@ public class BlockBreakListener implements Listener {
                     }
                 }
 
+                // Richness
                 if (minedMaterial.get().canBeRich()) {
                     //Draw for richness
                     if (!MetaUtils.isRich(event.getBlock())) {
