@@ -20,23 +20,23 @@
 package dev.th3shadowbroker.ouroboros.mines.regions;
 
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.plugin.Plugin;
 
+import java.lang.reflect.Constructor;
 import java.util.Optional;
 
 public abstract class RegionProvider {
 
     protected final OuroborosMines plugin;
 
-    protected final String providerName;
-
     protected final AbstractFlag flag;
 
-    public RegionProvider(String providerName, AbstractFlag flag) {
+    public RegionProvider(AbstractFlag flag) {
         this.plugin = OuroborosMines.INSTANCE;
-        this.providerName = providerName;
         this.flag = flag;
     }
 
@@ -54,8 +54,6 @@ public abstract class RegionProvider {
         return getRegion(block.getLocation());
     }
 
-    public abstract boolean isAvailable();
-
     public abstract void onLoad();
 
     public AbstractFlag getFlag() {
@@ -63,14 +61,37 @@ public abstract class RegionProvider {
     }
 
     public String getProviderName() {
-        return providerName;
+        return getProviderDescription().providerName();
     }
 
-    public static Optional<RegionProvider> getProvider(RegionProvider... providers) {
-        for (RegionProvider provider : providers) {
-            if (provider.isAvailable()) return Optional.of(provider);
+    public ProviderDescription getProviderDescription() {
+        return getClass().getAnnotation(ProviderDescription.class);
+    }
+
+    @SafeVarargs
+    public static Optional<RegionProvider> getProvider(Class<? extends RegionProvider>... providers) {
+        for (Class<? extends RegionProvider> provider : providers) {
+            Optional<ProviderDescription> description = getProviderDescription(provider);
+            if (description.isPresent()) {
+                Optional<Plugin> plugin = Optional.ofNullable(Bukkit.getServer().getPluginManager().getPlugin(description.get().providerName()));
+                if (plugin.isPresent()) {
+                    try {
+                        Constructor<?> providerConstructor = provider.getDeclaredConstructor();
+                        return Optional.of((RegionProvider) providerConstructor.newInstance());
+                    } catch (ReflectiveOperationException ex) {
+                        OuroborosMines.INSTANCE.getLogger().severe("Unable to create a region provider for " + plugin.get().getName());
+                        ex.printStackTrace();
+                    }
+                }
+            } else {
+                OuroborosMines.INSTANCE.getLogger().warning(String.format("The class %s does not contain a ProviderDescription annotation and will be ignored!", provider.getName()));
+            }
         }
         return Optional.empty();
+    }
+
+    public static Optional<ProviderDescription> getProviderDescription(Class<? extends RegionProvider> provider) {
+        return Optional.ofNullable(provider.getAnnotation(ProviderDescription.class));
     }
 
 }

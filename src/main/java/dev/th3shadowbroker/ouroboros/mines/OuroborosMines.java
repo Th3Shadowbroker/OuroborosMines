@@ -79,7 +79,7 @@ public class OuroborosMines extends JavaPlugin {
 
         //Region providers
         Optional<RegionProvider> regionProvider = RegionProvider.getProvider(
-          new WorldGuardProvider()
+            WorldGuardProvider.class
         );
 
         //Load region provider dynamically

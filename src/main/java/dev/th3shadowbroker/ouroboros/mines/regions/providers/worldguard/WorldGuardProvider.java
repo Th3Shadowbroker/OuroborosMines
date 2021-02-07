@@ -28,16 +28,20 @@ import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionType;
 import dev.th3shadowbroker.ouroboros.mines.regions.MiningRegion;
+import dev.th3shadowbroker.ouroboros.mines.regions.ProviderDescription;
 import dev.th3shadowbroker.ouroboros.mines.regions.RegionProvider;
 import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.Optional;
 
+@ProviderDescription(
+        providerName = "WorldGuard"
+)
 public class WorldGuardProvider extends RegionProvider {
 
     public WorldGuardProvider() {
-        super("WorldGuard", new WorldGuardFlag("ouroboros-mine"));
+        super(new WorldGuardFlag("ouroboros-mine"));
     }
 
     @Override
@@ -93,11 +97,6 @@ public class WorldGuardProvider extends RegionProvider {
     public Optional<MiningRegion> getRegion(String regionId, World world) {
         Optional<RegionManager> regionManager = Optional.ofNullable(WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world)));
         return regionManager.flatMap(manager -> Optional.ofNullable(manager.getRegion(regionId)).map(r -> new MiningRegion(r.getId(), r.getFlag((StateFlag) flag.getPluginFlag()) == StateFlag.State.ALLOW)));
-    }
-
-    @Override
-    public boolean isAvailable() {
-        return plugin.getServer().getPluginManager().getPlugin(providerName) != null;
     }
 
     @Override
