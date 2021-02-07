@@ -25,6 +25,7 @@ import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
 import dev.th3shadowbroker.ouroboros.mines.regions.MiningRegion;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -51,17 +52,7 @@ public class BlockBreakListener implements Listener {
 
                 // Abort if opening hours are enabled an the mines are closed
                 if (plugin.getAnnouncementManager().hasAny()) {
-                    Optional<RegionConfiguration> matchingConfig = plugin.getMaterialManager().getMineableMaterialOverrides().stream().filter(rc -> {
-                        boolean worldMatches = rc.getWorld() == event.getBlock().getWorld();
-                        boolean idMatches = false;
-
-                        Optional<MiningRegion> topRegion = plugin.getRegionProvider().getRegion(event.getBlock());
-                        if (topRegion.isPresent() && topRegion.get().getRegionId().equals(rc.getRegionId())) {
-                            idMatches = true;
-                        }
-
-                        return worldMatches && idMatches;
-                    }).findFirst();
+                    Optional<RegionConfiguration> matchingConfig = getRegionConfiguration(event.getBlock());
 
                     if (matchingConfig.isPresent() && !matchingConfig.get().minesAreOpen()) {
                         event.getPlayer().sendMessage(TemplateMessage.from("chat.messages.minesClosed", matchingConfig.get().getConfiguration()).colorize().toString());
@@ -112,6 +103,20 @@ public class BlockBreakListener implements Listener {
 
             event.setCancelled(true);
         }
+    }
+
+    private Optional<RegionConfiguration> getRegionConfiguration(Block block) {
+        return plugin.getMaterialManager().getMineableMaterialOverrides().stream().filter(rc -> {
+            boolean worldMatches = rc.getWorld() == block.getLocation().getWorld();
+            boolean idMatches = false;
+
+            Optional<MiningRegion> topRegion = plugin.getRegionProvider().getRegion(block);
+            if (topRegion.isPresent() && topRegion.get().getRegionId().equals(rc.getRegionId())) {
+                idMatches = true;
+            }
+
+            return worldMatches && idMatches;
+        }).findFirst();
     }
 
     private void breakBlock(BlockBreakEvent event, MineableMaterial mineableMaterial, ItemStack tool) {
