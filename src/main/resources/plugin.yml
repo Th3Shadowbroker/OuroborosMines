@@ -19,6 +19,7 @@ permissions:
     default: false
     children:
       ouroboros.mines.command.*: true
+      ouroboros.mines.mine: true
 
   ouroboros.mines.command.*:
     description: Grants permission to all of the plugins commands.
@@ -43,6 +44,9 @@ permissions:
     default: op
 
   ouroboros.mines.command.help:
+    default: true
+
+  ouroboros.mines.mine:
     default: true
 
   ouroboros.mines.autopickup:

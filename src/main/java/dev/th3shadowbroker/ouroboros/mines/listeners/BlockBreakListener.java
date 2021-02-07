@@ -49,6 +49,12 @@ public class BlockBreakListener implements Listener {
         Location blockLocation = event.getBlock().getLocation();
         Optional<ApplicableRegionSet> blockRegions = WorldUtils.getBlockRegions(event.getBlock());
         if ( blockRegions.isPresent() && blockRegions.get().testState(null, OuroborosMines.FLAG)) {
+
+            // Check for mining permission
+            if (!event.getPlayer().hasPermission(Permissions.FEATURE_MINE.permission)) {
+                return;
+            }
+
             Optional<ProtectedRegion> region = WorldUtils.getTopRegion(blockRegions.get());
             Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType(), region.orElseGet(() -> WorldUtils.getGlobalRegion(blockLocation.getWorld()).get()), BukkitAdapter.adapt(event.getBlock().getWorld()));
             if (minedMaterial.isPresent()) {
