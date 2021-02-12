@@ -19,14 +19,12 @@
 
 package dev.th3shadowbroker.ouroboros.mines.commands;
 
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.drops.DropGroupCreator;
+import dev.th3shadowbroker.ouroboros.mines.regions.MiningRegion;
 import dev.th3shadowbroker.ouroboros.mines.util.Permissions;
 import dev.th3shadowbroker.ouroboros.mines.util.RegionConfiguration;
 import dev.th3shadowbroker.ouroboros.mines.util.TemplateMessage;
-import dev.th3shadowbroker.ouroboros.mines.util.WorldUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -58,10 +56,9 @@ public class OmCommand implements CommandExecutor {
                         if (sender instanceof Player) {
                             Player player = (Player) sender;
                             if (args.length == 1) {
-                                Optional<ApplicableRegionSet> regionSet = WorldUtils.getPlayerRegions(player);
-                                Optional<ProtectedRegion> region = regionSet.flatMap(WorldUtils::getTopRegion);
+                                Optional<MiningRegion> region = plugin.getRegionProvider().getRegion(player.getLocation());
                                 if (region.isPresent()) {
-                                    createRegionConfiguration(region.get(), player);
+                                    createRegionConfiguration(region.get().getRegionId(), player);
                                 } else {
                                     sender.sendMessage(TemplateMessage.from("chat.messages.regionNotFound").colorize().toString());
                                 }
@@ -69,9 +66,9 @@ public class OmCommand implements CommandExecutor {
                                 String regionId = args[1];
                                 Optional<World> world = Optional.ofNullable(args.length >= 3 ? Bukkit.getWorld(args[2]) : player.getWorld());
                                 if (world.isPresent()) {
-                                    Optional<ProtectedRegion> region = WorldUtils.getRegion(regionId, world.get());
+                                    Optional<MiningRegion> region = plugin.getRegionProvider().getRegion(regionId, world.get());
                                     if (region.isPresent()) {
-                                        createRegionConfiguration(region.get(), player);
+                                        createRegionConfiguration(region.get().getRegionId(), player);
                                     } else {
                                         sender.sendMessage(TemplateMessage.from("chat.messages.regionNotFound").colorize().toString());
                                     }
@@ -158,12 +155,13 @@ public class OmCommand implements CommandExecutor {
         return true;
     }
 
-    private void createRegionConfiguration(ProtectedRegion region, Player player) {
-        if (!RegionConfiguration.configExists(region.getId(), player.getWorld().getName())) {
-            new RegionConfiguration(region.getId(), player.getWorld().getName());
-            player.sendMessage(TemplateMessage.from("chat.messages.regionCustomize").insert("region", region.getId()).colorize().toString());
+    private void createRegionConfiguration(String regionId, Player player) {
+        if (!RegionConfiguration.configExists(regionId, player.getWorld().getName())) {
+            new RegionConfiguration(regionId, player.getWorld().getName());
+            player.sendMessage(TemplateMessage.from("chat.messages.regionCustomize").insert("region", regionId).colorize().toString());
         } else {
-            player.sendMessage(TemplateMessage.from("chat.messages.regionAlreadyCustomized").insert("region", region.getId()).colorize().toString());
+            player.sendMessage(TemplateMessage.from("chat.messages.regionAlreadyCustomized").insert("region", regionId).colorize().toString());
         }
     }
+
 }
