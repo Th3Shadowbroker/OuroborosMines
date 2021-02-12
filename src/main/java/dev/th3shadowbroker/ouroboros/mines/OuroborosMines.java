@@ -19,12 +19,12 @@
 
 package dev.th3shadowbroker.ouroboros.mines;
 
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.flags.StateFlag;
 import dev.th3shadowbroker.ouroboros.mines.commands.OmCommand;
 import dev.th3shadowbroker.ouroboros.mines.drops.DropManager;
 import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialException;
 import dev.th3shadowbroker.ouroboros.mines.listeners.*;
+import dev.th3shadowbroker.ouroboros.mines.regions.RegionProvider;
+import dev.th3shadowbroker.ouroboros.mines.regions.providers.worldguard.WorldGuardProvider;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.BeautyQuestsSupport;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.JobsRebornSupport;
 import dev.th3shadowbroker.ouroboros.mines.thirdparty.PlaceholderAPISupport;
@@ -54,8 +54,6 @@ public class OuroborosMines extends JavaPlugin {
 
     public static String PREFIX;
 
-    public static StateFlag FLAG;
-
     private MaterialManager materialManager;
 
     private EffectManager effectManager;
@@ -66,17 +64,34 @@ public class OuroborosMines extends JavaPlugin {
 
     private DropManager dropManager;
 
-    private boolean worldGuardFound = false;
+    private RegionProvider regionProvider;
+
+    private boolean regionProviderFound = false;
 
     @Override
     public void onLoad() {
         //Check for world-guard and disable if not installed
-        worldGuardFound = worldGuardIsInstalled();
-        if (!worldGuardFound) { return; }
+        //worldGuardFound = worldGuardIsInstalled();
+        //if (!worldGuardFound) { return; }
 
         //Static stuff
         INSTANCE = this;
-        FLAG = new StateFlag("ouroboros-mine", getConfig().getBoolean("default", false));
+
+        //Region providers
+        Optional<RegionProvider> regionProvider = RegionProvider.getProvider(
+            WorldGuardProvider.class
+        );
+
+        //Load region provider dynamically
+        if (regionProvider.isPresent()) {
+            getLogger().info(String.format("Detected %s", regionProvider.get().getProviderName()));
+            this.regionProvider = regionProvider.get();
+            this.regionProvider.onLoad();
+            regionProviderFound = true;
+        } else {
+            getLogger().severe("No region provider available!");
+            return;
+        }
 
         //Internal stuff
         materialManager = new MaterialManager();
@@ -90,12 +105,12 @@ public class OuroborosMines extends JavaPlugin {
         PREFIX = ChatColor.translateAlternateColorCodes('&', getConfig().getString("chat.prefix", "&9[OM]") + "&r ");
 
         //Register flag
-        WorldGuard.getInstance().getFlagRegistry().register(FLAG);
+        //WorldGuard.getInstance().getFlagRegistry().register(FLAG);
     }
 
     @Override
     public void onEnable() {
-        if (!worldGuardFound) {
+        if (!regionProviderFound) {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
@@ -124,7 +139,7 @@ public class OuroborosMines extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (!worldGuardFound) { return; }
+        if (!regionProviderFound) { return; }
         getTaskManager().flush();
     }
 
@@ -294,6 +309,10 @@ public class OuroborosMines extends JavaPlugin {
 
     public DropManager getDropManager() {
         return dropManager;
+    }
+
+    public RegionProvider getRegionProvider() {
+        return regionProvider;
     }
 
 }

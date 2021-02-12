@@ -19,14 +19,13 @@
 
 package dev.th3shadowbroker.ouroboros.mines.listeners;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.events.DepositDiscoveredEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
+import dev.th3shadowbroker.ouroboros.mines.regions.MiningRegion;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -46,32 +45,21 @@ public class BlockBreakListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockBreak(BlockBreakEvent event) {
-        Location blockLocation = event.getBlock().getLocation();
-        Optional<ApplicableRegionSet> blockRegions = WorldUtils.getBlockRegions(event.getBlock());
-        if ( blockRegions.isPresent() && blockRegions.get().testState(null, OuroborosMines.FLAG)) {
-
+        Optional<MiningRegion> region = plugin.getRegionProvider().getRegion(event.getBlock());
+        if ((region.isPresent() && region.get().isMiningRegion()) || plugin.getConfig().getBoolean("default", false)) {
+          
             // Check for mining permission
             if (!event.getPlayer().hasPermission(Permissions.FEATURE_MINE.permission)) {
                 return;
             }
+          
+            Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType(), region.orElseGet(() -> plugin.getRegionProvider().getGlobalRegion(event.getBlock()).get()), event.getBlock().getWorld());
 
-            Optional<ProtectedRegion> region = WorldUtils.getTopRegion(blockRegions.get());
-            Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType(), region.orElseGet(() -> WorldUtils.getGlobalRegion(blockLocation.getWorld()).get()), BukkitAdapter.adapt(event.getBlock().getWorld()));
             if (minedMaterial.isPresent()) {
 
                 // Abort if opening hours are enabled an the mines are closed
                 if (plugin.getAnnouncementManager().hasAny()) {
-                    Optional<RegionConfiguration> matchingConfig = plugin.getMaterialManager().getMineableMaterialOverrides().stream().filter(rc -> {
-                        boolean worldMatches = rc.getWorld() == event.getBlock().getWorld();
-                        boolean idMatches = false;
-
-                        Optional<ProtectedRegion> topRegion = WorldUtils.getTopRegion(blockRegions.get());
-                        if (topRegion.isPresent() && topRegion.get().getId().equals(rc.getRegionId())) {
-                            idMatches = true;
-                        }
-
-                        return worldMatches && idMatches;
-                    }).findFirst();
+                    Optional<RegionConfiguration> matchingConfig = getRegionConfiguration(event.getBlock());
 
                     if (matchingConfig.isPresent() && !matchingConfig.get().minesAreOpen()) {
                         event.getPlayer().sendMessage(TemplateMessage.from("chat.messages.minesClosed", matchingConfig.get().getConfiguration()).colorize().toString());
@@ -80,13 +68,14 @@ public class BlockBreakListener implements Listener {
                     }
                 }
 
+                // Richness
                 if (minedMaterial.get().canBeRich()) {
                     //Draw for richness
                     if (!MetaUtils.isRich(event.getBlock())) {
                         int drawnRichness = minedMaterial.get().getDrawnRichness();
                         if (drawnRichness > 0) {
                             MetaUtils.setRichness(event.getBlock(), drawnRichness);
-                            Bukkit.getPluginManager().callEvent(new DepositDiscoveredEvent(event.getBlock(), event.getPlayer(), minedMaterial.get(),drawnRichness + 1));
+                            Bukkit.getPluginManager().callEvent(new DepositDiscoveredEvent(event.getBlock(), event.getPlayer(), minedMaterial.get(), drawnRichness + 1));
                         }
                     }
 
@@ -121,6 +110,20 @@ public class BlockBreakListener implements Listener {
 
             event.setCancelled(true);
         }
+    }
+
+    private Optional<RegionConfiguration> getRegionConfiguration(Block block) {
+        return plugin.getMaterialManager().getMineableMaterialOverrides().stream().filter(rc -> {
+            boolean worldMatches = rc.getWorld() == block.getLocation().getWorld();
+            boolean idMatches = false;
+
+            Optional<MiningRegion> topRegion = plugin.getRegionProvider().getRegion(block);
+            if (topRegion.isPresent() && topRegion.get().getRegionId().equals(rc.getRegionId())) {
+                idMatches = true;
+            }
+
+            return worldMatches && idMatches;
+        }).findFirst();
     }
 
     private void breakBlock(BlockBreakEvent event, MineableMaterial mineableMaterial, ItemStack tool) {
