@@ -47,7 +47,14 @@ public class BlockBreakListener implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         Optional<MiningRegion> region = plugin.getRegionProvider().getRegion(event.getBlock());
         if ((region.isPresent() && region.get().isMiningRegion()) || plugin.getConfig().getBoolean("default", false)) {
+          
+            // Check for mining permission
+            if (!event.getPlayer().hasPermission(Permissions.FEATURE_MINE.permission)) {
+                return;
+            }
+          
             Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType(), region.orElseGet(() -> plugin.getRegionProvider().getGlobalRegion(event.getBlock()).get()), event.getBlock().getWorld());
+
             if (minedMaterial.isPresent()) {
 
                 // Abort if opening hours are enabled an the mines are closed
