@@ -55,10 +55,6 @@ public class WorldGuardProvider extends RegionProvider {
                 if (regionManager.get().hasRegion("__global__")) {
                     ProtectedRegion region = regionManager.get().getRegion("__global__");
                     return Optional.ofNullable(region != null && region.getType() == RegionType.GLOBAL ? toMiningRegion(region) : null);
-                } else {
-                    GlobalProtectedRegion region = new GlobalProtectedRegion("__global__");
-                    regionManager.get().addRegion(region);
-                    return Optional.of(toMiningRegion(region));
                 }
             }
         }
@@ -82,7 +78,7 @@ public class WorldGuardProvider extends RegionProvider {
                     }
                 }
 
-                return Optional.ofNullable(region).map(this::toMiningRegion);
+                return region != null ? Optional.of(region).map(this::toMiningRegion) : getGlobalRegion(location);
             }
         }
 
