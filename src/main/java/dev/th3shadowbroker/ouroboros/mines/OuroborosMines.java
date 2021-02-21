@@ -25,10 +25,7 @@ import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialExcepti
 import dev.th3shadowbroker.ouroboros.mines.listeners.*;
 import dev.th3shadowbroker.ouroboros.mines.regions.RegionProvider;
 import dev.th3shadowbroker.ouroboros.mines.regions.providers.worldguard.WorldGuardProvider;
-import dev.th3shadowbroker.ouroboros.mines.thirdparty.BeautyQuestsSupport;
-import dev.th3shadowbroker.ouroboros.mines.thirdparty.JobsRebornSupport;
-import dev.th3shadowbroker.ouroboros.mines.thirdparty.PlaceholderAPISupport;
-import dev.th3shadowbroker.ouroboros.mines.thirdparty.QuestsSupport;
+import dev.th3shadowbroker.ouroboros.mines.thirdparty.*;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bstats.bukkit.MetricsLite;
 import org.bukkit.Bukkit;
@@ -283,6 +280,12 @@ public class OuroborosMines extends JavaPlugin {
             if (!success) {
                 getLogger().warning("Unable to register placeholders. Skipping!");
             }
+        }
+
+        boolean townyInstalled = getServer().getPluginManager().isPluginEnabled(TownySupport.PLUGIN_NAME);
+        if (townyInstalled) {
+            getLogger().info("Towny support is enabled!");
+            new TownySupport();
         }
     }
 

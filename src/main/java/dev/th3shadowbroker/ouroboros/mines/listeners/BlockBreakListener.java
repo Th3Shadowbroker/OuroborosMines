@@ -22,6 +22,7 @@ package dev.th3shadowbroker.ouroboros.mines.listeners;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.events.DepositDiscoveredEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
+import dev.th3shadowbroker.ouroboros.mines.events.RegionCheckEvent;
 import dev.th3shadowbroker.ouroboros.mines.regions.MiningRegion;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bukkit.*;
@@ -52,8 +53,13 @@ public class BlockBreakListener implements Listener {
             if (!event.getPlayer().hasPermission(Permissions.FEATURE_MINE.permission)) {
                 return;
             }
+
+            // Send a region check event to allow thirdparty modules to apply their own logic.
+            if (!performRegionCheck(event.getPlayer(), region.orElse(null), event.getBlock())) {
+                return;
+            }
           
-            Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType(), region.orElseGet(() -> plugin.getRegionProvider().getGlobalRegion(event.getBlock()).get()), event.getBlock().getWorld());
+            Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType(), region.orElse(null), event.getBlock().getWorld());
 
             if (minedMaterial.isPresent()) {
 
@@ -175,6 +181,12 @@ public class BlockBreakListener implements Listener {
                 }
             }
         });
+    }
+
+    private boolean performRegionCheck(Player player, MiningRegion miningRegion, Block block) {
+        RegionCheckEvent regionCheckEvent = new RegionCheckEvent(player, miningRegion, block);
+        Bukkit.getPluginManager().callEvent(regionCheckEvent);
+        return !regionCheckEvent.isCancelled();
     }
 
 }

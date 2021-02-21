@@ -49,9 +49,10 @@ public class MaterialManager {
     }
 
     public Optional<MineableMaterial> getMaterialProperties(Material material, MiningRegion region, World regionWorld) {
-         Optional<RegionConfiguration> regionConfiguration = mineableMaterialOverrides.stream()
-                                                             .filter(rc -> rc.getRegionId().equals(region.getRegionId()))
-                                                             .filter(rc -> rc.getWorld().getName().equals(regionWorld.getName())).findFirst();
+         Optional<RegionConfiguration> regionConfiguration = region != null ? mineableMaterialOverrides.stream()
+                                                                                .filter(rc -> rc.getRegionId().equals(region.getRegionId()))
+                                                                                .filter(rc -> rc.getWorld().getName().equals(regionWorld.getName())).findFirst()
+                                                                            :   Optional.empty();
 
          //Check for region specific settings
          if (regionConfiguration.isPresent()) {
