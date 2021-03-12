@@ -98,6 +98,7 @@ public class OuroborosMines extends JavaPlugin {
         //Config
         getLogger().info("Loading configuration...");
         saveDefaultConfig();
+        reloadConfig();
         updateConfig();
         PREFIX = ChatColor.translateAlternateColorCodes('&', getConfig().getString("chat.prefix", "&9[OM]") + "&r ");
 
