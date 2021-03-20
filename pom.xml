@@ -5,7 +5,7 @@
 
   <groupId>dev.th3shadowbroker.spigot</groupId>
   <artifactId>OuroborosMines</artifactId>
-  <version>1.10.1-SNAPSHOT</version>
+  <version>1.10.2-SNAPSHOT</version>
 
   <properties>
     <plugin.name>${project.artifactId}</plugin.name>

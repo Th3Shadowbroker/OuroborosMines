@@ -149,16 +149,18 @@ public class BlockBreakListener implements Listener {
     }
 
     private void breakNaturally(BlockBreakEvent event, boolean dropNaturalItems, boolean autoPickup) {
-        if (autoPickup) {
-            event.setDropItems(dropNaturalItems);
-            Collection<ItemStack> drops = event.getBlock().getDrops();
+        if (dropNaturalItems) {
+            if (autoPickup) {
+                event.setDropItems(false);
+                Collection<ItemStack> drops = event.getBlock().getDrops();
 
-            Player player = event.getPlayer();
-            Location blockLocation = event.getBlock().getLocation();
-            Map<Integer, ItemStack> overflow = player.getInventory().addItem(drops.stream().toArray(ItemStack[]::new));
-            overflow.values().forEach(i -> blockLocation.getWorld().dropItem(blockLocation, i));
-        } else {
-            event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+                Player player = event.getPlayer();
+                Location blockLocation = event.getBlock().getLocation();
+                Map<Integer, ItemStack> overflow = player.getInventory().addItem(drops.stream().toArray(ItemStack[]::new));
+                overflow.values().forEach(i -> blockLocation.getWorld().dropItem(blockLocation, i));
+            } else {
+                event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+            }
         }
     }
 

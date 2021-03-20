@@ -20,6 +20,7 @@
 package dev.th3shadowbroker.ouroboros.mines.drops;
 
 import dev.th3shadowbroker.ouroboros.mines.drops.types.AbstractDrop;
+import dev.th3shadowbroker.ouroboros.mines.drops.types.ItemDrop;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -57,7 +58,8 @@ public class DropGroup {
                 drops.add(drop);
             } else {
                 Random rnd = new Random();
-                boolean shallDrop = ((double) rnd.nextInt(100) / 100) <= drop.getChance();
+                double drawn = ((double) rnd.nextInt(100) / 100);
+                boolean shallDrop = drawn <= drop.getChance();
                 if (shallDrop) drops.add(drop);
             }
         });
@@ -73,7 +75,7 @@ public class DropGroup {
         double offset = 0;
 
         for (AbstractDrop pDrop : drops) {
-            boolean shallDrop = pDrop.getChance() <= drawn + offset;
+            boolean shallDrop = pDrop.getChance() >= 1 || pDrop.getChance() <= drawn + offset;
             if (shallDrop) {
                 drop = pDrop;
                 break;
