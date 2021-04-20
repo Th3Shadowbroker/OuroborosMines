@@ -4,7 +4,7 @@ version: ${plugin.version}
 description: ${plugin.description}
 website: ${plugin.website}
 main: ${plugin.main}
-softdepend: [WorldGuard,Quests,Jobs,PlaceholderAPI,BeautyQuests,Towny]
+softdepend: [WorldGuard,Quests,Jobs,PlaceholderAPI,BeautyQuests,Towny,ItemsAdder]
 api-version: 1.13
 
 commands:

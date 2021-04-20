@@ -25,10 +25,7 @@ import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialExcepti
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 public class MineableMaterial {
 
@@ -50,7 +47,9 @@ public class MineableMaterial {
 
     private final String dropGroup;
 
-    public MineableMaterial(Material material, Material[] replacements, Range cooldown, double richChance, Range richAmount, Range experience, Range depositExperience, String dropGroup) {
+    private final Map<String, Object> properties;
+
+    public MineableMaterial(Material material, Material[] replacements, Range cooldown, double richChance, Range richAmount, Range experience, Range depositExperience, String dropGroup, Map<String, Object> properties) {
         this.material = material;
         this.replacements = replacements;
         this.cooldown = cooldown;
@@ -59,6 +58,7 @@ public class MineableMaterial {
         this.experience = experience;
         this.depositExperience = depositExperience;
         this.dropGroup = dropGroup;
+        this.properties = properties;
     }
 
     public Material getMaterial() {
@@ -115,6 +115,18 @@ public class MineableMaterial {
 
     public Optional<DropGroup> getDropGroup() {
         return dropGroup == null ? Optional.empty() : OuroborosMines.INSTANCE.getDropManager().getDropGroup(dropGroup);
+    }
+
+    public Optional<String> getDropGroupName() {
+        return Optional.ofNullable(dropGroup);
+    }
+
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
+    public boolean hasProperties() {
+        return !properties.isEmpty();
     }
 
     public static MineableMaterial fromSection(ConfigurationSection section) throws InvalidMineMaterialException {
@@ -199,7 +211,10 @@ public class MineableMaterial {
                 depositExperience == null ? Range.zero() : depositExperience,
 
                 //Drop group
-                dropGroup
+                dropGroup,
+
+                //Properties
+                section.isConfigurationSection("properties") ? section.getConfigurationSection("properties").getValues(false) : new HashMap<>()
         );
     }
 
