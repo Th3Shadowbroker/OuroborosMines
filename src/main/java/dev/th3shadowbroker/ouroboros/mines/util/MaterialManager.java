@@ -20,13 +20,17 @@
 package dev.th3shadowbroker.ouroboros.mines.util;
 
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
+import dev.th3shadowbroker.ouroboros.mines.events.MaterialCheckEvent;
 import dev.th3shadowbroker.ouroboros.mines.regions.MiningRegion;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class MaterialManager {
 
@@ -48,7 +52,7 @@ public class MaterialManager {
         minableMaterials.add(mineableMaterial);
     }
 
-    public Optional<MineableMaterial> getMaterialProperties(Material material, MiningRegion region, World regionWorld) {
+    public Optional<MineableMaterial> getMaterialProperties(Block block, Material material, MiningRegion region, World regionWorld) {
          Optional<RegionConfiguration> regionConfiguration = region != null ? mineableMaterialOverrides.stream()
                                                                                 .filter(rc -> rc.getRegionId().equals(region.getRegionId()))
                                                                                 .filter(rc -> rc.getWorld().getName().equals(regionWorld.getName())).findFirst()
@@ -56,7 +60,10 @@ public class MaterialManager {
 
          //Check for region specific settings
          if (regionConfiguration.isPresent()) {
-             Optional<MineableMaterial> regionMineableMaterial = regionConfiguration.get().getMaterialList().stream().filter(mineableMaterial -> mineableMaterial.getMaterial() == material).findFirst();
+             Optional<MineableMaterial> regionMineableMaterial = regionConfiguration.get().getMaterialList().stream().filter(mineableMaterial -> mineableMaterial.getMaterial() == material && !mineableMaterial.hasProperties()).findFirst();
+             Optional<MineableMaterial> regionCustomMineableMaterial = reducedMaterials(regionConfiguration.get().getMaterialList()).stream().filter(m -> validateCustom(block, m)).findFirst();
+
+             if (regionCustomMineableMaterial.isPresent()) return regionCustomMineableMaterial;
              if (regionMineableMaterial.isPresent()) return regionMineableMaterial;
              if (!regionConfiguration.get().isInheritingDefaults()) return Optional.empty();
          }
@@ -64,7 +71,17 @@ public class MaterialManager {
          return minableMaterials.stream().filter(mineableMaterial -> mineableMaterial.getMaterial() == material).findFirst();
     }
 
-    public List<MineableMaterial> getMinableMaterials() {
+    private List<MineableMaterial> reducedMaterials(List<MineableMaterial> mineableMaterials) {
+        return mineableMaterials.stream().filter(MineableMaterial::hasProperties).collect(Collectors.toList());
+    }
+
+    private boolean validateCustom(Block block, MineableMaterial mineableMaterial) {
+        MaterialCheckEvent event = new MaterialCheckEvent(block, mineableMaterial);
+        Bukkit.getPluginManager().callEvent(event);
+        return event.isCustom();
+    }
+
+    public List<MineableMaterial> getMineableMaterials() {
         return minableMaterials;
     }
 

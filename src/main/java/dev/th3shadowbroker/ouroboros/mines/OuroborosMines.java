@@ -288,6 +288,12 @@ public class OuroborosMines extends JavaPlugin {
             getLogger().info("Towny support is enabled!");
             new TownySupport();
         }
+
+        boolean itemsAdderInstalled = getServer().getPluginManager().isPluginEnabled(ItemsAdderSupport.PLUGIN_NAME);
+        if (itemsAdderInstalled) {
+            getLogger().info("ItemdAdder support enabled!");
+            new ItemsAdderSupport();
+        }
     }
 
     private void checkForUpdates() {

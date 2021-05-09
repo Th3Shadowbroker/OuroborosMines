@@ -59,7 +59,7 @@ public class BlockBreakListener implements Listener {
                 return;
             }
           
-            Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock().getType(), region.orElse(null), event.getBlock().getWorld());
+            Optional<MineableMaterial> minedMaterial = plugin.getMaterialManager().getMaterialProperties(event.getBlock(), event.getBlock().getType(), region.orElse(null), event.getBlock().getWorld());
 
             if (minedMaterial.isPresent()) {
 
