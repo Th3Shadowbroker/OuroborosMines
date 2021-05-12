@@ -152,7 +152,7 @@ public class BlockBreakListener implements Listener {
         if (dropNaturalItems) {
             if (autoPickup) {
                 event.setDropItems(false);
-                Collection<ItemStack> drops = event.getBlock().getDrops();
+                Collection<ItemStack> drops = event.getBlock().getDrops(event.getPlayer().getInventory().getItemInMainHand());
 
                 Player player = event.getPlayer();
                 Location blockLocation = event.getBlock().getLocation();
