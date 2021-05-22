@@ -21,8 +21,11 @@ package dev.th3shadowbroker.ouroboros.mines.thirdparty;
 
 import dev.lone.itemsadder.api.CustomBlock;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
+import dev.th3shadowbroker.ouroboros.mines.events.DefaultDropsCheckEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialCheckEvent;
+import dev.th3shadowbroker.ouroboros.mines.util.MineableMaterial;
 import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -38,14 +41,27 @@ public class ItemsAdderSupport implements Listener {
 
     @EventHandler
     public void onMaterialCheck(MaterialCheckEvent event) {
-        Optional<String> namespacedId = Optional.ofNullable((String) event.getMineableMaterial().getProperties().get("ItemsAdder"));
+        if (isCustomBlock(event.getMineableMaterial(), event.getBlock())) {
+            event.setCustom(true);
+        }
+    }
+
+    @EventHandler
+    public void onDefaultDropsCheck(DefaultDropsCheckEvent event) {
+        if (isCustomBlock(event.getMineableMaterial(), event.getBlock())) {
+            CustomBlock customBlock = CustomBlock.byAlreadyPlaced(event.getBlock());
+            event.setDrops(customBlock.getLoot(event.getTool(), true));
+        }
+    }
+
+    private boolean isCustomBlock(MineableMaterial mineableMaterial, Block block) {
+        Optional<String> namespacedId = Optional.ofNullable((String) mineableMaterial.getProperties().get("ItemsAdder"));
         if (namespacedId.isPresent()) {
 
             Optional<CustomBlock> customBlock = Optional.ofNullable(CustomBlock.getInstance(namespacedId.get()));
-            if (customBlock.isPresent() && Optional.ofNullable(CustomBlock.byAlreadyPlaced(event.getBlock())).isPresent()) {
-                event.setCustom(true);
-            }
+            return customBlock.isPresent() && Optional.ofNullable(CustomBlock.byAlreadyPlaced(block)).isPresent();
         }
+        return false;
     }
 
 }
