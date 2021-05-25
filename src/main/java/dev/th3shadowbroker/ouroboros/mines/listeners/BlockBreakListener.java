@@ -20,6 +20,7 @@
 package dev.th3shadowbroker.ouroboros.mines.listeners;
 
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
+import dev.th3shadowbroker.ouroboros.mines.events.DefaultDropsCheckEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.DepositDiscoveredEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.RegionCheckEvent;
@@ -137,31 +138,51 @@ public class BlockBreakListener implements Listener {
 
         // Check for drop group
         if (mineableMaterial.getDropGroup().isPresent()) {
-            breakNaturally(event, !mineableMaterial.getDropGroup().get().isOverriding(), autoPickup);
+            breakNaturally(event, mineableMaterial, !mineableMaterial.getDropGroup().get().isOverriding(), autoPickup);
             mineableMaterial.getDropGroup().get().drop(event.getPlayer(), event.getBlock().getLocation());
         // No drop-group assigned
         } else {
-            breakNaturally(event, true, autoPickup);
+            breakNaturally(event, mineableMaterial, true, autoPickup);
         }
 
         decreaseToolDurability(event.getPlayer(), tool);
         updateStats(event.getPlayer(), mineableMaterial.getMaterial());
     }
 
-    private void breakNaturally(BlockBreakEvent event, boolean dropNaturalItems, boolean autoPickup) {
+    private void breakNaturally(BlockBreakEvent event, MineableMaterial mineableMaterial, boolean dropNaturalItems, boolean autoPickup) {
         if (dropNaturalItems) {
             if (autoPickup) {
                 event.setDropItems(false);
-                Collection<ItemStack> drops = event.getBlock().getDrops();
+                Collection<ItemStack> drops = getCustomDefaultDrops(event.getPlayer().getInventory().getItemInMainHand(), mineableMaterial, event.getBlock())
+                                              .orElse(event.getBlock().getDrops());
 
                 Player player = event.getPlayer();
                 Location blockLocation = event.getBlock().getLocation();
                 Map<Integer, ItemStack> overflow = player.getInventory().addItem(drops.stream().toArray(ItemStack[]::new));
                 overflow.values().forEach(i -> blockLocation.getWorld().dropItem(blockLocation, i));
             } else {
-                event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+                Optional<Collection<ItemStack>> customDefaultDrops = getCustomDefaultDrops(event.getPlayer().getInventory().getItemInMainHand(), mineableMaterial, event.getBlock());
+                if (!customDefaultDrops.isPresent()) {
+                    event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
+                } else {
+                    event.setDropItems(false);
+
+                    Location blockLocation = event.getBlock().getLocation();
+                    blockLocation.getBlock().setType(Material.AIR);
+                    customDefaultDrops.get().forEach(
+                            itemStack -> {
+                                blockLocation.getWorld().dropItemNaturally(blockLocation, itemStack);
+                            }
+                    );
+                }
             }
         }
+    }
+
+    private Optional<Collection<ItemStack>> getCustomDefaultDrops(ItemStack tool, MineableMaterial mineableMaterial, Block block) {
+        DefaultDropsCheckEvent event = new DefaultDropsCheckEvent(tool, mineableMaterial, block);
+        Bukkit.getPluginManager().callEvent(event);
+        return event.hasCustomDefaultDrops() ? Optional.of(event.getDrops()) : Optional.empty();
     }
 
     private void updateStats(Player player, Material material) {
