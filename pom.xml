@@ -9,7 +9,7 @@
 
   <properties>
     <plugin.name>${project.artifactId}</plugin.name>
-    <plugin.version>${project.version}</plugin.version>
+    <plugin.version>1.11.0-SNAPSHOT</plugin.version>
     <plugin.author>Th3Shadowbroker</plugin.author>
     <plugin.description>A plugin that brings regenerating mines to your server</plugin.description>
     <plugin.website>https://github.th3shadowbroker.dev</plugin.website>
