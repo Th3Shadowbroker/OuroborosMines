@@ -256,19 +256,19 @@ public class OuroborosMines extends JavaPlugin {
     }
 
     private void checkForSupportedPlugins() {
-        boolean questsInstalled = getServer().getPluginManager().isPluginEnabled(QuestsSupport.PLUGIN_NAME);
+        boolean questsInstalled = /*getServer().getPluginManager().isPluginEnabled(QuestsSupport.PLUGIN_NAME);*/ false;
         if (questsInstalled) {
             getLogger().info("Quests support is enabled!");
             new QuestsSupport();
         }
 
-        boolean beautyQuestInstalled = getServer().getPluginManager().isPluginEnabled(BeautyQuestsSupport.PLUGIN_NAME);
+        boolean beautyQuestInstalled = /*getServer().getPluginManager().isPluginEnabled(BeautyQuestsSupport.PLUGIN_NAME);*/ false;
         if (beautyQuestInstalled) {
             getLogger().info("BeautyQuests support is enabled!");
             new BeautyQuestsSupport();
         }
 
-        boolean jobsRebornInstalled = getServer().getPluginManager().isPluginEnabled(JobsRebornSupport.PLUGIN_NAME);
+        boolean jobsRebornInstalled = /*getServer().getPluginManager().isPluginEnabled(JobsRebornSupport.PLUGIN_NAME);*/ false;
         if (jobsRebornInstalled) {
             getLogger().info("Jobs support is enabled!");
             new JobsRebornSupport();
@@ -291,7 +291,7 @@ public class OuroborosMines extends JavaPlugin {
 
         boolean itemsAdderInstalled = getServer().getPluginManager().isPluginEnabled(ItemsAdderSupport.PLUGIN_NAME);
         if (itemsAdderInstalled) {
-            getLogger().info("ItemdAdder support enabled!");
+            getLogger().info("ItemsAdder support enabled!");
             new ItemsAdderSupport();
         }
     }

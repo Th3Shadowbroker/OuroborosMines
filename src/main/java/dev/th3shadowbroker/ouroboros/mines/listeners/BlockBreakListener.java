@@ -90,7 +90,9 @@ public class BlockBreakListener implements Listener {
                     if (MetaUtils.isRich(event.getBlock())) {
                         //event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
                         breakBlock(event, minedMaterial.get(), event.getPlayer().getInventory().getItemInMainHand());
-                        event.getBlock().setType(minedMaterial.get().getMaterial());
+                        //event.getBlock().setType(minedMaterial.get().getMaterial());
+                        replaceAsync(event.getBlock(), minedMaterial.get().getMaterial());
+
                         MetaUtils.decreaseRichness(event.getBlock());
 
                         //Fire event for mined material
@@ -112,11 +114,18 @@ public class BlockBreakListener implements Listener {
                 //Break it! Replace it!
                 //event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
                 breakBlock(event, minedMaterial.get(), event.getPlayer().getInventory().getItemInMainHand());
-                event.getBlock().setType(minedMaterial.get().getReplacement());
+                //event.getBlock().setType(minedMaterial.get().getReplacement());
+                replaceAsync(event.getBlock(), minedMaterial.get().getReplacement());
             }
 
-            event.setCancelled(true);
+            event.setDropItems(false);
         }
+    }
+
+    private void replaceAsync(Block block, Material material) {
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            block.setType(material);
+        });
     }
 
     private Optional<RegionConfiguration> getRegionConfiguration(Block block) {
@@ -146,7 +155,7 @@ public class BlockBreakListener implements Listener {
         }
 
         decreaseToolDurability(event.getPlayer(), tool);
-        updateStats(event.getPlayer(), mineableMaterial.getMaterial());
+        //updateStats(event.getPlayer(), mineableMaterial.getMaterial());
     }
 
     private void breakNaturally(BlockBreakEvent event, MineableMaterial mineableMaterial, boolean dropNaturalItems, boolean autoPickup) {
@@ -168,7 +177,10 @@ public class BlockBreakListener implements Listener {
                     event.setDropItems(false);
 
                     Location blockLocation = event.getBlock().getLocation();
-                    blockLocation.getBlock().setType(Material.AIR);
+
+                    //blockLocation.getBlock().setType(Material.AIR);
+                    replaceAsync(blockLocation.getBlock(), Material.AIR);
+
                     customDefaultDrops.get().forEach(
                             itemStack -> {
                                 blockLocation.getWorld().dropItemNaturally(blockLocation, itemStack);
