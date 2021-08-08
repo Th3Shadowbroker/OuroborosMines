@@ -5,7 +5,7 @@ description: ${plugin.description}
 website: ${plugin.website}
 main: ${plugin.main}
 softdepend: [WorldGuard,Quests,Jobs,PlaceholderAPI,BeautyQuests,Towny,ItemsAdder,AureliumSkills]
-api-version: 1.13
+api-version: 1.17
 
 commands:
   om:

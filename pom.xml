@@ -5,11 +5,11 @@
 
   <groupId>dev.th3shadowbroker.spigot</groupId>
   <artifactId>OuroborosMines</artifactId>
-  <version>1.11.0-SNAPSHOT</version>
+  <version>1.11.0-SNAPSHOT-1.17-DEV</version>
 
   <properties>
     <plugin.name>${project.artifactId}</plugin.name>
-    <plugin.version>${project.version}</plugin.version>
+    <plugin.version>1.11.0-SNAPSHOT</plugin.version>
     <plugin.author>Th3Shadowbroker</plugin.author>
     <plugin.description>A plugin that brings regenerating mines to your server</plugin.description>
     <plugin.website>https://github.th3shadowbroker.dev</plugin.website>
@@ -63,7 +63,7 @@
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
-      <version>1.16.2-R0.1-SNAPSHOT</version>
+      <version>1.17-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
 
