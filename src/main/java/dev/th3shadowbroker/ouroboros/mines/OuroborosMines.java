@@ -294,6 +294,12 @@ public class OuroborosMines extends JavaPlugin {
             getLogger().info("ItemdAdder support enabled!");
             new ItemsAdderSupport();
         }
+
+        boolean aureliumSkillsInstalled = getServer().getPluginManager().isPluginEnabled(AureliumSkillsSupport.PLUGIN_NAME);
+        if (aureliumSkillsInstalled) {
+            getLogger().info("AureliumSkills support enabled!");
+            new AureliumSkillsSupport();
+        }
     }
 
     private void checkForUpdates() {
