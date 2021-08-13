@@ -21,8 +21,14 @@ package dev.th3shadowbroker.ouroboros.mines.thirdparty;
 
 import com.archyx.aureliumskills.AureliumSkills;
 import com.archyx.aureliumskills.api.AureliumAPI;
+import com.archyx.aureliumskills.skills.Skill;
 import com.archyx.aureliumskills.skills.Skills;
-import com.archyx.aureliumskills.skills.mining.MiningSource;
+import com.archyx.aureliumskills.skills.farming.FarmingSource;
+import com.archyx.aureliumskills.skills.foraging.ForagingSource;
+import com.archyx.aureliumskills.source.BlockSource;
+import com.archyx.aureliumskills.source.Source;
+import com.archyx.aureliumskills.source.SourceManager;
+import com.archyx.aureliumskills.source.SourceRegistry;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
 import org.bukkit.Bukkit;
@@ -31,6 +37,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import java.lang.reflect.Method;
 import java.util.Optional;
 
 public class AureliumSkillsSupport implements Listener {
@@ -41,23 +48,94 @@ public class AureliumSkillsSupport implements Listener {
         Bukkit.getPluginManager().registerEvents(this, OuroborosMines.INSTANCE);
     }
 
+    /*
     @EventHandler
     public void onMaterialMined(MaterialMinedEvent event) {
         Block block = event.getBlock();
         Player player = event.getPlayer();
         AureliumSkills plugin = (AureliumSkills) Bukkit.getPluginManager().getPlugin(PLUGIN_NAME);
+        SourceRegistry sourceRegistry = plugin.getSourceRegistry();
+        SourceManager sourceManager = plugin.getSourceManager();
 
-        getMiningSource(block).ifPresent(source -> {
-            double xp = plugin.getSourceManager().getXp(source);
-            AureliumAPI.addXp(player, Skills.MINING, xp);
-        });
-    }
-
-    private Optional<MiningSource> getMiningSource(Block block) {
-        for (MiningSource source : MiningSource.values()) {
-            if (source.isMatch(block)) return Optional.of(source);
+        for (Skill skill : Skills.values()) {
+            for (Source source : sourceRegistry.values(skill)) {
+                Optional<Method> matchMethod = resolveMatchMethod(source);
+                if (matchMethod.isPresent() && matchMethod.get().getReturnType() == Boolean.TYPE) {
+                    try {
+                        boolean isMatch = (boolean) matchMethod.get().invoke(source, block);
+                        if (isMatch) {
+                            AureliumAPI.addXp(
+                                    player,
+                                    skill,
+                                    sourceManager.getXp(source)
+                            );
+                        }
+                    } catch (Exception ex) {
+                        OuroborosMines.INSTANCE.getLogger().severe("Unable to match mined material with AureliumSkills. Please report this to the author of OM.");
+                    }
+                }
+            }
         }
-        return Optional.empty();
     }
+    */
+
+    @EventHandler
+    public void onMaterialMined(MaterialMinedEvent event) {
+        Block block = event.getBlock();
+        Player player = event.getPlayer();
+        AureliumSkills plugin = (AureliumSkills) Bukkit.getPluginManager().getPlugin(PLUGIN_NAME);
+        SourceRegistry sourceRegistry = plugin.getSourceRegistry();
+        SourceManager sourceManager = plugin.getSourceManager();
+
+        for (Skill skill : Skills.values()) {
+            for (Source source : sourceRegistry.values(skill)) {
+
+                // Blocks
+                if (source instanceof BlockSource) {
+                    BlockSource blockSource = (BlockSource) source;
+                    if (blockSource.isMatch(block)) {
+                        AureliumAPI.addXp(
+                                player,
+                                skill,
+                                sourceManager.getXp(source)
+                        );
+                    }
+
+                // Foraging sources
+                } else if (source instanceof ForagingSource) {
+                    ForagingSource foragingSource = (ForagingSource) source;
+                    if (foragingSource.isMatch(block)) {
+                        AureliumAPI.addXp(
+                                player,
+                                skill,
+                                sourceManager.getXp(source)
+                        );
+                    }
+
+                // Farming sources
+                } else if (source instanceof FarmingSource) {
+                    FarmingSource farmingSource = (FarmingSource) source;
+                    if (farmingSource.isMatch(block)) {
+                        AureliumAPI.addXp(
+                                player,
+                                skill,
+                                sourceManager.getXp(source)
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    /*
+    private Optional<Method> resolveMatchMethod(Source source) {
+        try {
+            Method method = source.getClass().getMethod("isMatch", Block.class);
+            return Optional.of(method);
+        } catch (NoSuchMethodException ex) {
+            return Optional.empty();
+        }
+    }
+     */
 
 }
