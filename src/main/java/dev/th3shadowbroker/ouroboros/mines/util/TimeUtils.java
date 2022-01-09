@@ -39,7 +39,7 @@ public class TimeUtils {
             return difference;
         }
 
-        // Aimed time is behind current in-game time
+        // Aimed time is behind dev.th3shadowbroker.ouroboros.mines.tests.current in-game time
         else {
             long diffToNextCycle = Math.abs(TimeConstants.INGAME_DAY_TICKS - worldTime);
             //System.out.println(String.format("Diffs. Start: %s | World: %s", diffToNextCycle, aimedTime));

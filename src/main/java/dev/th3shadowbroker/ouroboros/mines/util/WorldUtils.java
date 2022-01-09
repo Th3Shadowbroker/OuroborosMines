@@ -19,91 +19,55 @@
 
 package dev.th3shadowbroker.ouroboros.mines.util;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.RegionType;
-import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class WorldUtils {
 
-    @Deprecated
-    public static Optional<ApplicableRegionSet> getBlockRegions(Block block) {
-        return getRegionManager(block.getWorld()).map(manager -> manager.getApplicableRegions(BukkitAdapter.asBlockVector(block.getLocation())));
+    private static List<Material> stackableMaterials = new ArrayList<>(){{
+       add(Material.SUGAR_CANE);
+       add(Material.BAMBOO);
+    }};
+
+    public static List<Material> getStackableMaterials() {
+        return Collections.unmodifiableList(stackableMaterials);
     }
 
-    @Deprecated
-    public static Optional<ProtectedRegion> getTopRegion(ApplicableRegionSet regionSet) {
-        ProtectedRegion[] regions = regionSet.getRegions().stream().filter(region -> region.getFlags().get((StateFlag) OuroborosMines.INSTANCE.getRegionProvider().getFlag().getPluginFlag()) == StateFlag.State.ALLOW).toArray(ProtectedRegion[]::new);
-        ProtectedRegion highestRegion = null;
+    public static List<Block> getBlocksAbove(Block block) {
+        List<Block> blocks = new ArrayList<>();
+        Location location = block.getLocation();
 
-        for (ProtectedRegion protectedRegion : regions) {
-            if (highestRegion != null) {
-                if (protectedRegion.getPriority() > highestRegion.getPriority()) {
-                    highestRegion = protectedRegion;
-                }
-            } else {
-                highestRegion = protectedRegion;
-            }
-        }
-        return Optional.ofNullable(highestRegion);
-    }
-
-    @Deprecated
-    public static Optional<ApplicableRegionSet> getPlayerRegions(Player player) {
-        return getRegionManager(player.getWorld()).map(manager -> manager.getApplicableRegions(BukkitAdapter.adapt(player.getLocation()).toVector().toBlockPoint()));
-    }
-
-    @Deprecated
-    public static Optional<RegionManager> getRegionManager(World world) {
-        return Optional.ofNullable( WorldGuard.getInstance().getPlatform().getRegionContainer().get( BukkitAdapter.adapt(world) ) );
-    }
-
-    @Deprecated
-    public static Optional<ProtectedRegion> getRegion(String id, World world) {
-        Optional<RegionManager> regionManager = getRegionManager(world);
-        return regionManager.map(manager -> manager.getRegion(id));
-    }
-
-    @Deprecated
-    public static Optional<GlobalProtectedRegion> getGlobalRegion(World world) {
-        Optional<RegionManager> regionManager = getRegionManager(world);
-
-        if (regionManager.isPresent()) {
-            if (regionManager.get().hasRegion("__global__")) {
-                ProtectedRegion region = regionManager.get().getRegion("__global__");
-                return Optional.ofNullable(region != null && region.getType() == RegionType.GLOBAL ? (GlobalProtectedRegion) region : null);
-            } else {
-                GlobalProtectedRegion region = new GlobalProtectedRegion("__global__");
-                regionManager.get().addRegion(region);
-                return Optional.of(region);
-            }
+        while (location.add(0, 1, 0).getBlock().getType() == block.getType()) {
+            blocks.add(location.getBlock());
         }
 
-        return Optional.empty();
+        return Collections.unmodifiableList(blocks);
     }
 
-    @Deprecated
-    public static boolean isAccessible(Block block) {
-        BlockFace[] accessibleFaces = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
-        for (BlockFace face : accessibleFaces)
-        {
-            Material relativeMaterial = block.getRelative(face).getType();
-            if ( relativeMaterial == Material.AIR || relativeMaterial == Material.CAVE_AIR || relativeMaterial == Material.VOID_AIR ) return true;
+    public static boolean isDirectional(BlockData blockData) {
+        return blockData instanceof Directional;
+    }
+
+    public static boolean canBeAttached(Location location, BlockData blockData) {
+        Directional attachable = ((Directional) blockData);
+        Material anchorMaterial = location.getBlock().getRelative(attachable.getFacing()).getType();
+
+        return anchorMaterial.isSolid() && !anchorMaterial.isAir();
+    }
+
+    public static void replaceInSequence(long offset, Material material, List<Block> blocks) {
+        AtomicLong currentOffset = new AtomicLong(offset);
+        for (Block block : blocks) {
+            new ReplacementTask(block.getLocation(), material, currentOffset.incrementAndGet());
         }
-        return false;
     }
 
     public static boolean compareLocations(Location a, Location b) {
