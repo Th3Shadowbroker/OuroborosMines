@@ -154,6 +154,13 @@ openingHours:
 # auto: If the timezone is set to 'auto', om will use the server's timezone.
 timezone: auto
 
+# Retry settings for directional blocks
+#
+# Use realistic behaviour for blocks that depend on other blocks. (For example: Cocoa plants)
+retryDirectionals: true
+# The interval (in seconds) for checking if the block can be placed again.
+retryInterval: 5
+
 # Placeholders
 #
 # Everything related to placeholders.

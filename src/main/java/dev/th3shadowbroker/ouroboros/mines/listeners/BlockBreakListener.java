@@ -38,6 +38,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -103,7 +104,14 @@ public class BlockBreakListener implements Listener {
 
                 //If richness was never set or hit 0
                 if (!plugin.getTaskManager().hasPendingReplacementTask(event.getBlock())) {
-                    new ReplacementTask(event.getBlock().getLocation(), event.getBlock().getType(), minedMaterial.get().getCooldown());
+                    long cooldown = minedMaterial.get().getCooldown();
+                    new ReplacementTask(event.getBlock().getLocation(), event.getBlock().getType(), cooldown);
+
+                    // Bamboo or Sugar cane?
+                    if (WorldUtils.getStackableMaterials().contains(event.getBlock().getType())) {
+                        List<Block> dependants = WorldUtils.getBlocksAbove(event.getBlock());
+                        dependants.forEach(dependingBlock -> WorldUtils.replaceInSequence(cooldown, event.getBlock().getType(), dependants));
+                    }
                 }
 
                 //Fire event for mined material

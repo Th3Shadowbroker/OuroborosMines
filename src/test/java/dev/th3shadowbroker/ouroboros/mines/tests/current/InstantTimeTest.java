@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jens Fischer
+ * Copyright 2021 Jens Fischer
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
@@ -17,7 +17,8 @@
  * SOFTWARE.
  */
 
-import dev.th3shadowbroker.ouroboros.mines.util.OMDuration;
+package dev.th3shadowbroker.ouroboros.mines.tests.current;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
