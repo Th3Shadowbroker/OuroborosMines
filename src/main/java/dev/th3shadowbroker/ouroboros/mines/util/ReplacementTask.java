@@ -23,6 +23,7 @@ import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -61,21 +62,26 @@ public class ReplacementTask implements Runnable {
     @Override
     public void run() {
         if (!plugin.getConfig().getBoolean("retryDirectionals", true) || (!isAttachableBlock || WorldUtils.canBeAttached(location, blockData))) {
-            location.getBlock().setType(minedMaterial);
-            location.getBlock().setBlockData(blockData);
+            Block relative = location.getBlock().getRelative(BlockFace.DOWN);
+            if (WorldUtils.getStackableMaterials().contains(minedMaterial) && relative.getType().isAir()) {
+                if (!getTask().isCancelled()) {
+                    retryLater();
+                }
+            } else  {
+                location.getBlock().setType(minedMaterial);
+                location.getBlock().setBlockData(blockData);
+            }
         } else {
             new ReplacementTask(location, minedMaterial, blockData, plugin.getConfig().getInt("retryInterval", 5));
         }
 
-        if (!getTask().isCancelled()) plugin.getTaskManager().unregister(this);
+        if (!getTask().isCancelled()) {
+            plugin.getTaskManager().unregister(this);
+        }
+    }
 
-        // Check if the block had been removed by the server after 1 tick, because certain requirements aren't given
-        /*if (task.isCancelled()) return;
-        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-            if (location.getBlock().getType() != minedMaterial) {
-                new ReplacementTask(location, minedMaterial, 1000);
-            }
-        }, 1);*/
+    public void retryLater() {
+        new ReplacementTask(location, minedMaterial, blockData, plugin.getConfig().getInt("retryInterval", 5));
     }
 
     public BukkitTask getTask() {

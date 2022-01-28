@@ -32,10 +32,12 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class WorldUtils {
 
-    private static List<Material> stackableMaterials = new ArrayList<>(){{
-       add(Material.SUGAR_CANE);
-       add(Material.BAMBOO);
-    }};
+    private static final List<Material> stackableMaterials = List.of(
+      Material.BAMBOO,
+      Material.SUGAR_CANE,
+      Material.CACTUS,
+      Material.KELP
+    );
 
     public static List<Material> getStackableMaterials() {
         return Collections.unmodifiableList(stackableMaterials);
