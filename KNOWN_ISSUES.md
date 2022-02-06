@@ -1,0 +1,2 @@
+- Indirect broken blocks are not affected by `autoPickup`.
+- Indirectly broken blocks are not restored correctly when the server is stopped while there are still blocks in the regeneration queue.
