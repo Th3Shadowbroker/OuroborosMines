@@ -138,6 +138,13 @@
       <version>5.4.0</version>
       <scope>test</scope>
     </dependency>
+
+    <!-- AureliumSkills -->
+    <dependency>
+      <groupId>com.github.Archy-X</groupId>
+      <artifactId>AureliumSkills</artifactId>
+      <version>Beta1.2.0</version>
+    </dependency>
   </dependencies>
 
   <build>
