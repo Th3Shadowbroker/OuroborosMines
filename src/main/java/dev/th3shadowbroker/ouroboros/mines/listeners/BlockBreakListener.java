@@ -28,6 +28,7 @@ import dev.th3shadowbroker.ouroboros.mines.regions.MiningRegion;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -108,9 +109,13 @@ public class BlockBreakListener implements Listener {
                     new ReplacementTask(event.getBlock().getLocation(), event.getBlock().getType(), cooldown);
 
                     // Bamboo or Sugar cane?
-                    if (WorldUtils.getStackableMaterials().contains(event.getBlock().getType())) {
-                        List<Block> dependants = WorldUtils.getBlocksAbove(event.getBlock());
-                        dependants.forEach(dependingBlock -> WorldUtils.replaceInSequence(cooldown, event.getBlock().getType(), dependants));
+                    if (BlockUtils.isStackable(event.getBlock())) {
+                        List<Block> dependants = BlockUtils.getConnectedBlocks(event.getBlock());
+                        dependants.forEach(d -> {
+                            Bukkit.getPluginManager().callEvent(new MaterialMinedEvent(minedMaterial.get(), event.getBlock(), false, event.getPlayer()));
+                            breakBlock(event, minedMaterial.get(), event.getPlayer().getInventory().getItemInMainHand());
+                        });
+                        WorldUtils.replaceInSequence(cooldown, event.getBlock().getType(), dependants);
                     }
                 }
 
@@ -201,7 +206,7 @@ public class BlockBreakListener implements Listener {
         Optional<ItemStack> miningTool = Optional.ofNullable(tool);
         miningTool.ifPresent( itemStack -> {
             ItemMeta meta = itemStack.getItemMeta();
-            if (meta instanceof Damageable && tool.getType().getMaxDurability() > 0) {
+            if (meta instanceof Damageable && tool.getType().getMaxDurability() > 0 && !meta.isUnbreakable()) {
                 Damageable damageable = (Damageable) meta;
                 if (damageable.getDamage() + 1 < tool.getType().getMaxDurability()) {
                     damageable.setDamage(damageable.getDamage() + 1);

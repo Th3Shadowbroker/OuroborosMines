@@ -22,48 +22,11 @@ package dev.th3shadowbroker.ouroboros.mines.util;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Directional;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class WorldUtils {
-
-    private static final List<Material> stackableMaterials = List.of(
-      Material.BAMBOO,
-      Material.SUGAR_CANE,
-      Material.CACTUS,
-      Material.KELP
-    );
-
-    public static List<Material> getStackableMaterials() {
-        return Collections.unmodifiableList(stackableMaterials);
-    }
-
-    public static List<Block> getBlocksAbove(Block block) {
-        List<Block> blocks = new ArrayList<>();
-        Location location = block.getLocation();
-
-        while (location.add(0, 1, 0).getBlock().getType() == block.getType()) {
-            blocks.add(location.getBlock());
-        }
-
-        return Collections.unmodifiableList(blocks);
-    }
-
-    public static boolean isDirectional(BlockData blockData) {
-        return blockData instanceof Directional;
-    }
-
-    public static boolean canBeAttached(Location location, BlockData blockData) {
-        Directional attachable = ((Directional) blockData);
-        Material anchorMaterial = location.getBlock().getRelative(attachable.getFacing()).getType();
-
-        return anchorMaterial.isSolid() && !anchorMaterial.isAir();
-    }
 
     public static void replaceInSequence(long offset, Material material, List<Block> blocks) {
         AtomicLong currentOffset = new AtomicLong(offset);

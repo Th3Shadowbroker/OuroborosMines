@@ -47,7 +47,7 @@ public class ReplacementTask implements Runnable {
         this.task = plugin.getServer().getScheduler().runTaskLater(plugin, this, cooldownSeconds);
         this.plugin.getTaskManager().register(this);
         this.blockData = blockLocation.getBlock().getState().getBlockData();
-        this.isAttachableBlock = WorldUtils.isDirectional(blockData);
+        this.isAttachableBlock = BlockUtils.isAttachable(location.getBlock());
     }
 
     private ReplacementTask(Location blockLocation, Material material, BlockData blockData, long cooldownSeconds) {
@@ -56,14 +56,23 @@ public class ReplacementTask implements Runnable {
         this.task = plugin.getServer().getScheduler().runTaskLater(plugin, this, cooldownSeconds);
         this.plugin.getTaskManager().register(this);
         this.blockData = blockData;
-        this.isAttachableBlock = WorldUtils.isDirectional(blockData);
+        this.isAttachableBlock = BlockUtils.isAttachable(location.getBlock());
     }
 
     @Override
     public void run() {
-        if (!plugin.getConfig().getBoolean("retryDirectionals", true) || (!isAttachableBlock || WorldUtils.canBeAttached(location, blockData))) {
+        // Stable to place block?
+        if (!BlockUtils.isStableBlock(location.getBlock())) {
+            if (!task.isCancelled()) {
+                retryLater();
+            }
+            return;
+        }
+
+
+        if (!plugin.getConfig().getBoolean("retryDirectionals", true) || (!isAttachableBlock || BlockUtils.isStableToAttach(location.getBlock()))) {
             Block relative = location.getBlock().getRelative(BlockFace.DOWN);
-            if (WorldUtils.getStackableMaterials().contains(minedMaterial) && relative.getType().isAir()) {
+            if (BlockUtils.isStackable(minedMaterial) && relative.getType().isAir()) {
                 if (!getTask().isCancelled()) {
                     retryLater();
                 }
@@ -72,7 +81,7 @@ public class ReplacementTask implements Runnable {
                 location.getBlock().setBlockData(blockData);
             }
         } else {
-            new ReplacementTask(location, minedMaterial, blockData, plugin.getConfig().getInt("retryInterval", 5));
+            retryLater();
         }
 
         if (!getTask().isCancelled()) {
@@ -82,6 +91,7 @@ public class ReplacementTask implements Runnable {
 
     public void retryLater() {
         new ReplacementTask(location, minedMaterial, blockData, plugin.getConfig().getInt("retryInterval", 5));
+        plugin.getTaskManager().unregister(this);
     }
 
     public BukkitTask getTask() {
