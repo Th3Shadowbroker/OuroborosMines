@@ -29,7 +29,7 @@ import java.util.*;
 
 public class MineableMaterial {
 
-    private final Material material;
+    private final MaterialIdentifier materialIdentifier;
 
     private final Material[] replacements;
 
@@ -49,8 +49,8 @@ public class MineableMaterial {
 
     private final Map<String, Object> properties;
 
-    public MineableMaterial(Material material, Material[] replacements, Range cooldown, double richChance, Range richAmount, Range experience, Range depositExperience, String dropGroup, Map<String, Object> properties) {
-        this.material = material;
+    public MineableMaterial(MaterialIdentifier materialIdentifier, Material[] replacements, Range cooldown, double richChance, Range richAmount, Range experience, Range depositExperience, String dropGroup, Map<String, Object> properties) {
+        this.materialIdentifier = materialIdentifier;
         this.replacements = replacements;
         this.cooldown = cooldown;
         this.richChance = richChance;
@@ -62,7 +62,11 @@ public class MineableMaterial {
     }
 
     public Material getMaterial() {
-        return material;
+        return materialIdentifier.getVanillaMaterial().orElse(Material.STONE);
+    }
+
+    public MaterialIdentifier getMaterialIdentifier() {
+        return materialIdentifier;
     }
 
     public Material[] getReplacements() {
@@ -131,8 +135,7 @@ public class MineableMaterial {
 
     public static MineableMaterial fromSection(ConfigurationSection section) throws InvalidMineMaterialException {
         //Parse material
-        Optional<Material> material = Optional.ofNullable(Material.getMaterial(section.getName().toUpperCase()));
-        if (!material.isPresent()) { throw new InvalidMineMaterialException( String.format("The mine-material %s failed to parse.", section.getName()) ); }
+        MaterialIdentifier materialIdentifier = MaterialIdentifier.valueOf(section.getName());
 
         //Parse replacement-materials
         List<Material> replacementMaterials = new ArrayList<>();
@@ -158,7 +161,7 @@ public class MineableMaterial {
         try {
             cooldown = Range.fromString(section.getString("cooldown"));
         } catch (NumberFormatException ex) {
-            throw new InvalidMineMaterialException( String.format("Unable to parse the cooldown of %s from string \"%s\"", material.get().name(), section.getString("cooldown")) );
+            throw new InvalidMineMaterialException( String.format("Unable to parse the cooldown of %s from string \"%s\"", materialIdentifier.getName(), section.getString("cooldown")) );
         } catch (Exception ex) {
             throw new InvalidMineMaterialException( ex.getMessage() );
         }
@@ -169,7 +172,7 @@ public class MineableMaterial {
             try {
                 richAmount = Range.fromString(section.getString("rich-amount"));
             } catch (Exception ex) {
-                throw new InvalidMineMaterialException(String.format("Unable to parse the rich-amount %s from %s", material.get().name(), section.getString("rich-amount")));
+                throw new InvalidMineMaterialException(String.format("Unable to parse the rich-amount %s from %s", materialIdentifier.getName(), section.getString("rich-amount")));
             }
         }
 
@@ -179,7 +182,7 @@ public class MineableMaterial {
             try {
                 experience = Range.fromString(section.getString("experience"));
             } catch (Exception ex) {
-                throw new InvalidMineMaterialException(String.format("Unable to parse the the experience for %s from %s", material.get().name(), section.getString("experience")));
+                throw new InvalidMineMaterialException(String.format("Unable to parse the the experience for %s from %s", materialIdentifier.getName(), section.getString("experience")));
             }
         }
 
@@ -189,7 +192,7 @@ public class MineableMaterial {
             try {
                 depositExperience = Range.fromString(section.getString("rich-experience"));
             } catch (Exception ex) {
-                throw new InvalidMineMaterialException(String.format("Unable to parse the the experience for %s from %s", material.get().name(), section.getString("rich-experience")));
+                throw new InvalidMineMaterialException(String.format("Unable to parse the the experience for %s from %s", materialIdentifier.getName(), section.getString("rich-experience")));
             }
         }
 
@@ -199,7 +202,7 @@ public class MineableMaterial {
         return new MineableMaterial(
 
                 //Material and replacements
-                material.get(),
+                materialIdentifier,
                 replacementMaterials.toArray( new Material[replacementMaterials.size()] ),
 
                 cooldown,
@@ -217,5 +220,27 @@ public class MineableMaterial {
                 section.isConfigurationSection("properties") ? section.getConfigurationSection("properties").getValues(false) : new HashMap<>()
         );
     }
+/*
+    @NotNull
+    @Override
+    public Map<String, Object> serialize() {
+        Map<String, Object> values = new HashMap<>();
 
+        values.put("replacements", Arrays.asList(replacements));
+        values.put("cooldown", cooldown.toString());
+
+        if (richChance > 0) values.put("rich-chance", richChance);
+        if (!richAmount.isZero()) values.put("rich-amount", richAmount);
+        if (!experience.isZero()) values.put("experience", experience.toString());
+        if (!depositExperience.isZero()) values.put("depositExperience", depositExperience);
+        if (dropGroup != null) values.put("dropGroup", dropGroup);
+        if (!properties.isEmpty()) values.put("properties", properties);
+
+        return values;
+    }
+
+    public static MineableMaterial deserialize(Map<String, Object> values) {
+
+    }
+*/
 }

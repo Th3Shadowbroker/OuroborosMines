@@ -60,7 +60,12 @@ public class MaterialManager {
 
          //Check for region specific settings
          if (regionConfiguration.isPresent()) {
-             Optional<MineableMaterial> regionMineableMaterial = regionConfiguration.get().getMaterialList().stream().filter(mineableMaterial -> mineableMaterial.getMaterial() == material && !mineableMaterial.hasProperties()).findFirst();
+             Optional<MineableMaterial> regionMineableMaterial = regionConfiguration.get().getMaterialList().stream()
+                     .filter(mineableMaterial -> {
+                         return mineableMaterial.getMaterial() == material &&
+                                mineableMaterial.getMaterialIdentifier().isInDefaultNamespace();
+                     })
+                     .findFirst();
              Optional<MineableMaterial> regionCustomMineableMaterial = reducedMaterials(regionConfiguration.get().getMaterialList()).stream().filter(m -> validateCustom(block, m)).findFirst();
 
              if (regionCustomMineableMaterial.isPresent()) return regionCustomMineableMaterial;
@@ -72,7 +77,7 @@ public class MaterialManager {
     }
 
     private List<MineableMaterial> reducedMaterials(List<MineableMaterial> mineableMaterials) {
-        return mineableMaterials.stream().filter(MineableMaterial::hasProperties).collect(Collectors.toList());
+        return mineableMaterials.stream().filter(m -> m.hasProperties() || !m.getMaterialIdentifier().isInDefaultNamespace()).collect(Collectors.toList());
     }
 
     private boolean validateCustom(Block block, MineableMaterial mineableMaterial) {

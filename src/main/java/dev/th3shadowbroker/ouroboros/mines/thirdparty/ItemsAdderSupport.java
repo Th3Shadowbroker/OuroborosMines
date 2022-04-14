@@ -23,6 +23,7 @@ import dev.lone.itemsadder.api.CustomBlock;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.events.DefaultDropsCheckEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialCheckEvent;
+import dev.th3shadowbroker.ouroboros.mines.util.MaterialIdentifier;
 import dev.th3shadowbroker.ouroboros.mines.util.MineableMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
@@ -55,10 +56,16 @@ public class ItemsAdderSupport implements Listener {
     }
 
     private boolean isCustomBlock(MineableMaterial mineableMaterial, Block block) {
-        Optional<String> namespacedId = Optional.ofNullable((String) mineableMaterial.getProperties().get("ItemsAdder"));
-        if (namespacedId.isPresent()) {
+        MaterialIdentifier namespacedId = mineableMaterial.getMaterialIdentifier();
+        if (!namespacedId.isInDefaultNamespace()) {
+            Optional<CustomBlock> customBlock = Optional.ofNullable(CustomBlock.getInstance(namespacedId.toString()));
+            return customBlock.isPresent() && Optional.ofNullable(CustomBlock.byAlreadyPlaced(block)).isPresent();
+        }
 
-            Optional<CustomBlock> customBlock = Optional.ofNullable(CustomBlock.getInstance(namespacedId.get()));
+        Optional<String> legacyNamespacedId = Optional.ofNullable((String) mineableMaterial.getProperties().get("ItemsAdder"));
+        if (legacyNamespacedId.isPresent()) {
+            OuroborosMines.INSTANCE.getLogger().warning(String.format("Material %s uses the legacy ItemsAdder property. This feature will be removed in the future!", mineableMaterial.getMaterialIdentifier()));
+            Optional<CustomBlock> customBlock = Optional.ofNullable(CustomBlock.getInstance(legacyNamespacedId.get()));
             return customBlock.isPresent() && Optional.ofNullable(CustomBlock.byAlreadyPlaced(block)).isPresent();
         }
         return false;

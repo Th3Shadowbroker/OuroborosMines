@@ -46,6 +46,15 @@ public class TaskManager {
 
     public void flush() {
         plugin.getLogger().info(String.format("Executing %s pending tasks...", tasks.size()));
+
+        // Sort attachable replacement tasks to the end to ensure anchor existence.
+        tasks.sort((o1, o2) -> {
+            if (o1.isAttachableBlock() == o2.isAttachableBlock()) {
+                return 0;
+            }
+            return !o1.isAttachableBlock() ? -1 : 1;
+        });
+
         for (int i = 0; i < tasks.size(); i++) {
             ReplacementTask replacementTask = tasks.get(i);
             replacementTask.getTask().cancel();

@@ -55,7 +55,7 @@
     <!-- PlaceholderAPI -->
     <repository>
       <id>placeholderapi</id>
-      <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+      <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
     </repository>
   </repositories>
 
@@ -93,6 +93,7 @@
       <artifactId>quests-dist</artifactId>
       <version>59cf463728</version>
     </dependency>
+
     <!-- BeautyQuests -->
     <dependency>
       <groupId>fr.skytasul</groupId>
@@ -111,7 +112,7 @@
     <dependency>
       <groupId>me.clip</groupId>
       <artifactId>placeholderapi</artifactId>
-      <version>2.10.9</version>
+      <version>2.11.1</version>
       <scope>provided</scope>
     </dependency>
 
@@ -127,7 +128,7 @@
     <dependency>
       <groupId>com.github.LoneDev6</groupId>
       <artifactId>api-itemsadder</artifactId>
-      <version>2.2.1</version>
+      <version>2.5.5</version>
       <scope>provided</scope>
     </dependency>
 
@@ -139,13 +140,30 @@
       <scope>test</scope>
     </dependency>
 
+
     <!-- AureliumSkills -->
     <dependency>
       <groupId>com.github.Archy-X</groupId>
       <artifactId>AureliumSkills</artifactId>
-      <version>Beta1.2.0</version>
+      <version>Beta1.2.8</version>
+    </dependency>
+
+    <!-- Lombok -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.22</version>
+      <scope>provided</scope>
+
     </dependency>
   </dependencies>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>maven-snapshots</id>
+      <url>https://repository.apache.org/content/repositories/snapshots/</url>
+    </pluginRepository>
+  </pluginRepositories>
 
   <build>
     <resources>
@@ -165,9 +183,16 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <source>16</source>
+          <target>16</target>
           <encoding>UTF-8</encoding>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>1.18.22</version>
+            </path>
+          </annotationProcessorPaths>
         </configuration>
       </plugin>
 
@@ -183,7 +208,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.1</version>
+        <version>3.3.1-SNAPSHOT</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -196,6 +221,7 @@
                   <include>org.bstats:bstats-bukkit-lite**</include>
                   <include>org.inventivetalent.spiget-update:bukkit**</include>
                   <include>org.th3shadowbroker.ouroboros.update:*:**</include>
+                  <include>org.th3shadowbroker.spigot:nexus:**</include>
                 </includes>
               </artifactSet>
               <relocations>
