@@ -16,7 +16,7 @@ jobs:
       uses: actions/setup-java@v3.1.1
       with:
         java-version: 1.17
-        distribution: openjdk
+        distribution: temurin
     - name: Build with Maven
       #env:
       #  SONAR_SERVER_URL: ${{ secrets.SONAR_SERVER_URL }}
