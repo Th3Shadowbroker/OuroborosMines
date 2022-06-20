@@ -131,7 +131,7 @@ public class OuroborosMines extends JavaPlugin {
 
         checkForSupportedPlugins();
 
-        new MetricsLite(this);
+        new MetricsLite(this, 72325);
         checkForUpdates();
     }
 
