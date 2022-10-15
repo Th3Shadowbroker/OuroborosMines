@@ -21,11 +21,8 @@ package dev.th3shadowbroker.ouroboros.mines.refactor.exceptions;
 
 public class RangeFormatException extends RuntimeException {
 
-    private Class<?> clazz;
-
     public RangeFormatException(Class<?> clazz, Object value, Throwable cause) {
         super(String.format("Could not parse %s from %s", clazz.getSimpleName(), value), cause);
-        this.clazz = clazz;
     }
 
 }
