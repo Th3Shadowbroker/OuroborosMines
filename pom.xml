@@ -7,6 +7,7 @@
   <artifactId>OuroborosMines</artifactId>
   <version>1.12.0-SNAPSHOT</version>
 
+
   <properties>
     <plugin.name>${project.artifactId}</plugin.name>
     <plugin.version>${project.version}</plugin.version>
@@ -143,7 +144,7 @@
     <!-- Mockito -->
     <dependency>
       <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
+      <artifactId>mockito-inline</artifactId>
       <version>4.8.0</version>
       <scope>test</scope>
     </dependency>
