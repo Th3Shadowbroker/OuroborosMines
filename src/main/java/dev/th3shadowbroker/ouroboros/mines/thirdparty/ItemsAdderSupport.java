@@ -23,6 +23,8 @@ import dev.lone.itemsadder.api.CustomBlock;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.events.DefaultDropsCheckEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialCheckEvent;
+import dev.th3shadowbroker.ouroboros.mines.events.thirdparty.itemsadder.PlaceCustomBlockEvent;
+import dev.th3shadowbroker.ouroboros.mines.events.thirdparty.itemsadder.RemoveCustomBlockEvent;
 import dev.th3shadowbroker.ouroboros.mines.util.MaterialIdentifier;
 import dev.th3shadowbroker.ouroboros.mines.util.MineableMaterial;
 import org.bukkit.Bukkit;
@@ -53,6 +55,19 @@ public class ItemsAdderSupport implements Listener {
             CustomBlock customBlock = CustomBlock.byAlreadyPlaced(event.getBlock());
             event.setDrops(customBlock.getLoot(event.getTool(), true));
         }
+    }
+
+    @EventHandler
+    public void onRemoveCustomBlock(RemoveCustomBlockEvent event) {
+        Optional.ofNullable(CustomBlock.byAlreadyPlaced(event.getBlock())).ifPresent(CustomBlock::remove);
+    }
+
+    @EventHandler
+    public void onPlaceCustomBlock(PlaceCustomBlockEvent event) {
+        Optional.ofNullable(CustomBlock.getInstance(event.getMaterialIdentifier().toString()))
+                .ifPresent(cb -> {
+                    cb.place(event.getLocation());
+                });
     }
 
     private boolean isCustomBlock(MineableMaterial mineableMaterial, Block block) {

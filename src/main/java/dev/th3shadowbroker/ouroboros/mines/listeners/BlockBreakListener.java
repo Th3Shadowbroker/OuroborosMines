@@ -24,6 +24,7 @@ import dev.th3shadowbroker.ouroboros.mines.events.DefaultDropsCheckEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.DepositDiscoveredEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.RegionCheckEvent;
+import dev.th3shadowbroker.ouroboros.mines.events.thirdparty.itemsadder.RemoveCustomBlockEvent;
 import dev.th3shadowbroker.ouroboros.mines.regions.MiningRegion;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bukkit.*;
@@ -106,7 +107,8 @@ public class BlockBreakListener implements Listener {
                 //If richness was never set or hit 0
                 if (!plugin.getTaskManager().hasPendingReplacementTask(event.getBlock())) {
                     long cooldown = minedMaterial.get().getCooldown();
-                    new ReplacementTask(event.getBlock().getLocation(), event.getBlock().getType(), cooldown);
+                    new ReplacementTask(event.getBlock().getLocation(), event.getBlock().getType(), cooldown)
+                                .withMaterialIdentifier(minedMaterial.get().getMaterialIdentifier());
 
                     // Bamboo or Sugar cane?
                     if (BlockUtils.isStackable(event.getBlock())) {
@@ -181,7 +183,10 @@ public class BlockBreakListener implements Listener {
                     event.setDropItems(false);
 
                     Location blockLocation = event.getBlock().getLocation();
+
+                    removeCustomBlockClaim(event.getBlock());
                     blockLocation.getBlock().setType(Material.AIR);
+
                     customDefaultDrops.get().forEach(
                             itemStack -> {
                                 blockLocation.getWorld().dropItemNaturally(blockLocation, itemStack);
@@ -223,6 +228,10 @@ public class BlockBreakListener implements Listener {
         RegionCheckEvent regionCheckEvent = new RegionCheckEvent(player, miningRegion, block);
         Bukkit.getPluginManager().callEvent(regionCheckEvent);
         return !regionCheckEvent.isCancelled();
+    }
+
+    private void removeCustomBlockClaim(Block block) {
+        Bukkit.getServer().getPluginManager().callEvent(new RemoveCustomBlockEvent(block));
     }
 
 }
