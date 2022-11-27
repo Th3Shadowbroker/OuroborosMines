@@ -20,12 +20,19 @@
 package dev.th3shadowbroker.ouroboros.mines.util;
 
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
+import dev.th3shadowbroker.ouroboros.mines.events.thirdparty.itemsadder.PlaceCustomBlockEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.event.EventException;
+import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.util.Arrays;
+import java.util.Optional;
 
 public class ReplacementTask implements Runnable {
 
@@ -38,6 +45,8 @@ public class ReplacementTask implements Runnable {
     private final BlockData blockData;
 
     private final boolean isAttachableBlock;
+
+    private MaterialIdentifier materialIdentifier;
 
     private final OuroborosMines plugin = OuroborosMines.INSTANCE;
 
@@ -77,8 +86,21 @@ public class ReplacementTask implements Runnable {
                     retryLater();
                 }
             } else  {
-                location.getBlock().setType(minedMaterial);
-                location.getBlock().setBlockData(blockData);
+                var identifier = Optional.ofNullable(materialIdentifier);
+                if (identifier.isEmpty() || identifier.get().isInDefaultNamespace()) {
+                    location.getBlock().setType(minedMaterial);
+                    location.getBlock().setBlockData(blockData);
+                } else {
+                    // Call has to be forced to guarantee execution after /stop command
+                    PlaceCustomBlockEvent pcbe = new PlaceCustomBlockEvent(location, identifier.get());
+                    Arrays.stream(PlaceCustomBlockEvent.getHandlerList().getRegisteredListeners()).forEach(rl -> {
+                        try {
+                            rl.callEvent(pcbe);
+                        } catch (EventException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                }
             }
         } else {
             retryLater();
@@ -109,4 +131,10 @@ public class ReplacementTask implements Runnable {
     public Block getBlock() {
         return location.getBlock();
     }
+
+    public ReplacementTask withMaterialIdentifier(MaterialIdentifier materialIdentifier) {
+        this.materialIdentifier = materialIdentifier;
+        return this;
+    }
+
 }
