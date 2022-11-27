@@ -44,9 +44,12 @@ public class ItemsAdderSupport implements Listener {
 
     @EventHandler
     public void onMaterialCheck(MaterialCheckEvent event) {
-        if (isCustomBlock(event.getMineableMaterial(), event.getBlock())) {
-            event.setCustom(true);
-        }
+        var customBlock = Optional.ofNullable(CustomBlock.byAlreadyPlaced(event.getBlock()));
+        customBlock.ifPresent(cb -> {
+            if (cb.getNamespacedID().equals(event.getMineableMaterial().getMaterialIdentifier().toString())) {
+                event.setCustom(true);
+            }
+        });
     }
 
     @EventHandler
