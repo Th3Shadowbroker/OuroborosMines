@@ -300,6 +300,12 @@ public class OuroborosMines extends JavaPlugin {
             getLogger().info("AureliumSkills support enabled!");
             new AureliumSkillsSupport();
         }
+
+        boolean ecoSkillsInstalled = getServer().getPluginManager().isPluginEnabled(EcoSkillsSupport.PLUGIN_NAME);
+        if (ecoSkillsInstalled) {
+            getLogger().info("EcoSkills support enabled!");
+            new EcoSkillsSupport();
+        }
     }
 
     private void checkForUpdates() {

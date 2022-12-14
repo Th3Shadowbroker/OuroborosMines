@@ -97,7 +97,7 @@ public class BlockBreakListener implements Listener {
                         MetaUtils.decreaseRichness(event.getBlock());
 
                         //Fire event for mined material
-                        Bukkit.getPluginManager().callEvent(new MaterialMinedEvent(minedMaterial.get(), event.getBlock(), true, event.getPlayer()));
+                        Bukkit.getPluginManager().callEvent(new MaterialMinedEvent(minedMaterial.get(), event.getBlock(), true, event.getPlayer(), event));
 
                         event.setCancelled(true);
                         return;
@@ -114,7 +114,7 @@ public class BlockBreakListener implements Listener {
                     if (BlockUtils.isStackable(event.getBlock())) {
                         List<Block> dependants = BlockUtils.getConnectedBlocks(event.getBlock());
                         dependants.forEach(d -> {
-                            Bukkit.getPluginManager().callEvent(new MaterialMinedEvent(minedMaterial.get(), event.getBlock(), false, event.getPlayer()));
+                            Bukkit.getPluginManager().callEvent(new MaterialMinedEvent(minedMaterial.get(), event.getBlock(), false, event.getPlayer(), event));
                             breakBlock(event, minedMaterial.get(), event.getPlayer().getInventory().getItemInMainHand());
                         });
                         WorldUtils.replaceInSequence(cooldown, event.getBlock().getType(), dependants);
@@ -122,7 +122,7 @@ public class BlockBreakListener implements Listener {
                 }
 
                 //Fire event for mined material
-                Bukkit.getPluginManager().callEvent(new MaterialMinedEvent(minedMaterial.get(), event.getBlock(), false, event.getPlayer()));
+                Bukkit.getPluginManager().callEvent(new MaterialMinedEvent(minedMaterial.get(), event.getBlock(), false, event.getPlayer(), event));
 
                 //Break it! Replace it!
                 //event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
