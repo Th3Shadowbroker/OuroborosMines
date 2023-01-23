@@ -20,10 +20,13 @@
 package dev.th3shadowbroker.ouroboros.mines.events;
 
 import dev.th3shadowbroker.ouroboros.mines.util.MineableMaterial;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.block.BlockBreakEvent;
 
 public class MaterialMinedEvent extends Event {
 
@@ -37,11 +40,15 @@ public class MaterialMinedEvent extends Event {
 
     private static final HandlerList handlerList = new HandlerList();
 
-    public MaterialMinedEvent(MineableMaterial material, Block block, boolean fromDeposit, Player player) {
+    @Getter
+    private final BlockBreakEvent originalEvent;
+
+    public MaterialMinedEvent(MineableMaterial material, Block block, boolean fromDeposit, Player player, BlockBreakEvent originalEvent) {
         this.material = material;
         this.block = block;
         this.fromDeposit = fromDeposit;
         this.player = player;
+        this.originalEvent = originalEvent;
     }
 
     public MineableMaterial getMaterial() {
