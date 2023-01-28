@@ -62,7 +62,12 @@ public class ItemsAdderSupport implements Listener {
 
     @EventHandler
     public void onRemoveCustomBlock(RemoveCustomBlockEvent event) {
-        Optional.ofNullable(CustomBlock.byAlreadyPlaced(event.getBlock())).ifPresent(CustomBlock::remove);
+        Optional.ofNullable(CustomBlock.byAlreadyPlaced(event.getBlock())).ifPresent(cb -> {
+            cb.playBreakEffect();
+            cb.playBreakParticles();
+            cb.playBreakSound();
+            cb.remove();
+        });
     }
 
     @EventHandler
