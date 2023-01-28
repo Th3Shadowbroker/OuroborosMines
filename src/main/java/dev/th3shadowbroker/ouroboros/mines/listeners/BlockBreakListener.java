@@ -173,6 +173,10 @@ public class BlockBreakListener implements Listener {
 
                 Player player = event.getPlayer();
                 Location blockLocation = event.getBlock().getLocation();
+
+                removeCustomBlockClaim(event.getBlock());
+                event.getBlock().setType(Material.AIR);
+
                 Map<Integer, ItemStack> overflow = player.getInventory().addItem(drops.stream().toArray(ItemStack[]::new));
                 overflow.values().forEach(i -> blockLocation.getWorld().dropItem(blockLocation, i));
             } else {
@@ -185,7 +189,7 @@ public class BlockBreakListener implements Listener {
                     Location blockLocation = event.getBlock().getLocation();
 
                     removeCustomBlockClaim(event.getBlock());
-                    blockLocation.getBlock().setType(Material.AIR);
+                    event.getBlock().setType(Material.AIR);
 
                     customDefaultDrops.get().forEach(
                             itemStack -> {
@@ -194,6 +198,9 @@ public class BlockBreakListener implements Listener {
                     );
                 }
             }
+        } else {
+            removeCustomBlockClaim(event.getBlock());
+            event.getBlock().setType(Material.AIR);
         }
     }
 
