@@ -256,10 +256,24 @@ public class OuroborosMines extends JavaPlugin {
     }
 
     private void checkForSupportedPlugins() {
-        boolean questsInstalled = getServer().getPluginManager().isPluginEnabled(QuestsSupport.PLUGIN_NAME);
+        boolean questsInstalled = getServer().getPluginManager().isPluginEnabled(QuestsPikaMugSupport.PLUGIN_NAME) ||
+                                  getServer().getPluginManager().isPluginEnabled(QuestsLMBishopSupport.PLUGIN_NAME);
         if (questsInstalled) {
-            getLogger().info("Quests support is enabled!");
-            new QuestsSupport();
+            var pikaMugPlugin = Optional.ofNullable(getServer().getPluginManager().getPlugin(QuestsPikaMugSupport.PLUGIN_NAME));
+            pikaMugPlugin.ifPresent(pl -> {
+                if (pl.getDescription().getAuthors().contains(QuestsPikaMugSupport.PLUGIN_AUTHOR)) {
+                    getLogger().info(String.format("Quests (by %s) support is enabled!", QuestsPikaMugSupport.PLUGIN_AUTHOR));
+                    new QuestsPikaMugSupport();
+                }
+            });
+
+            var lmbishopPlugin = Optional.ofNullable(getServer().getPluginManager().getPlugin(QuestsLMBishopSupport.PLUGIN_NAME));
+            lmbishopPlugin.ifPresent(pl -> {
+                if (pl.getDescription().getAuthors().contains(QuestsLMBishopSupport.PLUGIN_AUTHOR)) {
+                    getLogger().info(String.format("Quests (by %s) support is enabled!", QuestsLMBishopSupport.PLUGIN_AUTHOR));
+                    new QuestsLMBishopSupport();
+                }
+            });
         }
 
         boolean beautyQuestInstalled = getServer().getPluginManager().isPluginEnabled(BeautyQuestsSupport.PLUGIN_NAME);

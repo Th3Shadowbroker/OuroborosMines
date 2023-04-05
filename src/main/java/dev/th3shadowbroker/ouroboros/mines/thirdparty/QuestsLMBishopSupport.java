@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Jens Fischer
+ * Copyright 2023 Jens Fischer
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
@@ -19,50 +19,33 @@
 
 package dev.th3shadowbroker.ouroboros.mines.thirdparty;
 
+import com.leonardobishop.quests.bukkit.BukkitQuestsPlugin;
+import com.leonardobishop.quests.bukkit.tasktype.BukkitTaskTypeManager;
+import com.leonardobishop.quests.bukkit.tasktype.type.MiningTaskType;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
-import me.blackvein.quests.Quester;
-import me.blackvein.quests.Quests;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 
-public class QuestsSupport implements Listener {
+public class QuestsLMBishopSupport implements Listener {
 
     public static final String PLUGIN_NAME = "Quests";
 
-    public QuestsSupport() {
-        Bukkit.getPluginManager().registerEvents(this, OuroborosMines.INSTANCE);
-    }
+    public static final String PLUGIN_AUTHOR = "LMBishop & contributors";
 
-    private void addProgress(Player player, Material material) {
-        try
-        {
-            // Get plugin instance with the crowbar
-            Quests quests = (Quests) Bukkit.getPluginManager().getPlugin(PLUGIN_NAME);
-            Quester quester = quests.getQuester(player.getUniqueId());
+    private final BukkitTaskTypeManager typeManager;
 
-            // Check for matching quests
-            quester.getCurrentQuests().keySet().forEach(
-                    quest -> {
-                        // Modify progress manually
-                        quester.getCurrentStage(quest).getBlocksToBreak().stream().filter(itemStack -> itemStack.getType() == material).forEach(
-                                itemStack -> {
-                                    quester.breakBlock(quest, new ItemStack(material));
-                                }
-                        );
-                    });
-        } catch (NullPointerException ex) {
-            OuroborosMines.INSTANCE.getLogger().warning("Unable to manipulate Quests quest-progress. It seems the plugin isn't installed anymore.");
-        }
+    public QuestsLMBishopSupport() {
+        var plugin = (BukkitQuestsPlugin) Bukkit.getPluginManager().getPlugin(PLUGIN_NAME);
+        this.typeManager = (BukkitTaskTypeManager) plugin.getTaskTypeManager();
+        Bukkit.getServer().getPluginManager().registerEvents(this, OuroborosMines.INSTANCE);
     }
 
     @EventHandler
     public void onMaterialMined(MaterialMinedEvent event) {
-        addProgress(event.getPlayer(), event.getMaterial().getMaterial());
+        var task = (MiningTaskType) typeManager.getTaskType("blockbreak");
+        task.onBlockBreak(event.getOriginalEvent());
     }
 
 }
