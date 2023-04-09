@@ -20,7 +20,9 @@
 package dev.th3shadowbroker.ouroboros.mines.thirdparty;
 
 import com.willfp.ecoskills.skills.Skills;
+import com.willfp.ecoskills.skills.skills.SkillFarming;
 import com.willfp.ecoskills.skills.skills.SkillMining;
+import com.willfp.ecoskills.skills.skills.SkillWoodcutting;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialCheckEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
@@ -58,8 +60,14 @@ public class EcoSkillsSupport implements Listener {
 
     @EventHandler
     public void onMaterialMined(MaterialMinedEvent event) {
-        var skill = (SkillMining) Skills.MINING;
-        skill.handleLevelling(event.getOriginalEvent());
+        var skillMining = (SkillMining) Skills.MINING;
+        skillMining.handleLevelling(event.getOriginalEvent());
+
+        var skillWoodcutting = (SkillWoodcutting) Skills.WOODCUTTING;
+        skillWoodcutting.handleLevelling(event.getOriginalEvent());
+
+        var skillFarming = (SkillFarming) Skills.FARMING;
+        skillFarming.handleLevelling(event.getOriginalEvent());
     }
 
 }
