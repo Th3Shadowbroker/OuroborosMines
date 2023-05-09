@@ -26,6 +26,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.Ageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,8 +69,20 @@ public class MaterialManager {
                      .findFirst();
              Optional<MineableMaterial> regionCustomMineableMaterial = reducedMaterials(regionConfiguration.get().getMaterialList()).stream().filter(m -> validateCustom(block, m)).findFirst();
 
-             if (regionCustomMineableMaterial.isPresent()) return regionCustomMineableMaterial;
-             if (regionMineableMaterial.isPresent()) return regionMineableMaterial;
+             if (regionCustomMineableMaterial.isPresent()) {
+                 if (!canBeHarvested(block, regionCustomMineableMaterial.get()))
+                     return Optional.empty();
+
+                 return regionCustomMineableMaterial;
+             }
+
+             if (regionMineableMaterial.isPresent()) {
+                 if (!canBeHarvested(block, regionMineableMaterial.get()))
+                     return Optional.empty();
+
+                 return regionMineableMaterial;
+             }
+
              if (!regionConfiguration.get().isInheritingDefaults()) return Optional.empty();
          }
 
@@ -84,6 +97,16 @@ public class MaterialManager {
         MaterialCheckEvent event = new MaterialCheckEvent(block, mineableMaterial);
         Bukkit.getPluginManager().callEvent(event);
         return event.isCustom();
+    }
+
+    private boolean canBeHarvested(Block block, MineableMaterial material) {
+        if (block.getBlockData() instanceof Ageable ageable) {
+            if (material.hasProperties() && material.getProperties().containsKey("age")) {
+                var requiredAge = material.getProperties().get("age");
+                return ageable.getAge() >= (int) requiredAge;
+            }
+        }
+        return true;
     }
 
     public List<MineableMaterial> getMineableMaterials() {
