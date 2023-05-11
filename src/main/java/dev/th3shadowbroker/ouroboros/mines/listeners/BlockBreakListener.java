@@ -107,7 +107,7 @@ public class BlockBreakListener implements Listener {
                 //If richness was never set or hit 0
                 if (!plugin.getTaskManager().hasPendingReplacementTask(event.getBlock())) {
                     long cooldown = minedMaterial.get().getCooldown();
-                    new ReplacementTask(event.getBlock().getLocation(), event.getBlock().getType(), cooldown)
+                    new ReplacementTask(event.getBlock().getLocation(), event.getBlock().getType(), cooldown, minedMaterial.get().getProperties())
                                 .withMaterialIdentifier(minedMaterial.get().getMaterialIdentifier());
 
                     // Bamboo or Sugar cane?

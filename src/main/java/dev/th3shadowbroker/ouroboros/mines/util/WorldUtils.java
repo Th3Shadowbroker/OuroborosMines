@@ -23,6 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -31,7 +32,7 @@ public class WorldUtils {
     public static void replaceInSequence(long offset, Material material, List<Block> blocks) {
         AtomicLong currentOffset = new AtomicLong(offset);
         for (Block block : blocks) {
-            new ReplacementTask(block.getLocation(), material, currentOffset.incrementAndGet());
+            new ReplacementTask(block.getLocation(), material, currentOffset.incrementAndGet(), Collections.emptyMap());
         }
     }
 
