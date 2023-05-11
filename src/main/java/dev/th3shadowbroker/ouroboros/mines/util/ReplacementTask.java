@@ -21,17 +21,17 @@ package dev.th3shadowbroker.ouroboros.mines.util;
 
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.events.thirdparty.itemsadder.PlaceCustomBlockEvent;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.event.EventException;
-import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 
 public class ReplacementTask implements Runnable {
@@ -48,24 +48,28 @@ public class ReplacementTask implements Runnable {
 
     private MaterialIdentifier materialIdentifier;
 
+    private final Map<String, Object> properties;
+
     private final OuroborosMines plugin = OuroborosMines.INSTANCE;
 
-    public ReplacementTask(Location blockLocation, Material material, long cooldownSeconds) {
+    public ReplacementTask(Location blockLocation, Material material, long cooldownSeconds, Map<String, Object> properties) {
         this.location = blockLocation;
         this.minedMaterial = material;
         this.task = plugin.getServer().getScheduler().runTaskLater(plugin, this, cooldownSeconds);
         this.plugin.getTaskManager().register(this);
         this.blockData = blockLocation.getBlock().getState().getBlockData();
         this.isAttachableBlock = BlockUtils.isAttachable(location.getBlock());
+        this.properties = properties;
     }
 
-    private ReplacementTask(Location blockLocation, Material material, BlockData blockData, long cooldownSeconds) {
+    private ReplacementTask(Location blockLocation, Material material, BlockData blockData, long cooldownSeconds, Map<String, Object> properties) {
         this.location = blockLocation;
         this.minedMaterial = material;
         this.task = plugin.getServer().getScheduler().runTaskLater(plugin, this, cooldownSeconds);
         this.plugin.getTaskManager().register(this);
         this.blockData = blockData;
         this.isAttachableBlock = BlockUtils.isAttachable(location.getBlock());
+        this.properties = properties;
     }
 
     @Override
@@ -89,6 +93,11 @@ public class ReplacementTask implements Runnable {
                 var identifier = Optional.ofNullable(materialIdentifier);
                 if (identifier.isEmpty() || identifier.get().isInDefaultNamespace()) {
                     location.getBlock().setType(minedMaterial);
+
+                    if (properties != null && properties.containsKey("resetAge")) {
+                        var resetAge = (boolean) properties.get("resetAge");
+                        if (resetAge && blockData instanceof Ageable ageable) ageable.setAge(0);
+                    }
                     location.getBlock().setBlockData(blockData);
                 } else {
                     // Call has to be forced to guarantee execution after /stop command
@@ -112,7 +121,7 @@ public class ReplacementTask implements Runnable {
     }
 
     public void retryLater() {
-        new ReplacementTask(location, minedMaterial, blockData, plugin.getConfig().getInt("retryInterval", 5));
+        new ReplacementTask(location, minedMaterial, blockData, plugin.getConfig().getInt("retryInterval", 5), properties);
         plugin.getTaskManager().unregister(this);
     }
 
