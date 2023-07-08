@@ -23,6 +23,7 @@ import dev.lone.itemsadder.api.CustomBlock;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.events.DefaultDropsCheckEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialCheckEvent;
+import dev.th3shadowbroker.ouroboros.mines.events.ValidateMaterialIdentifierEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.thirdparty.itemsadder.PlaceCustomBlockEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.thirdparty.itemsadder.RemoveCustomBlockEvent;
 import dev.th3shadowbroker.ouroboros.mines.util.MaterialIdentifier;
@@ -76,20 +77,26 @@ public class ItemsAdderSupport implements Listener {
                 });
     }
 
+    @EventHandler
+    public void onValidateMaterialIdentifier(ValidateMaterialIdentifierEvent event) {
+        OuroborosMines.INSTANCE.getLogger().info(String.format("Validating material %s", event.getMaterialIdentifier().toString()));
+        OuroborosMines.INSTANCE.getLogger().info(String.format("%s", CustomBlock.getInstance(event.getMaterialIdentifier().toString())));
+
+        if (isCustomMaterial(event.getMaterialIdentifier())) event.setValid(true);
+        event.setValid(true);
+    }
+
     private boolean isCustomBlock(MineableMaterial mineableMaterial, Block block) {
-        MaterialIdentifier namespacedId = mineableMaterial.getMaterialIdentifier();
+        var namespacedId = mineableMaterial.getMaterialIdentifier();
         if (!namespacedId.isInDefaultNamespace()) {
             Optional<CustomBlock> customBlock = Optional.ofNullable(CustomBlock.getInstance(namespacedId.toString()));
             return customBlock.isPresent() && Optional.ofNullable(CustomBlock.byAlreadyPlaced(block)).isPresent();
         }
-
-        Optional<String> legacyNamespacedId = Optional.ofNullable((String) mineableMaterial.getProperties().get("ItemsAdder"));
-        if (legacyNamespacedId.isPresent()) {
-            OuroborosMines.INSTANCE.getLogger().warning(String.format("Material %s uses the legacy ItemsAdder property. This feature will be removed in the future!", mineableMaterial.getMaterialIdentifier()));
-            Optional<CustomBlock> customBlock = Optional.ofNullable(CustomBlock.getInstance(legacyNamespacedId.get()));
-            return customBlock.isPresent() && Optional.ofNullable(CustomBlock.byAlreadyPlaced(block)).isPresent();
-        }
         return false;
+    }
+
+    private boolean isCustomMaterial(MaterialIdentifier identifier) {
+        return CustomBlock.getInstance(identifier.toString()) != null;
     }
 
 }

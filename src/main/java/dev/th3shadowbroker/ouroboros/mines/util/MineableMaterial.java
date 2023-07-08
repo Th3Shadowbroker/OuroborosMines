@@ -21,7 +21,9 @@ package dev.th3shadowbroker.ouroboros.mines.util;
 
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.drops.DropGroup;
+import dev.th3shadowbroker.ouroboros.mines.events.ValidateMaterialIdentifierEvent;
 import dev.th3shadowbroker.ouroboros.mines.exceptions.InvalidMineMaterialException;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -31,7 +33,7 @@ public class MineableMaterial {
 
     private final MaterialIdentifier materialIdentifier;
 
-    private final Material[] replacements;
+    private final MaterialIdentifier[] replacements;
 
     private final Random replRandom = new Random();
 
@@ -49,7 +51,7 @@ public class MineableMaterial {
 
     private final Map<String, Object> properties;
 
-    public MineableMaterial(MaterialIdentifier materialIdentifier, Material[] replacements, Range cooldown, double richChance, Range richAmount, Range experience, Range depositExperience, String dropGroup, Map<String, Object> properties) {
+    public MineableMaterial(MaterialIdentifier materialIdentifier, MaterialIdentifier[] replacements, Range cooldown, double richChance, Range richAmount, Range experience, Range depositExperience, String dropGroup, Map<String, Object> properties) {
         this.materialIdentifier = materialIdentifier;
         this.replacements = replacements;
         this.cooldown = cooldown;
@@ -69,7 +71,7 @@ public class MineableMaterial {
         return materialIdentifier;
     }
 
-    public Material[] getReplacements() {
+    public MaterialIdentifier[] getReplacements() {
         return replacements;
     }
 
@@ -112,7 +114,7 @@ public class MineableMaterial {
         return depositExperience;
     }
 
-    public Material getReplacement() {
+    public MaterialIdentifier getReplacement() {
         if (replacements.length == 1) return replacements[0];
         return replacements[replRandom.nextInt(replacements.length)];
     }
@@ -138,18 +140,30 @@ public class MineableMaterial {
         MaterialIdentifier materialIdentifier = MaterialIdentifier.valueOf(section.getName());
 
         //Parse replacement-materials
-        List<Material> replacementMaterials = new ArrayList<>();
+        List<MaterialIdentifier> replacementMaterials = new ArrayList<>();
         if (!section.isSet("replacements")) { throw new InvalidMineMaterialException( String.format("The mine-material %s defines not replacements. Skipping.", section.getName()) ); }
         for (String materialName : section.getStringList("replacements"))
         {
-            Optional<Material> parsedMaterial = Optional.ofNullable( Material.getMaterial(materialName.toUpperCase()) );
-            if (parsedMaterial.isPresent())
-            {
-                replacementMaterials.add(parsedMaterial.get());
-            }
-            else
-            {
-                OuroborosMines.INSTANCE.getLogger().warning( String.format("The mine-material %s defines an invalid replacement-material: %s", section.getName(), materialName) );
+            var identifier = MaterialIdentifier.valueOf(materialName);
+            var isCustom = !identifier.isInDefaultNamespace();
+
+            // Vanilla materials
+            if (!isCustom) {
+                var material = identifier.getVanillaMaterial();
+                if (material.isPresent())
+                    replacementMaterials.add(identifier);
+                else
+                    OuroborosMines.INSTANCE.getLogger().warning( String.format("The mine-material %s defines an invalid replacement-material: %s", section.getName(), materialName) );
+
+            // Custom materials
+            } else {
+                var validationEvent = new ValidateMaterialIdentifierEvent(identifier);
+                Bukkit.getPluginManager().callEvent(validationEvent);
+                replacementMaterials.add(identifier);
+                //if (validationEvent.isValid())
+                  //  replacementMaterials.add(identifier);
+                //else
+                  //  OuroborosMines.INSTANCE.getLogger().warning( String.format("The custom mine-material %s defines an invalid replacement-material: %s", section.getName(), materialName) );
             }
         }
 
@@ -203,7 +217,7 @@ public class MineableMaterial {
 
                 //Material and replacements
                 materialIdentifier,
-                replacementMaterials.toArray( new Material[replacementMaterials.size()] ),
+                replacementMaterials.toArray(MaterialIdentifier[]::new),
 
                 cooldown,
                 section.getDouble("rich-chance", 0),

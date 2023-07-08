@@ -19,11 +19,13 @@
 
 package dev.th3shadowbroker.ouroboros.mines.listeners;
 
+import dev.lone.itemsadder.api.Events.CustomBlockPlaceEvent;
 import dev.th3shadowbroker.ouroboros.mines.OuroborosMines;
 import dev.th3shadowbroker.ouroboros.mines.events.DefaultDropsCheckEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.DepositDiscoveredEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.RegionCheckEvent;
+import dev.th3shadowbroker.ouroboros.mines.events.thirdparty.itemsadder.PlaceCustomBlockEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.thirdparty.itemsadder.RemoveCustomBlockEvent;
 import dev.th3shadowbroker.ouroboros.mines.regions.MiningRegion;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
@@ -127,7 +129,16 @@ public class BlockBreakListener implements Listener {
                 //Break it! Replace it!
                 //event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
                 breakBlock(event, minedMaterial.get(), event.getPlayer().getInventory().getItemInMainHand());
-                event.getBlock().setType(minedMaterial.get().getReplacement());
+
+                var replacementMaterial = minedMaterial.get().getReplacement();
+                var isCustom = !replacementMaterial.isInDefaultNamespace();
+
+                if (!isCustom) {
+                    replacementMaterial.getVanillaMaterial().ifPresent(m -> event.getBlock().setType(m));
+                } else {
+                    var placeEvent = new PlaceCustomBlockEvent(event.getBlock().getLocation(), replacementMaterial);
+                    plugin.getServer().getPluginManager().callEvent(placeEvent);
+                }
             }
 
             event.setCancelled(true);
