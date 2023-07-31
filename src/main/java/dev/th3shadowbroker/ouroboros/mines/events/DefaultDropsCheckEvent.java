@@ -20,9 +20,12 @@
 package dev.th3shadowbroker.ouroboros.mines.events;
 
 import dev.th3shadowbroker.ouroboros.mines.util.MineableMaterial;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.block.Block;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,6 +33,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+@Getter
 public class DefaultDropsCheckEvent extends Event {
 
     private final ItemStack tool;
@@ -38,26 +42,22 @@ public class DefaultDropsCheckEvent extends Event {
 
     private final Block block;
 
+    private final BlockBreakEvent originalEvent;
+
+    @Getter
+    @Setter
+    private boolean overrideDrops;
+
     private Collection<ItemStack> drops;
 
     private static final HandlerList handlers = new HandlerList();
 
-    public DefaultDropsCheckEvent(ItemStack tool, MineableMaterial mineableMaterial, Block block) {
+    public DefaultDropsCheckEvent(ItemStack tool, MineableMaterial mineableMaterial, Block block, BlockBreakEvent originalEvent) {
         this.tool = tool;
         this.mineableMaterial = mineableMaterial;
         this.block = block;
-    }
-
-    public ItemStack getTool() {
-        return tool;
-    }
-
-    public MineableMaterial getMineableMaterial() {
-        return mineableMaterial;
-    }
-
-    public Block getBlock() {
-        return block;
+        this.originalEvent = originalEvent;
+        this.overrideDrops = false;
     }
 
     public void setDrops(Collection<ItemStack> drops) {
@@ -69,7 +69,7 @@ public class DefaultDropsCheckEvent extends Event {
     }
 
     public boolean hasCustomDefaultDrops() {
-        return drops != null && !drops.isEmpty();
+        return (drops != null && !drops.isEmpty()) | overrideDrops;
     }
 
     @NotNull

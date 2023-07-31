@@ -320,6 +320,12 @@ public class OuroborosMines extends JavaPlugin {
             getLogger().info("EcoSkills support enabled!");
             new EcoSkillsSupport();
         }
+
+        boolean mmoItemsInstalled = getServer().getPluginManager().isPluginEnabled(MMOItemsSupport.PLUGIN_NAME);
+        if (mmoItemsInstalled) {
+            getLogger().info("MMOItems support enabled!");
+            new MMOItemsSupport();
+        }
     }
 
     private void checkForUpdates() {

@@ -25,6 +25,7 @@ import dev.th3shadowbroker.ouroboros.mines.events.DepositDiscoveredEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.MaterialMinedEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.RegionCheckEvent;
 import dev.th3shadowbroker.ouroboros.mines.events.thirdparty.itemsadder.RemoveCustomBlockEvent;
+import dev.th3shadowbroker.ouroboros.mines.events.thirdparty.mmoitems.DamageMMOItem;
 import dev.th3shadowbroker.ouroboros.mines.regions.MiningRegion;
 import dev.th3shadowbroker.ouroboros.mines.util.*;
 import org.bukkit.*;
@@ -168,7 +169,7 @@ public class BlockBreakListener implements Listener {
         if (dropNaturalItems) {
             if (autoPickup) {
                 event.setDropItems(false);
-                Collection<ItemStack> drops = getCustomDefaultDrops(event.getPlayer().getInventory().getItemInMainHand(), mineableMaterial, event.getBlock())
+                Collection<ItemStack> drops = getCustomDefaultDrops(event.getPlayer().getInventory().getItemInMainHand(), mineableMaterial, event)
                                               .orElse(event.getBlock().getDrops());
 
                 Player player = event.getPlayer();
@@ -180,7 +181,7 @@ public class BlockBreakListener implements Listener {
                 Map<Integer, ItemStack> overflow = player.getInventory().addItem(drops.stream().toArray(ItemStack[]::new));
                 overflow.values().forEach(i -> blockLocation.getWorld().dropItem(blockLocation, i));
             } else {
-                Optional<Collection<ItemStack>> customDefaultDrops = getCustomDefaultDrops(event.getPlayer().getInventory().getItemInMainHand(), mineableMaterial, event.getBlock());
+                Optional<Collection<ItemStack>> customDefaultDrops = getCustomDefaultDrops(event.getPlayer().getInventory().getItemInMainHand(), mineableMaterial, event);
                 if (!customDefaultDrops.isPresent()) {
                     event.getBlock().breakNaturally(event.getPlayer().getInventory().getItemInMainHand());
                 } else {
@@ -204,8 +205,9 @@ public class BlockBreakListener implements Listener {
         }
     }
 
-    private Optional<Collection<ItemStack>> getCustomDefaultDrops(ItemStack tool, MineableMaterial mineableMaterial, Block block) {
-        DefaultDropsCheckEvent event = new DefaultDropsCheckEvent(tool, mineableMaterial, block);
+    private Optional<Collection<ItemStack>> getCustomDefaultDrops(ItemStack tool, MineableMaterial mineableMaterial, BlockBreakEvent originalEvent) {
+        var block = originalEvent.getBlock();
+        DefaultDropsCheckEvent event = new DefaultDropsCheckEvent(tool, mineableMaterial, block, originalEvent);
         Bukkit.getPluginManager().callEvent(event);
         return event.hasCustomDefaultDrops() ? Optional.of(event.getDrops()) : Optional.empty();
     }
@@ -215,11 +217,18 @@ public class BlockBreakListener implements Listener {
     }
 
     private void decreaseToolDurability(Player player, ItemStack tool) {
+        // Decreases applied by other plugins
+        var damageEvent = new DamageMMOItem(player);
+        plugin.getServer().getPluginManager().callEvent(damageEvent);
+        if (!damageEvent.isApplyDefaultDamage())
+            return;
+
+        // Perform regular decrease
         Optional<ItemStack> miningTool = Optional.ofNullable(tool);
         miningTool.ifPresent( itemStack -> {
             ItemMeta meta = itemStack.getItemMeta();
             if (meta instanceof Damageable && tool.getType().getMaxDurability() > 0 && !meta.isUnbreakable()) {
-                Damageable damageable = (Damageable) meta;
+                var damageable = (Damageable) meta;
                 if (damageable.getDamage() + 1 < tool.getType().getMaxDurability()) {
                     damageable.setDamage(damageable.getDamage() + 1);
                     tool.setItemMeta((ItemMeta) damageable);
